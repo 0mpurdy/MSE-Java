@@ -1,0 +1,66 @@
+bible1~Genesis~50
+bible2~Exodus~40
+bible3~Leviticus~27
+bible4~Numbers~36
+bible5~Deuteronomy~34
+bible6~Joshua~24
+bible7~Judges~21
+bible8~Ruth~4
+bible9~1 Samuel~31
+bible10~2 Samuel~24
+bible11~1 Kings~22
+bible12~2 Kings~25
+bible13~1 Chronicles~29
+bible14~2 Chronicles~36
+bible15~Ezra~10
+bible16~Nehemiah~13
+bible17~Esther~10
+bible18~Job~42
+bible19~Psalm~150
+bible20~Proverbs~31
+bible21~Ecclesiastes~12
+bible22~Song of Songs~8
+bible23~Isaiah~66
+bible24~Jeremiah~52
+bible25~Lamentations~5
+bible26~Ezekiel~48
+bible27~Daniel~12
+bible28~Hosea~14
+bible29~Joel~3
+bible30~Amos~9
+bible31~Obadiah~1
+bible32~Jonah~4
+bible33~Micah~7
+bible34~Nahum~3
+bible35~Habakkuk~3
+bible36~Zephaniah~3
+bible37~Haggai~2
+bible38~Zechariah~14
+bible39~Malachi~4
+bible40~Matthew~28
+bible41~Mark~16
+bible42~Luke~24
+bible43~John~21
+bible44~Acts~28
+bible45~Romans~16
+bible46~1 Corinthians~16
+bible47~2 Corinthians~13
+bible48~Galatians~6
+bible49~Ephesians~6
+bible50~Philippians~4
+bible51~Colossians~4
+bible52~1 Thessalonians~5
+bible53~2 Thessalonians~3
+bible54~1 Timothy~6
+bible55~2 Timothy~4
+bible56~Titus~3
+bible57~Philemon~1
+bible58~Hebrews~13
+bible59~James~5
+bible60~1 Peter~5
+bible61~2 Peter~3
+bible62~1 John~5
+bible63~2 John~1
+bible64~3 John~1
+bible65~Jude~1
+bible66~Revelation~22

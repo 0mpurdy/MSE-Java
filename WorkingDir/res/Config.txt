@@ -1,0 +1,28 @@
+{
+  "mseVersion": "3.0.0",
+  "defaultBrowser": "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe",
+  "workingDir": "F:\\dev\\Java\\MSE-Java\\WorkingDir\\res\\",
+  "resultsFileName": "search_results.htm",
+  "searchString": "",
+  "searchType": "Phrase",
+  "selectedAuthors": [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "beep": false,
+  "splashWindow": false,
+  "autoLoad": false,
+  "fullScan": false,
+  "loggingActions": true,
+  "debugOn": false
+}

@@ -1,0 +1,397 @@
+<html><head><title>Ministry Search Engine</title></head><center>
+<img src="../images/process_title.gif"><br><br>
+</center>
+This page describes the process involved in producing the Ministry Search Engine disk.
+
+<h2>Scanning</h2>
+<ul>
+<li>
+Two pages were scanned simultaneously and then each page was processed as a separate region using an Optical Character
+Recognition (OCR) package to produce an ASCII text version of the pages.</li>
+<li>
+During the scan we had to press down on the spine of the book to ensure that the words on the inside edges of the page
+came into full contact with the scanner bed.</li>
+<li>
+We saved each volume in a separate file.</li>
+<li>
+The files were initially saved as Microsoft Word documents to make use of the Word spell checker, and later converted to
+plain ASCII text.</li>
+<li>
+Our work was backed up regularly on CD or separate hard disk.</li>
+<li>
+Depending on the scanner model, we found it frequently made the same mistake. For example, mistook '1' for 'I' and vice
+versa. It was generally quickest to fix all such mistakes first (using global replace) before reading through the text
+and fixing other mistakes.</li>
+</ul>
+
+
+<h2>Preparation for search engine</h2>
+We followed the following guidelines to ensure the text could easily be searched using a custom search engine (written
+in Java as an Applet). The <b>bolded</b> tasks were facilitated with Word VBA macros.
+<ul>
+<li>
+Leave archaic words &amp; expressions as they are.</li>
+<li>
+Fix obvious typographical or punctuation errors, but if in any doubt leave as in the original text.</li>
+<li>
+<b>Prefix all scripture references that have at least the name of the book and a chapter (i.e. 2 Timothy 2 or
+Exodus 10: 2, but not Chapter 12 or John's gospel) with '@'. Place the '@' immediately before the reference
+(i.e. no spaces, brackets or punctuation marks in between).</b></li>
+<li>
+Separate chapter and verse with colon (for example, 2 Chronicles 9:3).</li>
+<li>
+<b>Expand abbreviated references (for example, 2 Chron. 9 to 2 Chronicles 9).</b></li>
+<li>
+<b>Replace 'Canticles' and 'Song of Solomon' with 'Song of Songs' in scripture references.</b></li>
+<li>
+<b>Expand abbreviations such as chap. and v. to chapter and verse respectively.</b></li>
+<li>
+Separate verses with comma or space-dash-space as appropriate (for example, 2 Chronicles 9:3,5 or John 2:7 - 10).</li>
+<li>
+Replace Roman Numerals with Arabic (see below).</li>
+<li>
+Where references have been omitted, add them unless the reference is very short (e.g. do not add a reference
+to &quot;in the Spirit&quot;) or if included in the references at the head of the section. For example, the first verse of the Bible is
+"In the beginning God created the heavens and the earth" (@Genesis 1:1) and the last verse is "The grace of our Lord Jesus Christ [be] with you all. Amen", @Revelation 22:21.
+See below for further guidance. This is very time consuming and so it has not been implemented for all volumes yet.</li>
+<li>
+<b>Replace multiple consecutive spaces with a single space.</b></li>
+<li>
+<b>Make sure that a possessive apostrophe <u>at the end of a word</u> is replaced with '¬' (for example,
+"Moses' face" becomes "Moses¬ face" - this allows the indexing program to distinguish it from a single quote)</b></li>
+<li>
+<b>Make sure all dashes (not hyphens) are changed to two dashes (--) and separated from adjacent words by a space
+on both sides.</b></li>
+<li>
+Remove all hyphens used to split words across lines.</li>
+<li>
+<b>Insert an asterisk immediately before and after all italicised text.</b></li>
+<li>
+Rejoin words split across two pages.</li>
+<li>
+Only insert carriage returns for new paragraphs.</li>
+<li>
+<b>Remove any blank lines.</b></li>
+<li>
+At the beginning of each new page add a line with the page number in braces, for example, {23}.</li>
+<li>
+Headings should not be split over multiple lines.</li>
+<li>
+<b>Change first words of sections to have only an initial capital rather than being fully uppercase,
+for example "TONIGHT" becomes "Tonight" and "I WOULD like" becomes "I would like".</b></li>
+<li>
+Where parts of hymns are quoted insert '(hymn)' after the quotation.</li>
+<li>
+Mark footnotes with the text '(~)'.</li>
+<li>
+Replace section breaks such as "* * * * *" with &lt;hr&gt;.</li>
+<li>
+Mark start and end of block quotations with &lt;blockquote&gt; and &lt;/blockquote&gt; respectively.</li>
+<li>
+Replace all Greek/Hebrew letters with the English equivalents, e.g. a for alpha and b for beta.
+</ul>
+
+<h2>Final check &amp; indexing</h2>
+The final check and indexing was carried out using a number of custom Java programs.
+
+<hr>
+
+<h2>Further Guidance from Kingston Bible Trust</h2>
+<h3>Standard Works of Reference</h3>
+
+The sixth edition (1976) of The Concise Oxford Dictionary (C.O.D.) is to be regarded as the standard on orthography and meanings of words.  The abbreviations listed in
+that dictionary, supplemented by those given in these notes, will generally be acceptable.
+
+<h3>Quotations from Scripture</h3>
+
+Quotations from Scripture, other than those from the scriptures read at the beginning of the meeting, should be accompanied by the reference.  All scripture quotations
+should be in double quotes.  Only in exceptional circumstances should double quotes be used for anything except quotations from Scripture.
+<p>
+The words quoted and the punctuation must be exactly as in the Bible, except that ‘LORD’ (as used in the A.V.) will generally be rendered ‘Lord’, and brackets should be given
+only if the whole of the parenthesis is quoted; otherwise the brackets should be left out.
+<p>
+A capital letter may be used at the beginning of a quotation even if a lower case letter is used in the Bible.  This is particularly desirable where direct speech is being quoted: an
+example of its use is afforded in the New Translation in the quotation in Matthew 2 : 15 (“saying, Out of Egypt…”) which is from Hosea 11 : 1 (“loved him, and out of Egypt…”).
+<p>
+Quotations must be from the Authorised Version or from the New Translation (1961 edition).  In current ministry the New Translation will normally be used.  The use of the term
+‘Holy Ghost’ should always be avoided by quoting from the New Translation.  If a quotation needs major correction the New Translation version should normally be used. 
+Occasionally an allusion (not a direct quotation) to a scripture already quoted becomes obscure if the quotation itself is altered to conform to the New Translation; this must be
+watched for if any alteration is substantial.
+<p>
+Attention is called to the fact that the 1961 edition of the New Translation differs from earlier editions in the use of italics (particularly in the Gospel of John) and, less frequently, in
+punctuation.
+<p>
+The punctuation at the end of the quotation, except for notes of interrogation (?) or exclamation (!) is to be left out and the punctuation needed for the sentence is to be inserted
+outside the inverted commas.  Examples are:-
+<ol>
+<li>What is meant by that word, “the horns of the buffaloes”?</li>
+<li>“The king said to him, Art thou Ziba?”</li>
+<li>“On the same day”, it says, they went into the ark.</li>
+<li>The man in John 9 says, “One thing I know”.</li>
+</ol>
+The strict application of this rule may lead to such punctuation as:-
+<blockquote>Why does David say, “Art thou Ziba?”?</blockquote>
+
+which, although correct, is clumsy and is to be avoided by omitting the mark outside the inverted commas.
+<p>
+Italics are used in the New Translation to indicate emphasis and should be reproduced exactly in quotations.
+<p>
+Italics are not to be used in quoting from the Authorised Version and only in regard to the New Translation when actually given in the Scripture.
+
+<h3>Scripture References</h3>
+
+The references should comprise the name of the book (in full), the chapter number, a colon, and the verse number or numbers.  Where two consecutive verses are referred to
+they should be indicated by their numbers with a comma interposed e.g. 1 Corinthians 3:2,3.  Where there are more than two verses the first and last should be quoted by
+number and connected by a hyphen thus, 1 Corinthians 3:2-10.  If the passsage of Scripture concerned finishes at the end of the chapter the numbers of the verses should still
+be quoted, expressions such as '2 - end' should not be employed, similarly if the entire chapter is used the verse numbers should be quoted in the usual way; the word ‘entire’
+should not be used as a substitute for such.  Where two sets of verses are quoted from one chapter they should be separated by a comma, e.g. 1 Corinthians 3:2-6, 11-14. 
+Where one reference is followed by another from another chapter the two should be separated by a semi-colon, e.g. 1 Corinthians 3:2; 1 Corinthians 6:1-4 or
+1 Corinthians 3:2; Galatians 4:1-7.
+<p>
+References at the heading of a reading or an address are generally given without a full stop at the end, but when used in the text normal punctuation should be employed. 
+<p>
+Where a full reference, immediately following a quotation, occurs at the end of a sentence, a comma should be inserted after the closing inverted commas, thus
+
+<blockquote>“Out of Egypt have I called my son”, @Matthew 2:15.  The Lord…</blockquote>
+
+If the reference occurs within a sentence it should be in brackets without a comma between the quotation and the first bracket, thus
+
+<blockquote>Does the Scripture, “We have the mind of Christ” (@1 Corinthians 2:16) come in here?</blockquote>
+
+If the reference at the end of a sentence is not a full reference, but contains only the chapter or verse number, or does not follow an actual quotation, or includes the word ‘see’,
+brackets should be used; examples are:-
+
+<blockquote>“Do not hinder me” (verse 56).</blockquote>
+
+<blockquote>Paul refers to himself as a nurse (@1 Thessalonians 2:7).</blockquote>
+
+<blockquote>… his speaking to Joseph with regard to his Father and Benjamin (see @Genesis 44).</blockquote>
+
+Punctuation after references in brackets should be as required by the sentence.
+
+Square brackets should be used in the rare cases when it is necessary to insert explanatory matter within a scripture quotation.  An example would be:-
+
+<blockquote>“The Chiliarch commanded him [Paul] to be brought …”</blockquote>
+
+<h3>Quotations from sources other than Scripture</h3>
+
+Quotations from sources other than Scripture, verbatim remarks quoted as such, conversation, J.N.D. footnotes etc. will normally be placed within single quotes. 
+Double quotes (“…”) must be reserved for quotations from Scripture.
+
+<h3>References to Publications</h3>
+
+The general form of such references should be Author, Title, Date or Edition (if known), Volume Number, Page Number.
+<p>
+The title, if quoted in full, should be in italics.  Examples are:-
+
+<blockquote>J.N.D., Collected Writings, 1st Edition, Volume 18, page 62. and</blockquote>
+<blockquote>J.T., N.S. Volume 10, page 32.</blockquote>
+
+The importance of quoting the edition and the correct page number in such references as this, where there is more than one edition, will be evident.  Where possible, reference
+should be to the most recent edition.
+<p>
+It is thought that for such publications as J.T. New Series, which are well known, the use of the full title is hardly necessary. References to the notes in the New Translation
+should not be by the index letters as these vary from one edition to another.  It is generally sufficient to quote the verse, for example:
+
+<blockquote>‘See New Translation Note on “earth” in @Acts 1 : 8’.</blockquote>
+
+<h3>Capitalisation</h3>
+
+The term here refers to the use of capital letters for the initials of certain words when the words do not commence a sentence.  In scriptural quotations the capitalisation will be
+exactly as in the Bible, except possibly, at the commencement of the quotation as explained above.
+<p>
+Except in quotations, such words as ‘Father’, ‘Lord’, ‘Man’, ‘Babe’, ‘Person’, ‘One’, and the pronouns ‘He’, ‘Him’, ‘Them’, and similar words (but not ‘who’ or ‘whom’ etc.)
+applying to divine Persons should commence with a capital letter.
+<p>
+Other words for which capitals should be used are:-
+<ul>
+<li>‘Bible’</li>
+<li>Names of the books of the Bible</li>
+<li>‘the Supper’ (but ‘the Lord’s supper’)</li>
+<li>‘Deity’ when synonymous with ‘God’</li>
+<li>National names such as ‘Jew’, ‘Jewish’, ‘American’ (but ‘judaise’)</li>
+<li>Scripture or Scriptures meaning the Bible as a whole (or in such expressions as ‘New Testament Scriptures’) but ‘scripture’ when
+referring to the portion under consideration.</li>
+<li>‘Levite’ as a member of the tribe</li>
+<li>‘Person’ when applying to God</li>
+</ul>
+Lower case initial letters should be used in the following words in addition to those noted above:
+<ul>
+<li>‘gospel’, ‘assembly’, ‘sanctuary’</li>
+<li>‘apostle’ (except as referring to the Lord, e.g. as in Hebrews 3)</li>
+<li>‘psalmist’ and ‘psalm’ (except the book of Psalms and similar)</li>
+<li>‘cross’, ‘divine’, ‘heaven’</li>
+<li>‘devil’, ‘government’ (but ‘British Government’ and similar)</li>
+<li>‘sonship’, ‘manhood’, ‘lordship’ and similar</li>
+<li>‘gentile’</li>
+<li>‘christian’, ‘christianity’, ‘christendom’, ’judaism’ and similar</li>
+<li>‘His name’s sake’ (lower case ‘n’)</li>
+<li>‘epistle’</li>
+<li>‘levite’ when used to describe a servant</li>
+<li>‘John the baptist’</li>
+</ul>
+
+<h3>Miscellaneous Notes</h3>
+
+The fewest possible alterations are to be made.  Actual errors in quotations from Scripture, grammar, punctuation, etc. should be fixed, but attempts merely to improve
+style or mode of expression must be avoided.
+<ul><li>‘Today’ and ‘tonight’ should be without hyphens</li>
+<li>‘Fulness’ is preferred to ‘fullness’</li>
+<li>‘Free from’ not ‘free of’</li>
+<li>Abbreviated forms of ‘not’ such as in ‘couldn’t’, ‘can’t’ etc. are not to be used.</li>
+<li>‘Got’ is often used conversationally but should be eliminated.</li>
+<li>Figures should be expressed in words excepting scripture quotations, volume numbers etc.</li>
+<li>‘etc!’ should not be used; ‘and so on’ or, when a quotation is concerned, an ellipsis (…) will generally be satisfactory.</li>
+<li>Italics are to be used for foreign phrases such as ‘par excellence’, and in reference to publications (see above).</li>
+<li>‘Judgment’ is the preferred spelling</li></ul>
+
+If there are any items not covered by the above, reference should be make to ‘Hart’s Rules for Compositors and Readers at the University Press Oxford’, 37th edition,
+Oxford University Press.
+
+<h3>Roman Numerals</h3>
+
+<table border=1>
+<tr><td>Arabic</td><td>
+ Roman</td><td>
+ Notes
+</td></tr><tr><td>1</td><td>
+ I</td><td>
+</td></tr><tr><td>2</td><td>
+ II</td><td>
+</td></tr><tr><td>3</td><td>
+ III</td><td>
+</td></tr><tr><td>4</td><td>
+ IV</td><td>
+ One short of five
+</td></tr><tr><td>5</td><td>
+ V</td><td>
+</td></tr><tr><td>6</td><td>
+ VI</td><td>
+ Five + one
+</td></tr><tr><td>7</td><td>
+ VII</td><td>
+ Five + two
+</td></tr><tr><td>8</td><td>
+ VIII</td><td>
+ Five + three
+</td></tr><tr><td>9</td><td>
+ IX</td><td>
+ One short of ten
+</td></tr><tr><td>10</td><td>
+ X</td><td>
+</td></tr><tr><td>11</td><td>
+ XI</td><td>
+ Ten + one
+</td></tr><tr><td>12</td><td>
+ XII</td><td>
+ Ten + two
+</td></tr><tr><td>13</td><td>
+ XIII</td><td>
+ Ten + three
+</td></tr><tr><td>14</td><td>
+ XIV</td><td>
+ Ten + four
+</td></tr><tr><td>15</td><td>
+ XV</td><td>
+ Ten + five
+</td></tr><tr><td>16</td><td>
+ XVI</td><td>
+ Ten + six
+</td></tr><tr><td>17</td><td>
+ XVII</td><td>
+ Ten + seven
+</td></tr><tr><td>18</td><td>
+ XVIII</td><td>
+ Ten + eight
+</td></tr><tr><td>19</td><td>
+ XIX</td><td>
+ Ten + nine (= One short of ten)
+</td></tr><tr><td>20</td><td>
+ XX</td><td>
+ Ten + ten
+</td></tr><tr><td>21</td><td>
+ XXI</td><td>
+ Ten + ten + one
+</td></tr><tr><td>22</td><td>
+ XXII</td><td>
+ Ten + ten + two
+</td></tr><tr><td>23</td><td>
+ XXIII</td><td>
+ Ten + ten + three
+</td></tr><tr><td>24</td><td>
+ XXIV</td><td>
+ Ten + ten + four (= One short of five)
+</td></tr><tr><td>25</td><td>
+ XXV</td><td>
+ Ten + ten + five
+</td></tr><tr><td>26</td><td>
+ XXVI</td><td>
+ Ten + ten + six
+</td></tr><tr><td>27</td><td>
+ XXVII</td><td>
+ Ten + ten + seven
+</td></tr><tr><td>28</td><td>
+ XXVIII</td><td>
+ Ten + ten + eight
+</td></tr><tr><td>29</td><td>
+ XXIX</td><td>
+ Ten + ten + nine
+</td></tr><tr><td>30</td><td>
+ XXX</td><td>
+ Ten + ten + ten
+</td></tr><tr><td>33</td><td>
+ XXXIII</td><td>
+</td></tr><tr><td>40</td><td>
+ XL</td><td>
+ Ten short of fifty
+</td></tr><tr><td>44</td><td>
+ XLIV</td><td>
+</td></tr><tr><td>50</td><td>
+ L</td><td>
+</td></tr><tr><td>57</td><td>
+ LVII</td><td>
+</td></tr><tr><td>60</td><td>
+ LX</td><td>
+ Fifty + ten
+</td></tr><tr><td>65</td><td>
+ LXV</td><td>
+ Fifty + ten + five
+</td></tr><tr><td>70</td><td>
+ LXX</td><td>
+ Fifty + twenty (= ten + ten)
+</td></tr><tr><td>72</td><td>
+ LXXII</td><td>
+</td></tr><tr><td>80</td><td>
+ LXXX</td><td>
+ Fifty + thirty (=ten + ten + ten)
+</td></tr><tr><td>88</td><td>
+ LXXXVIII</td><td>
+</td></tr><tr><td>90</td><td>
+ XC</td><td>
+ Ten short of one hundred
+</td></tr><tr><td>94</td><td>
+ XCIV</td><td>
+</td></tr><tr><td>100</td><td>
+ C</td><td>
+</td></tr><tr><td>123</td><td>
+ CXXIII</td><td>
+</td></tr><tr><td>150</td><td>
+ CL</td><td>
+</td></tr><tr><td>155</td><td>
+ CLV</td><td>
+</td></tr><tr><td>200</td><td>
+ CC</td><td>
+</td></tr><tr><td>300</td><td>
+ CCC</td><td>
+</td></tr><tr><td>400</td><td>
+ CD</td><td>
+ One hundred short of five hundred
+</td></tr><tr><td>500</td><td>
+ D</td><td>
+</td></tr><tr><td>1000</td><td>
+ M</td><td>
+</td></tr><tr><td>2000</td><td>
+ MM</td><td>
+</td></tr></table>
+
+</body></html>

@@ -1,0 +1,29 @@
+
+
+Version:	3.7
+CmdLine:	C:\Users\Michael\Dropbox\code\Netbeans\MSE\dist\mse.exe --l4j-debug
+WOW64:		yes
+Working dir:	C:\Users\Michael\Dropbox\code\Netbeans\MSE\dist\.
+64-bit search:	SOFTWARE\JavaSoft\Java Runtime Environment...
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.6
+Check launcher:	C:\Program Files\Java\jre6\bin\javaw.exe (OK)
+Match:		1.6
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.6.0_27
+Check launcher:	C:\Program Files\Java\jre6\bin\javaw.exe (OK)
+Match:		1.6.0_27
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.8
+Check launcher:	C:\Program Files\Java\jre1.8.0_40\bin\javaw.exe (OK)
+Match:		1.8
+Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.8.0_40
+Check launcher:	C:\Program Files\Java\jre1.8.0_40\bin\javaw.exe (OK)
+Match:		1.8.0_40
+64-bit search:	SOFTWARE\JavaSoft\Java Development Kit...
+Check:		SOFTWARE\JavaSoft\Java Development Kit\1.8
+Ignore:		1.8
+Check:		SOFTWARE\JavaSoft\Java Development Kit\1.8.0_40
+Ignore:		1.8.0_40
+Runtime used:	1.8.0_40 (64-bit)
+Launcher:	C:\Program Files\Java\jre1.8.0_40\bin\javaw.exe
+Launcher args:	-jar "C:\Users\Michael\Dropbox\code\Netbeans\MSE\dist\mse.exe"
+Args length:	62/32768 chars
+Exit code:	0

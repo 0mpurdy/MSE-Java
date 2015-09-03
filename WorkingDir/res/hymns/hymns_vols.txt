@@ -1,0 +1,14 @@
+hymns1~Hymns (1973)~502
+hymns2~Hymns (1962)~456
+hymns3~Hymns (1951)~480
+hymns4~Hymns (1932) -- TBC~382
+hymns5~Hymns (1903) -- TBC~402
+hymns6~~0
+hymns7~~0
+hymns8~Notes of 1973 reselection~1
+hymns9~Hymn Book Revision, 1962~8
+hymns10~The Hymn Book Revision 1951~24
+hymns11~Notes of readings in connection with the new [1932] hymnbook~36
+hymns12~From the preface of 1903 hymnbook~1
+hymns13~From the preface of 1881 hymnbook~1
+hymns14~Account of the 1856 hymn book~1
