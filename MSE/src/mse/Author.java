@@ -6,6 +6,7 @@
 package mse;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  *
@@ -32,6 +33,18 @@ public enum Author {
     private final String folder;
     private final String contentsName;
     private final boolean searchable;
+    
+    private static final HashMap<String, Author> lookup = new HashMap<String, Author>();
+
+    static {
+        for (Author a : Author.values()) {
+            lookup.put(a.getCode(), a);
+        }
+    }
+    
+    public static Author getAuthorByCode(String authorCode) {
+        return lookup.get(authorCode);
+    }
 
     Author(String code, String name, String folder, String contentsName, boolean searchable) {
         this.code = code;
@@ -39,7 +52,7 @@ public enum Author {
         this.folder = folder;
         this.contentsName = contentsName;
         this.searchable = searchable;
-    }
+    }    
 
     public String getCode() {
         return code;
