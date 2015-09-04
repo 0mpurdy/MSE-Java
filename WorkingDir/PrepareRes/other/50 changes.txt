@@ -1,0 +1,31 @@
+General, when abbreviating book name e.g. Cor on p121, please add stop, i.e. "Cor.", but not after a full book name e.g. "@John. 8", p316.
+p21, encumbent
+p34, to see? 
+p69, "We never 
+p94, 27. not fearing 
+p117, The King's 
+p142, Matthew16
+p143, John6
+p151, christians are 
+p179, Ephesians1
+p184, added hymn ref. 112
+p188, heavenly family
+p196, knowledge_gf God 
+p212, added hymn ref. 221
+p234, word'God' 
+p241, elan
+p256, 2. he replied
+p259, -- The Almighty God 
+p265, So. that 
+p265, Psalm135
+p277, Revelation1
+p291, impestuous
+p325, dty
+p359, Acts2
+p366, kingship. and 
+p415, HERE
+p424, ofNain
+p435, added <blockquote>
+p446, added <blockquote>
+I have programs & macros that do some other changes automatically (mostly formatting) in preparation for conversion to html, and so I have attached the updated doc so that you can do a MS Word compare.
+

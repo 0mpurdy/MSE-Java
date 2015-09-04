@@ -1,0 +1,70 @@
+1.  [^^&£%~#\/¬`\*\\_=\>\<+°•€¦]     [&£%~#\/`‘’\\_=\>\<+°•€]
+1a. Find (match case) (space)V.(space) & (space)P. with &nbsp;V. etc.
+2.  Footnotes
+3.  alt-l (abbreviations - chap(s). vv. v. with verse, Ques./Rem., em & en dashes, tabs, double spaces & double ^p)
+4.  Replace manual line break with <br>
+5.  alt-q & w ([a-z]'[!a-z])
+6.  alt-v, b, n & m (italics)
+7.  Convert to text.
+8.  Page numbers
+9.  alt-p (split para), alt-r (fix) & alt-g (fix split word)
+10. replace ^p with ^l then find [!}]^l[a-z]
+11. alt-c, x & s (caps at start of section)
+12. alt-k (^#^$)
+13. alt-t (^$^#)
+14. Hymn/sing
+15.  ([A-Z].[A-Z]) -> ^p\1  (Ques.)  (Rem.)
+16. alt-h & j (dashes) [!0-9] - 
+17. Bible references
+18. @@ -> @
+19. ([0-9]) ([0-9]) -> \1: \2
+19a. '' -> "
+19b. .¦ -> ¦.
+19c. etc¦
+20. Spell check
+21. Tidy
+22. <ax
+23. Labourers
+24. Contents page
+25. Inform Mr Burton
+
+footnotes for jnd synopsis
+maps & photos
+
+Hymns 1932 (in progress) ???
+
+JND 1-8 (excl 6) done 17
+
+JND 4-34 @ 1-8, 11-13, 9 done vol. 17
+JND 38-41
+JND 51-53
+
+AJG1 - 20
+AJG3 - 20
+AJG5 - 20
+AJG6 - 20
+AJG8 - 20
+AJG10 - 20
+
+SMCC1 - 20
+SMCC3 - 20
+SMCC4 - 20
+SMCC5 - 20
+SMCC7 - 20
+SMCC8 - 20
+SMCC9 - 20
+
+CHM1-5 - 9
+CHM6- just need to do page numbers & tidy
+
+misc 20 - last poems
+misc 25 - add remaining months
+
+JND 2 p261 need pictures
+JND 22 p21 check table
+JND 25 p36 need pictures
+
+
+Page nos, times new roman 12, left margin 4cm, right margin 7cm, para 12 pt before
+
+

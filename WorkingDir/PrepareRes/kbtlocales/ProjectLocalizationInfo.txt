@@ -1,0 +1,78 @@
+# InstallAnywhere Localization Information and Mapping File
+#
+# This file provides information for the mappings of localization properties
+#     to the action for which the localization is provided.  This file is meant
+#     to be used in conjunction with the custom_xx files found in the same
+#     directory.
+#
+# Notes on the conventions used in this file:
+#     '+--'  denotes a data object that belongs to another given object (it
+#            defines some portion of the properties of its owner object).  This
+#            data object possesses one or more properties that are localizable
+#     '|--'  denotes a parent-child relationship between two objects (typically,
+#            this relationship is represented visually as a hierarchy or nesting
+#            in the Install task of InstallAnywhere's Advanced Designer)
+#     'NoEP' denotes an object that exists in the tree, but does not possess any
+#            externalizable/localizable properties
+#
+#     The relationships described above can be used to help identify the correct
+#     property to configure an object when working with the custom_xx files.
+#
+# Product Name: Ministry Search Engine
+# Project File: C:\kbt\src\kbt.iap_xml
+# Generated:    Sun Dec 11 19:31:27 GMT 2005
+
+
+---- PRE-INSTALL ACTIONS ----
+-- IntroAction.560e77a09fcd
+   +-- Help.6a12b952bece
+-- InstallDirAction.560e77a19fcd
+   +-- Help.6a12b95cbece
+-- ShortcutLocAction.560e77a09fce
+   +-- Help.6a12b95cbecf
+-- InstallSummary.560e77a19fce
+   +-- Help.6a12b970becf
+
+
+---- POST-INSTALL ACTIONS ----
+-- InstallCompleteAction.560e77a09fcf
+   +-- Help.6a12b970bed0
+
+
+---- EXTERNAL ID TREE ----
+-- Installer.560e76c49fba
+   +-- Help.6a12b862bea9
+   +-- InstallFrameConfigurator.560e77019fbb
+   +-- InstallerInfoData.560e77009fba
+   |-- InstallSet.560e77a09fca
+   |-- InstallBundle.560e77a19fca
+   |-- GhostDirectory.560e776e9fc9 (NoEP)
+   |   |-- InstallDirectory.560e77a19fcf (NoEP)
+   |   |   |-- InstallUninstaller.560e780e9fcf
+   |   |-- MakeExecutable.560e89029fd5
+   |-- GhostDirectory.560e893f9fda (NoEP)
+   |   |-- CreateShortcut.560e893e9fda
+   |-- Billboard.560e776f9fc9
+
+
+---- LEGEND ----
+ASCIIFileManipulator                    ==>      Modify Text File - Single File
+Billboard                               ==>      Billboard
+CreateShortcut                          ==>      Create Alias, Link, Shortcut
+DisplayMessage                          ==>      Panel: Display Message
+DisplayMessageConsole                   ==>      Console: Display Message
+DisplayScrollingMessage                 ==>      Panel: Scrolling Message
+InstallBundle                           ==>      Product Feature
+InstallCompleteAction                   ==>      Panel: Install Complete
+InstallCompleteActionConsole            ==>      Console: Install Complete
+InstallDirAction                        ==>      Panel: Choose Install Folder
+InstallPanelAction                      ==>      Panel: Custom Code
+InstallProgressAction                   ==>      Install Progress
+InstallSet                              ==>      Install Set
+InstallSummary                          ==>      Panel: Pre-Install Summary
+InstallUninstaller                      ==>      Create Uninstaller
+IntroAction                             ==>      Panel: Introduction
+LicenseAgrAction                        ==>      Panel: License Agreement
+MakeExecutable                          ==>      Create LaunchAnywhere for Java Application
+ShortcutLocAction                       ==>      Panel: Choose Alias, Link, Shortcut Folder
+UninstallCompleteActionConsole          ==>      UninstallCompleteActionConsole

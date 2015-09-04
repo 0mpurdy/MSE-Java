@@ -1,0 +1,1530 @@
+'spare
+Global strCurrentPage
+Global strJNDCurrentPage
+Global selKeep
+Global RefEnd
+
+Sub A_DoublePara()
+    'alt-a
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "^p^p"
+        .Replacement.Text = "^p"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+End Sub
+
+Sub D_jnd()
+    V_findItalics
+    B_addStar
+End Sub
+
+Sub E_jnd()
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "^p<"
+        .Replacement.Text = "^p#"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "#[0-9][0-9][0-9][0-9][0-9][EF]*\>"
+        .Replacement.Text = "#"
+        .MatchWildcards = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "# "
+        .Replacement.Text = "#"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "{"
+        .Replacement.Text = "€"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "}"
+        .Replacement.Text = "¦"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "#"
+        .Replacement.Text = ""
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    Selection.EndKey Unit:=wdStory
+
+    strJNDCurrentPage = 362
+    While (strJNDCurrentPage > 0)
+        strLookForNext = "^p" & strJNDCurrentPage & " "
+        strReplaceNext = "{" & strJNDCurrentPage & "}"
+    
+        With Selection.Find
+            .Text = strLookForNext
+            .Replacement.Text = "^p"
+            .Forward = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceOne
+    
+        Selection.MoveLeft Unit:=wdCharacter, Count:=1
+        Selection.MoveRight Unit:=wdCharacter, Count:=1
+        Selection.TypeText Text:=strReplaceNext
+        Selection.TypeParagraph
+        Selection.MoveUp Unit:=wdLine, Count:=1
+        strJNDCurrentPage = strJNDCurrentPage - 1
+    Wend
+
+    Selection.HomeKey Unit:=wdStory
+
+    With Selection.Find
+        .Text = "*****"
+        .Replacement.Text = "+"
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "****"
+        .Replacement.Text = "+"
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "***"
+        .Replacement.Text = "+"
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "**"
+        .Replacement.Text = "+"
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+
+    With Selection.Find
+        .Text = "*"
+        .Replacement.Text = "+"
+        .Forward = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    
+End Sub
+
+
+Sub addSectPage()
+    'alt-?
+    If (strCurrentPage = "") Then
+        strCurrentPage = 223
+    Else
+        strCurrentPage = strCurrentPage + 1
+    End If
+    Selection.TypeParagraph
+    Selection.TypeText Text:="{" & strCurrentPage & "}"
+'    Selection.MoveDown Unit:=wdScreen, Count:=1
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^m"
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindAsk
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub B_addStar()
+    'alt-b
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="*"
+    Selection.Find.ClearFormatting
+    Selection.Find.Font.Italic = False
+    With Selection.Find
+        .Text = "^?^?"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    
+    SelEnd = Selection.Range.Start
+    Selection.SetRange Start:=SelEnd - 1, End:=SelEnd
+    LastChar = Selection.Text
+    While LastChar = " " Or LastChar = "." Or LastChar = "," Or LastChar = """" Or LastChar = "'" Or LastChar = "?" Or LastChar = "!" Or LastChar = "-" Or LastChar = ";" Or LastChar = ")" Or LastChar = "-" Or LastChar = Chr$(13)
+       Selection.MoveLeft Unit:=wdCharacter, Count:=1
+       SelEnd = Selection.Range.Start
+       Selection.SetRange Start:=SelEnd - 1, End:=SelEnd
+       LastChar = Selection.Text
+    Wend
+    
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="*"
+    Selection.MoveRight Unit:=wdCharacter, Count:=2
+End Sub
+
+Sub C_findCaps()
+    'alt-c
+    Selection.Find.ClearFormatting
+    With Selection.Find
+'        .Text = "[a-z0-9][a-z0-9]"
+        .Text = "^p"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = True
+        .MatchWholeWord = False
+'        .MatchWildcards = True
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[A-Z][A-Z]"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub F_addPageBack()
+    'alt-f
+    If (strCurrentPage = "") Then
+        strCurrentPage = 95
+    Else
+        strCurrentPage = strCurrentPage - 1
+    End If
+'    Selection.TypeBackspace
+    Selection.TypeParagraph
+    Selection.TypeText Text:="{" & strCurrentPage & "}"
+    Selection.TypeParagraph
+    Selection.MoveUp Unit:=wdScreen, Count:=1
+    Selection.HomeKey Unit:=wdLine
+'    With Selection.Find
+'        .Text = "#"
+'    End With
+'    Selection.Find.Execute
+End Sub
+
+Sub G_joinPara()
+    'alt-g
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.Delete Unit:=wdCharacter, Count:=1
+    findSplitPara
+    Selection.MoveUp Unit:=wdLine, Count:=1
+    findSplitPara
+End Sub
+
+Sub H_dashFind()
+    'alt-h
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "-"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub I_backRef()
+    'alt-i
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.Paste
+    Y_skipRef
+End Sub
+
+Sub J_dashReplace()
+    'alt-j
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:=" "
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="- "
+    H_dashFind
+End Sub
+
+Sub K_split()
+    'alt-k
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^#^$"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+End Sub
+
+Sub L_abbrev()
+    'alt-l
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "Gen."
+        .Replacement.Text = "Genesis"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Ex."
+        .Replacement.Text = "Exodus"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Exod."
+        .Replacement.Text = "Exodus"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Lev."
+        .Replacement.Text = "Leviticus"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Num."
+        .Replacement.Text = "Numbers"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Deut."
+        .Replacement.Text = "Deuteronomy"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Jos."
+        .Replacement.Text = "Joshua"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Josh."
+        .Replacement.Text = "Joshua"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Jud."
+        .Replacement.Text = "Judges"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Judg."
+        .Replacement.Text = "Judges"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Sam."
+        .Replacement.Text = "Samuel"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Chron."
+        .Replacement.Text = "Chronicles"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Neh."
+        .Replacement.Text = "Nehemiah"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Psa."
+        .Replacement.Text = "Psalm"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Ps."
+        .MatchCase = True
+        .Replacement.Text = "Psalm"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Prov."
+        .Replacement.Text = "Proverbs"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Eccles."
+        .Replacement.Text = "Ecclesiastes"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "S. of S."
+        .Replacement.Text = "Song of Songs"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Isa."
+        .Replacement.Text = "Isaiah"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Jer."
+        .Replacement.Text = "Jeremiah"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Lam."
+        .Replacement.Text = "Lamentations"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Ezek."
+        .Replacement.Text = "Ezekiel"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Dan."
+        .Replacement.Text = "Daniel"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Hos."
+        .Replacement.Text = "Hosea"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Zech."
+        .Replacement.Text = "Zechariah"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Hab."
+        .Replacement.Text = "Habakkuk"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Zeph."
+        .Replacement.Text = "Zephaniah"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Hag."
+        .Replacement.Text = "Haggai"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Mal."
+        .Replacement.Text = "Malachi"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Matt."
+        .Replacement.Text = "Matthew"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Cor."
+        .Replacement.Text = "Corinthians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Rom."
+        .Replacement.Text = "Romans"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Gal."
+        .Replacement.Text = "Galatians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Eph."
+        .Replacement.Text = "Ephesians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Phil."
+        .Replacement.Text = "Philippians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Col."
+        .Replacement.Text = "Colossians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Tim."
+        .Replacement.Text = "Timothy"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Tit."
+        .Replacement.Text = "Titus"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Thess."
+        .Replacement.Text = "Thessalonians"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Philem."
+        .Replacement.Text = "Philemon"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Heb."
+        .Replacement.Text = "Hebrews"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Pet."
+        .Replacement.Text = "Peter"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Jas."
+        .Replacement.Text = "James"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Rev."
+        .Replacement.Text = "Revelation"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Vol."
+        .Replacement.Text = "Volume"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "to-day"
+        .Replacement.Text = "today"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "to-night"
+        .Replacement.Text = "tonight"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "æ"
+        .Replacement.Text = "ae"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " 0"
+        .Replacement.Text = " O"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^="
+        .Replacement.Text = " -- "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^+"
+        .Replacement.Text = " -- "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^~"
+        .Replacement.Text = "-"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "--"
+        .Replacement.Text = " -- "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = ". ."
+        .Replacement.Text = ".."
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = ". ."
+        .Replacement.Text = ".."
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "..."
+        .Replacement.Text = " ... "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+'    With Selection.Find
+'        .Text = ".*^p"
+'        .Replacement.Text = "*.^p"
+'    End With
+'    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ;"
+        .Replacement.Text = ";"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " :"
+        .Replacement.Text = ":"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ,"
+        .Replacement.Text = ","
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "' s "
+        .Replacement.Text = "'s "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ?"
+        .Replacement.Text = "?"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = ChrW(8220)
+        .Replacement.Text = """"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = ChrW(8221)
+        .Replacement.Text = """"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "[‘’]"
+        .Replacement.Text = "'"
+        .MatchWildcards = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "[“”]"
+        .Replacement.Text = """"
+        .MatchWildcards = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " !"
+        .Replacement.Text = "!"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "@ "
+        .Replacement.Text = "@"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^t"
+        .Replacement.Text = " "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "  "
+        .Replacement.Text = " "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "  "
+        .Replacement.Text = " "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "  "
+        .Replacement.Text = " "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ^p"
+        .Replacement.Text = "^p"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^p "
+        .Replacement.Text = "^p"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^p^p"
+        .Replacement.Text = "^p"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^p^p"
+        .Replacement.Text = "^p"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "^p^p"
+        .Replacement.Text = "^p"
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    Selection.Find.Replacement.Font.Italic = False
+    With Selection.Find
+        .Text = "vv."
+        .Replacement.Text = "verses "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "v. "
+        .Replacement.Text = "verse "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ver. "
+        .Replacement.Text = " verse "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "(ver. "
+        .Replacement.Text = "(verse "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "(v."
+        .Replacement.Text = "(verse "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "chap. "
+        .Replacement.Text = "chapter "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " ch. "
+        .Replacement.Text = " chapter "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "(ch. "
+        .Replacement.Text = "(chapter "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "chaps. "
+        .Replacement.Text = "chapters "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " pp."
+        .Replacement.Text = " pages "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "(pp."
+        .Replacement.Text = "(pages "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " p."
+        .Replacement.Text = " page "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "(p."
+        .Replacement.Text = "(page "
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    
+    Selection.Find.Font.Italic = True
+    With Selection.Find
+        .Text = "Rem. "
+        .Replacement.Text = "Rem. "
+        .Format = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = "Ques. "
+        .Replacement.Text = "Ques. "
+        .Format = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    With Selection.Find
+        .Text = " "
+        .Replacement.Text = " "
+        .Format = True
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "^l"
+        .Replacement.Text = " "
+        .MatchCase = False
+        .Format = True
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub M_skipItalics()
+    'alt-m
+    Selection.Find.ClearFormatting
+    Selection.Find.Font.Italic = False
+    With Selection.Find
+        .Text = "^?^?"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+    End With
+    Selection.Find.Execute
+    Selection.Find.ClearFormatting
+    Selection.Find.Font.Italic = True
+    With Selection.Find
+        .Text = "^?"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+    End With
+    Selection.Find.Execute
+    SelStart = Selection.Range.Start
+    Selection.SetRange Start:=SelStart, End:=SelStart + 5
+    RemOrQues = Selection.Text
+    If RemOrQues = "Rem. " Or RemOrQues = "Ques." Then
+        M_skipItalics
+    End If
+End Sub
+
+Sub N_moveLeft()
+    'alt-n
+    Selection.MoveLeft Unit:=wdCharacter, Count:=2
+    Selection.TypeBackspace
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="*"
+    Selection.MoveRight Unit:=wdCharacter, Count:=2
+End Sub
+
+Sub O_fixContents()
+    'alt-o
+    Selection.WholeStory
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "~^?^?"
+        .Replacement.Text = "^p"
+        .Forward = True
+        .Wrap = wdFindAsk
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
+    Selection.EndKey Unit:=wdStory
+    Selection.TypeText Text:="</td></tr></table>"
+    Selection.HomeKey Unit:=wdStory
+    Selection.TypeParagraph
+    Selection.MoveUp Unit:=wdLine, Count:=1
+    Selection.TypeText Text:="<hr><a name=XX><h2>Volume XX</h2></a>"
+    Selection.TypeParagraph
+    Selection.TypeText Text:="<table cellpadding=""10"">"
+    Selection.TypeParagraph
+    Selection.TypeText Text:="<tr><td colspan=""2""><b>XXX, 1940-41 (Volume XX)</b></td></tr>"
+    Selection.TypeParagraph
+    Selection.TypeText Text:="<tr><td width=""1%""></td><td>"
+    Selection.WholeStory
+    Selection.Cut
+End Sub
+
+Sub P_findSplitParaMoveUp()
+    'alt-p
+    findSplitPara
+    Selection.MoveUp Unit:=wdLine, Count:=1
+    findSplitPara
+End Sub
+
+Sub Q_findQuotes()
+    'alt-q
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[s]'[!a-z]"
+        .Replacement.Text = " "
+        .Forward = True
+'        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub R_joinParaSpace()
+    'alt-r
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:=" "
+    Selection.Delete Unit:=wdCharacter, Count:=1
+    findSplitPara
+    Selection.MoveUp Unit:=wdLine, Count:=1
+    findSplitPara
+End Sub
+
+Sub S_changeCaps1()
+    'alt-s
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.MoveLeft Unit:=wdCharacter, Count:=2
+    Selection.Range.Case = wdNextCase
+    C_findCaps
+End Sub
+
+Sub T_split2()
+    'alt-t
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^$^#"
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute
+End Sub
+
+Sub U_addpreHash()
+    'alt-u
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="@"
+    RefStart = Selection.Range.Start - 1
+    Selection.MoveRight Unit:=wdCharacter, Count:=2
+    Y_skipRef
+    Selection.SetRange Start:=RefStart, End:=RefEnd
+    Selection.Copy
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Y_skipRef
+End Sub
+
+Sub V_findItalics()
+    'alt-v
+    Selection.Find.ClearFormatting
+    Selection.Find.Font.Italic = True
+    With Selection.Find
+        .Text = "^?"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+'        .Wrap = wdFindAsk
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    SelStart = Selection.Range.Start
+    Selection.SetRange Start:=SelStart, End:=SelStart + 5
+    RemOrQues = Selection.Text
+    If RemOrQues = "Rem. " Or RemOrQues = "Ques." Then
+        Selection.Find.ClearFormatting
+        Selection.Find.Font.Italic = False
+        With Selection.Find
+            .Text = "^?^?"
+            .Forward = True
+            .Wrap = wdFindContinue
+            .Format = True
+        End With
+        Selection.Find.Execute
+        V_findItalics
+    Else
+        Selection.SetRange Start:=SelStart, End:=SelStart + 1
+        strFirstChar = Selection.Text
+        If strFirstChar = """" Or strFirstChar = "'" Or strFirstChar = "-" Or strFirstChar = "^p" Or strFirstChar = "(" Then
+            Selection.MoveRight Unit:=wdCharacter, Count:=1
+            V_findItalics
+        End If
+    End If
+End Sub
+
+Sub W_changeQuotes()
+    'alt-w
+    Selection.MoveLeft Unit:=wdCharacter, Count:=2
+    Selection.MoveRight Unit:=wdCharacter, Count:=2
+    Selection.TypeText Text:="¬"
+    Selection.Delete Unit:=wdCharacter, Count:=1
+    Q_findQuotes
+End Sub
+
+Sub X_changeCaps2()
+    'alt-x
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.MoveLeft Unit:=wdCharacter, Count:=2
+    Selection.Range.Case = wdNextCase
+    Selection.Range.Case = wdNextCase
+    C_findCaps
+End Sub
+
+Sub Y_skipRef()
+    'alt-y
+'    Selection.moveLeft Unit:=wdCharacter, Count:=1
+'    findRefs
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[!0123456789: ,\-]"
+        .Replacement.Text = " "
+        .Forward = True
+'        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    findRefs
+End Sub
+
+Sub Z_addPage()
+    'alt-z
+    If (strCurrentPage = "") Then
+        strCurrentPage = 61
+    Else
+        strCurrentPage = strCurrentPage - 1
+    End If
+    Selection.TypeBackspace
+    Selection.TypeParagraph
+    Selection.TypeText Text:="{" & strCurrentPage & "}"
+    Selection.TypeParagraph
+    Selection.MoveUp Unit:=wdScreen, Count:=1
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[^#^#^#]"
+    End With
+'    Selection.Find.Execute
+End Sub
+
+
+Sub findSplitPara()
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[!+¦\!\'\?\>"".€}A-Z0-9]^13?[!{\<]"
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+Sub editfootnotes()
+    'alt-?
+    Selection.Delete Unit:=wdCharacter, Count:=1
+    Ans = InputBox("Page?")
+    
+    Selection.TypeText Text:="`hr>`a name=43:" & Ans & ">`/a>`h2>Synopsis of Colossians - Revelation, page " & Ans & "`/h2>"
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "{*"
+    End With
+    Selection.Find.Execute
+End Sub
+Sub inbetween()
+    'alt-?
+    Ans = InputBox("Letter?")
+    If Ans = "" Then
+        Ans = "b"
+    End If
+    Selection.TypeBackspace
+    Selection.TypeBackspace
+    Selection.TypeText Text:=" `br>[" & Ans & "] "
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "{*"
+    End With
+    Selection.Find.Execute
+End Sub
+Sub setPage()
+    'alt-?
+    strCurrentPage = 33
+End Sub
+Sub findChapter()
+    'alt-?
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "chapter ^#"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+End Sub
+Sub findDoubleQuotes()
+    'alt-?
+    Dim SelStart As Long
+    Dim SelEnd As Long
+    Dim Scripture As Selection
+    
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = """"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = True
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    SelStart = Selection.Range.Start + 1
+    Selection.Find.Execute
+    SelEnd = Selection.Range.Start
+    Selection.SetRange Start:=SelStart, End:=SelEnd
+    Selection.Copy
+    Selection.MoveRight Unit:=wdCharacter, Count:=2
+End Sub
+Sub enclosePage()
+    'alt-?
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="{"
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = " "
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="}" + Chr$(13)
+    findPage
+End Sub
+Sub boldChapter()
+    'alt-?
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="<b>"
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^#"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[0-9]"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchWildcards = False
+    End With
+    Selection.Find.Execute
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "[!0-9]"
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchWildcards = True
+    End With
+    Selection.Find.Execute
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+'    Selection.moveRight Unit:=wdCharacter, Count:=1
+    Selection.TypeText Text:="</b>"
+End Sub
+Sub findFootnote()
+    'alt-?
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    SelStart = Selection.Range.Start + 1
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "}"
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    SelEnd = Selection.Range.Start
+    Selection.SetRange Start:=SelStart, End:=SelEnd
+    Selection.Cut
+    Windows(1).Activate
+    Selection.Paste
+    Selection.TypeBackspace
+    Selection.TypeParagraph
+    Windows(3).Activate
+    
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^p{ ("
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+Sub findFootnote2()
+    'alt-?
+    Selection.MoveLeft Unit:=wdCharacter, Count:=1
+    SelStart = Selection.Range.Start + 1
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "}"
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+'    Selection.Find.Execute
+    Selection.MoveRight Unit:=wdCharacter, Count:=1
+    SelEnd = Selection.Range.Start
+    Selection.SetRange Start:=SelStart, End:=SelEnd
+    Selection.Cut
+    Windows(1).Activate
+    Selection.Paste
+    Selection.TypeBackspace
+    Selection.TypeParagraph
+    Windows(2).Activate
+    
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^p~"
+        .Replacement.Text = ""
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = False
+        .MatchCase = True
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+End Sub
+Sub findRefs()
+    'called from elsewhere
+    Selection.Find.ClearFormatting
+    With Selection.Find
+        .Text = "^#"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindContinue
+        .Format = True
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute
+    SelEnd = Selection.Range.Start
+    Selection.SetRange Start:=SelEnd - 1, End:=SelEnd
+    LastChar = Selection.Text
+    Selection.SetRange Start:=SelEnd - 4, End:=SelEnd
+    Last4 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 5, End:=SelEnd
+    Last5 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 6, End:=SelEnd
+    Last6 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 7, End:=SelEnd
+    Last7 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 8, End:=SelEnd
+    Last8 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 9, End:=SelEnd
+    Last9 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 10, End:=SelEnd
+    Last10 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 11, End:=SelEnd
+    Last11 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 12, End:=SelEnd
+    Last12 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 13, End:=SelEnd
+    Last13 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 14, End:=SelEnd
+    Last14 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd - 15, End:=SelEnd
+    Last15 = LCase(Selection.Text)
+    Selection.SetRange Start:=SelEnd, End:=SelEnd + 1
+    If LastChar = "{" Or LastChar = "`" Or Last5 = "page " Or Last6 = "verse " Or Last6 = "pages " Or Last7 = "verses " Or Last7 = "volume " Or Last8 = "chapter " Or Last9 = "chapters " Then
+        Selection.Find.ClearFormatting
+        With Selection.Find
+            .Text = "^$"
+            .Replacement.Text = " "
+            .Forward = True
+            .Wrap = wdFindContinue
+            .Format = True
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute
+        findRefs
+    Else
+        MakeChangeNow = False
+        If Last4 = "job " Then
+            Selection.SetRange Start:=SelEnd - 4, End:=SelEnd - 4
+            MakeChangeNow = True
+        End If
+        If Last5 = "ruth " Or Last5 = "ezra " Or Last5 = "joel " Or Last5 = "amos " Or Last5 = "mark " Or Last5 = "luke " Or Last5 = "john " Or Last5 = "acts " Or Last5 = "jude " Then
+            If Last7 = "1 john " Or Last7 = "2 john " Or Last7 = "3 john " Then
+                MakeChangeNow = False
+            Else
+                Selection.SetRange Start:=SelEnd - 5, End:=SelEnd - 5
+                atChar = Left(Last6, 1)
+                MakeChangeNow = True
+            End If
+        End If
+        If Last6 = "psalm " Or Last6 = "hosea " Or Last6 = "jonah " Or Last6 = "micah " Or Last6 = "nahum " Or Last6 = "titus " Or Last6 = "james " Then
+            Selection.SetRange Start:=SelEnd - 6, End:=SelEnd - 6
+            atChar = Left(Last7, 1)
+            MakeChangeNow = True
+        End If
+        If Last7 = "exodus " Or Last7 = "joshua " Or Last7 = "judges " Or Last7 = "esther " Or Last7 = "isaiah " Or Last7 = "daniel " Or Last7 = "haggai " Or Last7 = "romans " Then
+            Selection.SetRange Start:=SelEnd - 7, End:=SelEnd - 7
+            atChar = Left(Last8, 1)
+            MakeChangeNow = True
+        End If
+        If Last7 = "psalms " Then
+            Selection.SetRange Start:=SelEnd - 7, End:=SelEnd
+            SelStart = Selection.Range.Start
+            If Last8 = "@psalms " Then
+                Selection.TypeText Text:="Psalm "
+            Else
+                Selection.TypeText Text:="@Psalm "
+            End If
+            Selection.SetRange Start:=SelStart, End:=SelEnd
+            Selection.Copy
+            Selection.SetRange Start:=SelEnd, End:=SelEnd + 1
+            Y_skipRef
+        End If
+        If Last8 = "genesis " Or Last8 = "numbers " Or Last8 = "ezekiel " Or Last8 = "obadiah " Or Last8 = "malachi " Or Last8 = "matthew " Or Last8 = "hebrews " Then
+            Selection.SetRange Start:=SelEnd - 8, End:=SelEnd - 8
+            atChar = Left(Last9, 1)
+            MakeChangeNow = True
+        End If
+        If Last9 = "nehemiah " Or Last9 = "proverbs " Or Last9 = "jeremiah " Or Last9 = "habakkuk " Or Last9 = "philemon " Then
+            Selection.SetRange Start:=SelEnd - 9, End:=SelEnd - 9
+            atChar = Left(Last10, 1)
+            MakeChangeNow = True
+        End If
+        If Last10 = "leviticus " Or Last10 = "zephaniah " Or Last10 = "zechariah " Or Last10 = "galatians " Or Last10 = "ephesians " Then
+            Selection.SetRange Start:=SelEnd - 10, End:=SelEnd - 10
+            atChar = Left(Last11, 1)
+            MakeChangeNow = True
+        End If
+        If Last10 = "canticles " Then
+            Selection.SetRange Start:=SelEnd - 10, End:=SelEnd
+            Selection.TypeText Text:="@Song of Songs "
+            Selection.SetRange Start:=SelEnd - 2, End:=SelEnd - 1
+            Y_skipRef
+            findRefs
+        End If
+        If Last11 = "colossians " Or Last11 = "revelation " Then
+            Selection.SetRange Start:=SelEnd - 11, End:=SelEnd - 11
+            atChar = Left(Last12, 1)
+            MakeChangeNow = True
+        End If
+        If Last12 = "deuteronomy " Or Last12 = "philippians " Then
+            Selection.SetRange Start:=SelEnd - 12, End:=SelEnd - 12
+            atChar = Left(Last13, 1)
+            MakeChangeNow = True
+        End If
+        If Last13 = "ecclesiastes " Or Last13 = "lamentations " Then
+            Selection.SetRange Start:=SelEnd - 13, End:=SelEnd - 13
+            atChar = Left(Last14, 1)
+            MakeChangeNow = True
+        End If
+        If Last14 = "song of songs " Then
+            Selection.SetRange Start:=SelEnd - 14, End:=SelEnd - 14
+            atChar = Left(Last15, 1)
+            MakeChangeNow = True
+        End If
+        
+        If MakeChangeNow = False Then
+            SelMultiStart = SelEnd
+            atChar = Right(Last15, 1)
+            BookChars = 4
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " john" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 5
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " kings" Or Left(Book, BookChars + 1) = " peter" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 6
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " samuel" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 7
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " timothy" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 10
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " chronicles" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 11
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " corinthians" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            BookChars = 13
+            Selection.SetRange Start:=SelMultiStart + 1, End:=SelMultiStart + BookChars + 4
+            Book = LCase(Selection.Text)
+            If Left(Book, BookChars + 1) = " thessalonians" Then
+                MakeMultiChangeNow = True
+                DigitAfter = Right(Book, 1)
+                SelMultiEnd = Selection.Range.End - 1
+            End If
+            
+            If DigitAfter < "0" Or DigitAfter > "9" Then
+                MakeMultiChangeNow = False
+            End If
+            If MakeMultiChangeNow = True Then
+                If atChar <> "@" Then
+                    Selection.SetRange Start:=SelMultiStart, End:=SelMultiStart
+                    Selection.TypeText Text:="@"
+                    Selection.SetRange Start:=SelMultiStart, End:=SelMultiEnd + 1
+                    Selection.Copy
+                End If
+                Selection.SetRange Start:=SelMultiEnd, End:=SelMultiEnd + 1
+                Y_skipRef
+            Else
+                Selection.SetRange Start:=SelMultiStart, End:=SelMultiStart + 1
+            End If
+        End If
+        
+        If MakeChangeNow = True Then
+            If atChar <> "@" Then
+                Selection.TypeText Text:="@"
+                SelStart = Selection.Range.Start - 1
+                Selection.SetRange Start:=SelStart, End:=SelEnd + 1
+                Selection.Copy
+            Else
+                SelStart = Selection.Range.Start - 1
+                Selection.SetRange Start:=SelStart, End:=SelEnd
+                Selection.Copy
+            End If
+            Selection.SetRange Start:=SelEnd, End:=SelEnd + 1
+            Y_skipRef
+'            findRefs
+        End If
+    End If
+    RefEnd = Selection.Range.Start
+End Sub

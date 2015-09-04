@@ -1,0 +1,36 @@
+Sub addSectPage()    'alt-a
+Sub addStar()    'alt-b
+Sub findCaps()    'alt-c
+Sub fixJay()' alt-d
+Sub editfootnotes()    'alt-e
+Sub addPageBack()    'alt-f
+Sub joinPara()     'alt-g
+Sub dashFind()    'alt-h
+Sub addpreHash()    'alt-i
+Sub dashReplace()    'alt-j
+Sub split()    'alt-k
+Sub abbrev()    'alt-l
+Sub skipItalics()    'alt-m
+Sub moveLeft()    'alt-n
+Sub backRef()    'alt-o
+Sub findSplitParaMoveUp()    'alt-p
+Sub findQuotes()    'alt-q
+Sub joinParaSpace()    'alt-r
+Sub changeCaps1()    'alt-s
+Sub split2()    'alt-t
+Sub addHash()    'alt-u
+Sub findItalics()    'alt-v
+Sub changeQuotes()    'alt-w
+Sub changeCaps2()    'alt-x
+Sub skipRef()    'alt-y
+Sub addPage()    'alt-z
+Sub findSplitPara()
+Sub inbetween()    'alt-?
+Sub setPage()    'alt-?
+Sub findChapter()    'alt-?
+Sub findDoubleQuotes()    'alt-?
+Sub enclosePage()    'alt-?
+Sub boldChapter()    'alt-?
+Sub findFootnote()    'alt-?
+Sub findFootnote2()    'alt-?
+Sub findRefs()    'called from elsewhere

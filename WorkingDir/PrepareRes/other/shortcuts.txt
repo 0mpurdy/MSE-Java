@@ -1,0 +1,2 @@
+C:\jbuilder5\jdk1.3\bin\java.exe -Xrunhprof:cpu=samples,depth=6 -classpath c:\kbt\classes Prepare
+C:\jbuilder5\jdk1.3\bin\java.exe -Xrunhprof:cpu=samples,depth=6 -classpath c:\kbt\classes SearchGUI
