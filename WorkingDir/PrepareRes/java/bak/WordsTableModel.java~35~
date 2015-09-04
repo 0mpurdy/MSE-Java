@@ -1,0 +1,114 @@
+//package com.ipurdy;
+
+//import javax.swing.BorderFactory;
+//import java.awt.BorderLayout;
+//import java.awt.Color;
+//import java.awt.Cursor;
+//import java.awt.Dimension;
+//import java.awt.event.ActionListener;
+//import java.awt.event.KeyAdapter;
+//import java.awt.event.KeyEvent;
+//import java.awt.event.KeyListener;
+//import java.awt.event.MouseAdapter;
+//import java.awt.event.MouseEvent;
+//import java.awt.event.WindowAdapter;
+//import java.awt.event.WindowEvent;
+//import java.awt.GridBagConstraints;
+//import java.awt.GridBagLayout;
+//import java.awt.Insets;
+//import java.awt.Rectangle;
+//import java.awt.Toolkit;
+//import java.io.File;
+//import javax.swing.ButtonGroup;
+//import javax.swing.event.HyperlinkEvent;
+//import javax.swing.event.HyperlinkListener;
+//import javax.swing.Icon;
+//import javax.swing.ImageIcon;
+//import javax.swing.JEditorPane;
+//import javax.swing.JFrame;
+//import javax.swing.JScrollPane;
+//import javax.swing.JTabbedPane;
+//import javax.swing.JTable;
+//import javax.swing.JWindow;
+//import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+//import javax.swing.table.TableModel;
+//import javax.swing.Timer;
+//import java.util.Arrays;
+
+public class WordsTableModel extends AbstractTableModel {
+    String[] saWords;
+    int[][] iaaRefs;
+
+    String[] saColumnNames = {"Row", "Word", "Total Refs", "Bible", "JND", "JBS", "FER", "CAC", "JT", "GRC", "Misc", "Hymns"};
+
+    public WordsTableModel() {
+        try {
+            java.io.File fIndex = new java.io.File("c:\\kbt\\bible\\superset.idx");
+            if (fIndex.exists()) {
+                java.io.FileInputStream fisIndex = new  java.io.FileInputStream(fIndex);
+                java.io.ObjectInputStream oisIndex = new java.io.ObjectInputStream(fisIndex);
+                saWords = (String[])oisIndex.readObject();
+                iaaRefs = (int[][])oisIndex.readObject();
+                oisIndex.close();
+            }
+        } catch (Exception e) {
+            new Alert("Error", "Error reading superset index (c:\\kbt\\bible\\superset.idx)");
+            Log.getLog().write(Constants.LOG_LOW, "<br>Error reading superset index: " + e);
+        }
+    }//WordsListModel
+
+    public int getRowCount() {
+        return saWords.length;
+    }//getSize
+
+    public int getColumnCount() {
+        return saColumnNames.length;
+    }
+
+    public String getColumnName(int intCol) {
+        return saColumnNames[intCol].toString();
+    }
+
+    public Object getValueAt(int intRow, int intCol) {
+        Object oValue;
+        if (intCol == 0) {
+            oValue = intRow + "";
+        } else if (intCol == 1) {
+            oValue = saWords[intRow];
+        } else if (intCol == 2) {
+            int intTotal = 0;
+            for (int intAuth = 0; intAuth <= Constants.MAX_AUTH_POS; intAuth++) {
+                if (iaaRefs[intRow][intAuth] == -1) {
+                    intTotal = -1;
+                    break;
+                } else {
+                    intTotal = intTotal + iaaRefs[intRow][intAuth];
+                }
+            }
+            oValue = new Integer(intTotal);
+        } else {
+            oValue = new Integer(iaaRefs[intRow][intCol - 3]);
+        }
+
+        if (oValue.toString().equals("-1")) {
+            oValue = new Integer(9999);
+        }
+
+        return oValue;
+    }
+
+    public int find(String strFind) {
+        int intIndex = 0;
+        for (int x = 0; x < saWords.length; x++) {
+            if (saWords[x].length() >= strFind.length()) {
+                String strSubWord = saWords[x].substring(0, strFind.length());
+                if (strSubWord.equals(strFind)) {
+                    intIndex = x;
+                    break;
+                }
+            }
+        }
+        return intIndex;
+    }
+}//WordsListModel
