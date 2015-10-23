@@ -5,6 +5,8 @@
  */
 package mse;
 
+import mse.common.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,11 +27,12 @@ public class VolumeSearch implements Runnable {
     private Config cfg;
     private SearchScope searchScope;
     private ArrayList<Author> authorsToSearch;
-    private Index index;
+    private Logger logger;
 
-    public VolumeSearch(Config cfg, Index index, String searchString, SearchScope searchScope, ArrayList<Author> authorsToSearch) {
+    public VolumeSearch(Config cfg, Logger logger, String searchString,
+                        SearchScope searchScope, ArrayList<Author> authorsToSearch) {
         this.cfg = cfg;
-        this.index = index;
+        this.logger = logger;
         this.searchString = searchString.toLowerCase();
         this.searchScope = searchScope;
         this.authorsToSearch = authorsToSearch;
@@ -41,87 +44,55 @@ public class VolumeSearch implements Runnable {
         ArrayList<Byte> wordReferences = null;
         
         try {
-            cfg.writeToLog(" Began search for " + searchString + " in " + authorsToSearch.toString() + " at " + Calendar.getInstance());
+            logger.log(LogLevel.DEBUG, "\tStarted Search: \"searchString\" in " + authorsToSearch.toString());
+
             // try to open and write to the results file
             try {
                 PrintWriter pwResults = new PrintWriter(new File(cfg.getWorkingDir() + cfg.getResultsFileName()));
 
-                pwResults.println("<html><head><title>Search Results</title></head>");
-                pwResults.println("<body bgcolor=\"#FFFFFF\" link=\"#0000FF\" vlink=\"#0000FF\" alink=\"#0000FF\">");
-                pwResults.println("<center><img src=\"../images/results.gif\"></center>");
+                // write the html header
+                pwResults.println("<!DOCTYPE html>\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
+                pwResults.println("<body>");
+                pwResults.println("\t<p><img src=\"../images/results.gif\"></p>");
 
-                // TODO progress window
-//            for (int intAuth = 0; intAuth < Constants.MAX_AUTH_POS + 1; intAuth++) {
-//                if (gui.cbToBeSearched[intAuth].isSelected()) {
-//                    intAuthCount++;
-//                }
-//            }
-//            float floatAuthsFactor = Constants.PROGRESS_BAR_MAX/(intAuthCount * 2);
-                // TODO -I find out why bible and hymns are paragraph scope
-                // for each author to be searched search the volume
+                // for each author to be searched
                 for (Author nextAuthor : authorsToSearch) {
 
-                    cfg.writeToLog("Searching: " + nextAuthor.getName() + " for " + searchString);
+                    AuthorIndex authorIndex = new AuthorIndex(nextAuthor.getIndexFilePath());
 
-                    // TODO -I find out what this does
-                    HashMap<String, String> compareWord = new HashMap<>();
+                    logger.log(LogLevel.DEBUG, "\t\tSearching: " + nextAuthor.getName() + " for " + searchString);
 
-                    // initialise the search count
-                    int lowCount = TOO_FREQUENT;
-                    int lowIndex = -1;
-                    int criteriaCount = 0;
-
-                    boolean foundAll = true;
-                    String basicSearchText = getBasicWords(searchString, true, true).trim();
-
-                    // TODO -I stars?
-                    int firstStarPos = searchString.indexOf("*");
-                    int secondStarPos;
-
-                    // TODO 3 update progress - searching for X
-                    int loadingResult = index.loadAuthor(nextAuthor);
-                    switch (loadingResult) {
-                        case Index.LOADED:
-                            cfg.writeToLog("Loaded " + nextAuthor.getName() + " index");
-                            break;
-                        case Index.RELOADED:
-                            cfg.writeToLog("Reloaded " + nextAuthor.getName() + " index");
-                            break;
-                        case Index.NOT_LOADED:
-//                            progressSearch.close();
-                            cfg.writeToLog("Failed to load " + nextAuthor.getName() + " index");
-                            break;
-                    }
-
-                    // TODO update progress - searching xAuthor ...
-                    pwResults.println("<center><hr><h1><font color=\"#A00000\">Results of search through " + nextAuthor.getName() + "</font></h1></center>");
-
-                    // initialise wildSearch to false and first wild word to true;
-                    boolean wildSearch = false;
-                    boolean firstWildWord = true;
+                    pwResults.println("\t<p>\n\t\t<hr>\n\t\t<h1>Results of search through " + nextAuthor.getName() + "</h1>\n\t</p>");
 
                     // create and populate a list of words to search for
                     String searchWords = "";
 
                     // check if the search is a wild search
                     if (searchString.contains("*")) {
-                        wildSearch = true;
-
                         if (checkValidWildcardSearch(searchString)) {
+
+                            boolean firstWildWord = true;
 
                             // remove the stars from the search string
                             String bareSearchString = searchString.replace("*", "");
-                            for (String nextWord : index.getWordsList()) {
+
+                            for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
+
                                 if (nextWord.contains(bareSearchString)) {
+
+                                    // TODO if first wild word then first search word? combine ifs?
+
                                     // for every word that contains the search string
                                     // print out the word to the user (with a preceding 
                                     // comma if it isn't the first word)
+
                                     if (firstWildWord) {
                                         firstWildWord = false;
                                         pwResults.println(nextWord);
                                     } else {
                                         pwResults.println(", " + nextWord);
                                     }
+
                                     // add the word to the list of words to be searched (with
                                     // a comma if it isn't the first word
                                     if (searchWords.length() > 0) {
@@ -131,7 +102,7 @@ public class VolumeSearch implements Runnable {
                                 }
                             }
                         } else {
-                            // TODO error - not a valid wild card search
+                            logger.log(LogLevel.INFO, "\t\t\tInvalid wildcard search: " + searchString);
                         }
                     } else {
                         // if it's not a wildcard search
@@ -139,31 +110,29 @@ public class VolumeSearch implements Runnable {
                     }
                     
                     // log the search strings
-                    cfg.writeToLog("Search strings: " + searchWords);
-                    
-                    ArrayList<String> searchWordsList = new ArrayList<>(Arrays.asList(searchWords.split(",")));
+                    logger.log(LogLevel.DEBUG, "Search strings: " + searchWords);
+
+                    // get the list of words to search
+                    String[] searchWordsList = searchWords.split(",");
                     
                     for (String nextSearchWord : searchWordsList) {
-                        int intIndex = index.getIndexPos(searchWords);
-                        if (intIndex != index.WORD_NOT_FOUND) {//found word in index
-                            // TODO finish
-//                            wordReferences = index.getRefs(intIndex);
-//                            if (baRefs != null) {//infrequent word
+
+                        // TODO too frequent words
+
+                        int numReferences = authorIndex.getTokenCount(nextSearchWord);
+
+//                        if (numReferences < 1) {
 //                                int intCurrCount = baRefs.length;
 //                                if (intCurrCount < intLowCount) {//lowest so far
 //                                    intLowCount = intCurrCount;
 //                                    intLowIndex = intIndex;
 //                                }//lowest so far
-//                                
+//
 //                                // TODO -I what is the criteria count
 ////                                intCriteriaCount++;
-//                            } else {//too frequent word
-//                                cfg.writeToLog("'" + nextSearchWord + "' is too frequent");
-//                            }
-                        } else {//didn't find word in index
-                            cfg.writeToLog("Couldn't find any occurrence of '" + nextSearchWord + "'");
-                            foundAll = false;
-                        }//didn't find word in index
+//                        } else {//didn't find word in index
+//                            logger.log(LogLevel.DEBUG, "Couldn't find any occurrence of \"" + nextSearchWord + "\"");
+//                        }//didn't find word in index
                     } //each word in search string
                 }
 

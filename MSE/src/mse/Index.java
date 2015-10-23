@@ -3,23 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package mse;
+
+import mse.common.Author;
+import mse.common.Config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
  * @author michael
  */
+
 public class Index {
 
     public static final int NOT_LOADED = 0;
@@ -57,8 +59,8 @@ public class Index {
         // check the availability of files
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor.isSearchable()) {
-                File nextFile = new File(cfg.getWorkingDir() + nextAuthor.getContentsPath());
-                if (nextFile.isDirectory()) {
+                File nextFile = new File(cfg.getWorkingDir() + nextAuthor.getIndexFilePath());
+                if (nextFile.exists()) {
                     indexAvailable.put(nextAuthor, Boolean.TRUE);
                 } else {
                     indexAvailable.put(nextAuthor, Boolean.FALSE);
@@ -78,7 +80,7 @@ public class Index {
                     // TODO 2 update progress
                 }
             } catch (Exception e) {
-                cfg.writeToLog("Stopped index pre-load");
+                System.out.println("Stopped index pre-load");
             }
             // TODO 2 close progress
         }
@@ -110,7 +112,7 @@ public class Index {
 
         // if the author is not loaded
         if (!indexLoaded.get(author)) {
-            File authorIndexFile = new File(cfg.getWorkingDir() + author.getContentsPath());
+            File authorIndexFile = new File(cfg.getWorkingDir() + author.getIndexFilePath());
             if (authorIndexFile.exists()) {
                 // if the index file exists
 
@@ -166,11 +168,11 @@ public class Index {
 
                     // record the author as loaded
                     indexLoaded.put(author, Boolean.TRUE);
-                    cfg.writeToLog("Loaded " + author.name() + " index (" + wordsList.length + " words)");
+                    System.out.println("Loaded " + author.name() + " index (" + wordsList.length + " words)");
                     result = LOADED;
 
                 } catch (Exception ex) {
-                    cfg.writeToLog("Error reading index file: " + author.getIndexPath() + "\n" + ex);
+                    System.out.println("Error reading index file: " + author.getIndexFilePath() + "\n" + ex);
                 } finally {
                     // close the input streams
                     try {
@@ -185,7 +187,7 @@ public class Index {
                 }
 
             } else {
-                cfg.writeToLog("Could not load " + author.getName() + " index at: " + author.getIndexPath());
+                System.out.println("Could not load " + author.getName() + " index at: " + author.getIndexFilePath());
             }
         } else {
             wordsList = authorWordsMap.get(author);

@@ -1,0 +1,30 @@
+{
+  "TOO_FREQUENT": 10000,
+  "mseVersion": "3.0.0",
+  "workingDir": "",
+  "resDir": "res\\",
+  "resultsFileName": "search_results.htm",
+  "searchString": "this",
+  "searchType": "Phrase",
+  "selectedAuthors": {
+    "AJG": false,
+    "JBS": false,
+    "FER": false,
+    "GRC": false,
+    "CHM": false,
+    "HYMNS": false,
+    "JT": false,
+    "BIBLE": true,
+    "SMC": false,
+    "JND": false,
+    "CAC": false,
+    "Misc": false
+  },
+  "synopsis": true,
+  "beep": false,
+  "splashWindow": false,
+  "autoLoad": false,
+  "fullScan": false,
+  "setup": false,
+  "debugOn": false
+}

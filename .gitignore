@@ -43,3 +43,6 @@ Temporary Items
 .apdisk
 /MSE/build/
 /MSE/dist/
+
+out/
+res/

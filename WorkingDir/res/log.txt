@@ -1,9 +1,0 @@
-
-Could not locate: C:\Users\Michael\Dropbox\MSE\WorkingDir\res\bible\books.htm
-Cannot run program "x-www-browser": CreateProcess error=2, The system cannot find the file specified
-Opened: C:\Users\Michael\Dropbox\MSE\WorkingDir\res\bible\books.htm
-Opened: C:\Users\Michael\Dropbox\MSE\WorkingDir\res\bible\books.htm
-Opened: C:\Users\Michael\Dropbox\MSE\WorkingDir\res\bible\books.htm
-Opened: C:\Users\Michael\Dropbox\MSE\WorkingDir\res\hymns\hymns.htm
-Opened: F:\dev\Java\MSE-Java\WorkingDir\res\bible\books.htm
-Opened: F:\dev\Java\MSE-Java\WorkingDir\res\chm\chm.htm
