@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import mse.VolumeSearch;
 import mse.common.*;
 import com.google.gson.Gson;
 
@@ -25,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -152,7 +154,6 @@ public class FXMLSearchController implements Initializable {
 
         String searchString = searchBox.getText();
 
-        // TODO Alerts
         if ((searchString.contains("*")) && (searchString.contains(" "))) {
             logger.log(LogLevel.INFO, "Wildcard searches must only have one word");
             progressLabel.setText("Wildcard searches must only have one word");
@@ -164,10 +165,19 @@ public class FXMLSearchController implements Initializable {
             if (cfg.isAuthorSelected()) {
                 // TODO progress window
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
-//                Progress progressSearch = new Progress("Searching ...", Constants.PROGRESS_BAR_MAX);
-//                Thread t = new Thread(new VolumeSearch(cfg,logger,));
-//                enableButtons(false);
-//                t.start();
+
+                // get which authors to search
+                HashMap<Author, Boolean> authors = cfg.getSelectedAuthors();
+                ArrayList authorsToSearch = new ArrayList();
+                for (Author nextAuthor : Author.values()) {
+                    if (authors.get(nextAuthor)) {
+                        authorsToSearch.add(nextAuthor);
+                    }
+                }
+
+                // start the thread to search
+                Thread search = new Thread(new VolumeSearch(cfg,logger,searchString, authorsToSearch));
+                search.start();
             } else {
                 progressLabel.setText("At least one author must be selected");
                 logger.log(LogLevel.INFO, "At least one author must be selected");

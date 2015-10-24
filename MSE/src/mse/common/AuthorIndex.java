@@ -127,6 +127,10 @@ public class AuthorIndex implements Serializable {
         return author;
     }
 
+    public String[] getReferences(String key) {
+        return references.get(key);
+    }
+
     public void loadIndex(String location) {
 
         // try to load the index of the current author

@@ -25,16 +25,16 @@ public class VolumeSearch implements Runnable {
 
     private String searchString;
     private Config cfg;
-    private SearchScope searchScope;
+//    private SearchScope searchScope;
     private ArrayList<Author> authorsToSearch;
     private Logger logger;
 
     public VolumeSearch(Config cfg, Logger logger, String searchString,
-                        SearchScope searchScope, ArrayList<Author> authorsToSearch) {
+                        /*SearchScope searchScope,*/ ArrayList<Author> authorsToSearch) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString.toLowerCase();
-        this.searchScope = searchScope;
+//        this.searchScope = searchScope;
         this.authorsToSearch = authorsToSearch;
     }
 
@@ -83,7 +83,7 @@ public class VolumeSearch implements Runnable {
                                     // TODO if first wild word then first search word? combine ifs?
 
                                     // for every word that contains the search string
-                                    // print out the word to the user (with a preceding 
+                                    // print out the word to the user (with a preceding
                                     // comma if it isn't the first word)
 
                                     if (firstWildWord) {
@@ -113,27 +113,92 @@ public class VolumeSearch implements Runnable {
                     logger.log(LogLevel.DEBUG, "Search strings: " + searchWords);
 
                     // get the list of words to search
-                    String[] searchWordsList = searchWords.split(",");
-                    
-                    for (String nextSearchWord : searchWordsList) {
+                    String[] searchTokensList = searchWords.split(",");
 
-                        // TODO too frequent words
+                    /* Search all the words to make sure that all the search tokens are in the author's
+                    * index. log any words that are too frequent, find the least frequent token and
+                    * record the number of infrequent words */
 
-                        int numReferences = authorIndex.getTokenCount(nextSearchWord);
+                    boolean allTokensFound = true;
+                    int lowestNumRefs = cfg.TOO_FREQUENT;
+                    String leastFrequentToken = null;
+                    int numInfreqTokens = 0;
 
-//                        if (numReferences < 1) {
-//                                int intCurrCount = baRefs.length;
-//                                if (intCurrCount < intLowCount) {//lowest so far
-//                                    intLowCount = intCurrCount;
-//                                    intLowIndex = intIndex;
-//                                }//lowest so far
+                    for (String nextSearchToken : searchTokensList) {
+
+                        // check that the index contains the words
+                        Integer numReferences = authorIndex.getTokenCount(nextSearchToken);
+
+                        if (numReferences != null) {
+
+                            // check that the words aren't too frequent
+                            if (numReferences > 0) {
+
+                                if (numReferences < lowestNumRefs) {
+                                    // lowest number of references so far
+                                    lowestNumRefs = numReferences;
+                                    leastFrequentToken = nextSearchToken;
+                                }
+                                numInfreqTokens++;
+
+                            } else {
+                                // word is too frequent
+                                logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " is too frequent");
+                            }
+
+                        } else {
+                            // word not found in author index
+                            logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
+                            allTokensFound = false;
+                        }
+                    }
+
+                    if ((leastFrequentToken != null) && allTokensFound) {
+                        // at least one searchable token and all tokens in author index
+
+                        int currentVolume = 0;
+                        int currentPage = 0;
+
+                        for (String reference : authorIndex.getReferences(leastFrequentToken)) {
+
+                        }
+
+
+                    }
+
+//                        StringBuffer sbLowestWordRefs = new StringBuffer();
+//                        String strPage = "";
+//                        baRefs = index.getRefs(intLowIndex);
+//                        if (baRefs != null) {//infrequent word - should always be true
+//                            int intCurrVol = 0;
+//                            int intCurrPage = 0;
+//                            for (int x = 0; x <= baRefs.length - 1; x++) {//each reference
+//                                int byteCurr = intFromByte(baRefs[x]);
+//                                if (byteCurr == 0) {//new volume
+//                                    x++;
+//                                    intCurrVol = intFromByte(baRefs[x]);
+//                                    intCurrPage = 0;
+//                                } else {//reference
+//                                    if (byteCurr == 255) {//large delta
+//                                        x++;
+//                                        int intHigh = intFromByte(baRefs[x]);
+//                                        x++;
+//                                        int intLow = intFromByte(baRefs[x]);
+//                                        intCurrPage = intCurrPage + (intHigh * 254) + intLow;
+//                                    } else {//small delta
+//                                        intCurrPage = intCurrPage + byteCurr;
+//                                    }//small delta
+//                                    sbLowestWordRefs.append(Utils.leftZeroPad(intCurrVol, Constants.MAX_DIGITS_IN_VOL_NUM) + "/" +
+//                                            Utils.leftZeroPad(intCurrPage, Constants.MAX_DIGITS_IN_PAGE_NUM) + " ");
+//                                }//reference
+//                            }//each reference
+//                        }//infrequent word - should always be true
+//                        progressSearch.updateStatus("Built index for: " + index.saWords[intLowIndex]);
+//                        log.write(Constants.LOG_HIGH, "<br>References to " + index.saWords[intLowIndex] + " (least frequent): " + sbLowestWordRefs.toString());
 //
-//                                // TODO -I what is the criteria count
-////                                intCriteriaCount++;
-//                        } else {//didn't find word in index
-//                            logger.log(LogLevel.DEBUG, "Couldn't find any occurrence of \"" + nextSearchWord + "\"");
-//                        }//didn't find word in index
-                    } //each word in search string
+//                        strLowestWordRefs = sbLowestWordRefs.toString();
+
+
                 }
 
             } catch (IOException ioe) {
