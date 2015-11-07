@@ -25,7 +25,7 @@ public class VolumeSearch implements Runnable {
 
     private String searchString;
     private Config cfg;
-//    private SearchScope searchScope;
+    //    private SearchScope searchScope;
     private ArrayList<Author> authorsToSearch;
     private Logger logger;
 
@@ -40,9 +40,9 @@ public class VolumeSearch implements Runnable {
 
     @Override
     public void run() {
-        
+
         ArrayList<Byte> wordReferences = null;
-        
+
         try {
             logger.log(LogLevel.DEBUG, "\tStarted Search: \"searchString\" in " + authorsToSearch.toString());
 
@@ -64,53 +64,18 @@ public class VolumeSearch implements Runnable {
 
                     pwResults.println("\t<p>\n\t\t<hr>\n\t\t<h1>Results of search through " + nextAuthor.getName() + "</h1>\n\t</p>");
 
+                    // check if it is a wildcard search
+                    boolean wildSearch = checkValidWildcardSearch(searchString);
+
                     // create and populate a list of words to search for
-                    String searchWords = "";
+                    String searchWords = getSearchWords(authorIndex, searchString, wildSearch);
 
-                    // check if the search is a wild search
-                    if (searchString.contains("*")) {
-                        if (checkValidWildcardSearch(searchString)) {
+                    // print out the search words
+                    String printableSearchWords = searchWords.replace(", ", ",");
+                    pwResults.println(printableSearchWords);
 
-                            boolean firstWildWord = true;
-
-                            // remove the stars from the search string
-                            String bareSearchString = searchString.replace("*", "");
-
-                            for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
-
-                                if (nextWord.contains(bareSearchString)) {
-
-                                    // TODO if first wild word then first search word? combine ifs?
-
-                                    // for every word that contains the search string
-                                    // print out the word to the user (with a preceding
-                                    // comma if it isn't the first word)
-
-                                    if (firstWildWord) {
-                                        firstWildWord = false;
-                                        pwResults.println(nextWord);
-                                    } else {
-                                        pwResults.println(", " + nextWord);
-                                    }
-
-                                    // add the word to the list of words to be searched (with
-                                    // a comma if it isn't the first word
-                                    if (searchWords.length() > 0) {
-                                        searchWords += ",";
-                                    }
-                                    searchWords += nextWord;
-                                }
-                            }
-                        } else {
-                            logger.log(LogLevel.INFO, "\t\t\tInvalid wildcard search: " + searchString);
-                        }
-                    } else {
-                        // if it's not a wildcard search
-                        searchWords += searchString.replace(" ", ",");
-                    }
-                    
                     // log the search strings
-                    logger.log(LogLevel.DEBUG, "Search strings: " + searchWords);
+                    logger.log(LogLevel.DEBUG, "Search strings: " + printableSearchWords);
 
                     // get the list of words to search
                     String[] searchTokensList = searchWords.split(",");
@@ -159,47 +124,133 @@ public class VolumeSearch implements Runnable {
                         int currentVolume = 0;
                         int currentPage = 0;
 
-                        for (String reference : authorIndex.getReferences(leastFrequentToken)) {
+                        ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(authorIndex.getReferences(leastFrequentToken)));
+
+                        // if there is more than one infrequent word
+                        // add the references to search to each word
+                        if (numInfreqTokens > 1) {
+
+                            // for each word
+                            for (String token : searchTokensList) {
+
+                                // if it's not the lowest word
+                                if (!token.equals(leastFrequentToken)) {
+
+                                    // if it has references in the index and it is infrequent
+                                    String[] currentTokenRefs = authorIndex.getReferences(token);
+                                    if ((currentTokenRefs != null) && (currentTokenRefs.length > 1)) {
+
+                                        // if it is a wildcard search
+                                        if (wildSearch) {
+
+                                            // compare the references of each word to find matches
+                                            // rtsIndex -> referencesToSearchIndex
+                                            // ctrIndex -> currentTokenReferencesIndex
+                                            int rtsIndex = 0;
+                                            int ctrIndex = 0;
+
+                                            // add any references in the current references list
+                                            // to the list of references to search
+                                            while ((rtsIndex < referencesToSearch.size()) &&
+                                                    (ctrIndex < currentTokenRefs.length)) {
+
+                                                String nextCurrentReference = currentTokenRefs[ctrIndex];
+
+                                                // compare the next two references
+                                                int compareValue = referencesToSearch.get(rtsIndex).compareTo(nextCurrentReference);
+
+                                                // if references are equal increment both indexes
+                                                if (compareValue == 0) {
+                                                    rtsIndex++;
+                                                    ctrIndex++;
+                                                } else if (compareValue >0) {
+                                                    // if the reference is not already in the list of references to search add it
+                                                    referencesToSearch.add(nextCurrentReference);
+                                                    ctrIndex++;
+                                                } else {
+                                                    // reference is in refs to search but not current word refs
+                                                    rtsIndex++;
+                                                }
+
+                                            }
+
+                                            // if there are any references left in the current list of references add
+                                            // them to the list of references to search
+                                            while ((ctrIndex < currentTokenRefs.length)) {
+                                                referencesToSearch.add(currentTokenRefs[ctrIndex]);
+                                                ctrIndex++;
+                                            } // end combining list of references
+
+                                        } else {
+                                            // not a wildcard search
+
+                                            // if the next reference for the current word is not on the
+                                            // previous, current or next page remove the reference from
+                                            // the list of references to search
+
+                                        } // end not a wildcard search
+
+                                    }
+
+                                }
+
+                            }
+
 
                         }
 
-
-                    }
-
-//                        StringBuffer sbLowestWordRefs = new StringBuffer();
-//                        String strPage = "";
-//                        baRefs = index.getRefs(intLowIndex);
-//                        if (baRefs != null) {//infrequent word - should always be true
-//                            int intCurrVol = 0;
-//                            int intCurrPage = 0;
-//                            for (int x = 0; x <= baRefs.length - 1; x++) {//each reference
-//                                int byteCurr = intFromByte(baRefs[x]);
-//                                if (byteCurr == 0) {//new volume
-//                                    x++;
-//                                    intCurrVol = intFromByte(baRefs[x]);
-//                                    intCurrPage = 0;
-//                                } else {//reference
-//                                    if (byteCurr == 255) {//large delta
-//                                        x++;
-//                                        int intHigh = intFromByte(baRefs[x]);
-//                                        x++;
-//                                        int intLow = intFromByte(baRefs[x]);
-//                                        intCurrPage = intCurrPage + (intHigh * 254) + intLow;
-//                                    } else {//small delta
-//                                        intCurrPage = intCurrPage + byteCurr;
-//                                    }//small delta
-//                                    sbLowestWordRefs.append(Utils.leftZeroPad(intCurrVol, Constants.MAX_DIGITS_IN_VOL_NUM) + "/" +
-//                                            Utils.leftZeroPad(intCurrPage, Constants.MAX_DIGITS_IN_PAGE_NUM) + " ");
-//                                }//reference
-//                            }//each reference
-//                        }//infrequent word - should always be true
-//                        progressSearch.updateStatus("Built index for: " + index.saWords[intLowIndex]);
-//                        log.write(Constants.LOG_HIGH, "<br>References to " + index.saWords[intLowIndex] + " (least frequent): " + sbLowestWordRefs.toString());
+//                            StringBuffer sbCurrentWordRefs = new StringBuffer();
 //
-//                        strLowestWordRefs = sbLowestWordRefs.toString();
+//                                        htCompareWord.clear();
+//                                        sbCurrentWordRefs.setLength(0);
+//
+//                                            int intCurrVol = 0;
+//                                            int intCurrPage = 0;
+
+//                                                int intCharPosLowest = 0;
+//                                                int intCharPosCurr = 0;
+//                                                String strCurrentWordRefs = sbCurrentWordRefs.toString();
+//
 
 
-                }
+
+//
+
+
+//                                            } else {//not wildcard search
+//                                                //check lowest array against this one
+//                                                int intCharPos = 0;
+//                                                String strRef = "";
+//                                                String strVol = "";
+//                                                int intPage = 0;
+//                                                String strPreRef = "";
+//                                                String strPostRef = "";
+//                                                while ((intCharPos < strLowestWordRefs.length()) && (htCompareWord.size() > 0)) {
+//                                                    strRef = strLowestWordRefs.substring(intCharPos, intCharPos
+//                                                            + Constants.MAX_DIGITS_IN_VOL_NUM + Constants.MAX_DIGITS_IN_PAGE_NUM + 1);
+//                                                    strVol = strRef.substring(0, Constants.MAX_DIGITS_IN_VOL_NUM + 1);
+//                                                    intPage = Integer.parseInt(strRef.substring(Constants.MAX_DIGITS_IN_VOL_NUM + 1));
+//                                                    strPreRef = strVol + Utils.leftZeroPad(intPage - 1, Constants.MAX_DIGITS_IN_PAGE_NUM);
+//                                                    strPostRef = strVol + Utils.leftZeroPad(intPage + 1, Constants.MAX_DIGITS_IN_PAGE_NUM);
+//
+//                                                    if ((htCompareWord.get(strRef) == null)
+//                                                            && (htCompareWord.get(strPreRef) == null)
+//                                                            && (htCompareWord.get(strPostRef) == null)) {
+//                                                        //ref is not page before/after ref in list of references for least frequent word
+//                                                        //remove from sbLowestWordRefs
+//                                                        strLowestWordRefs = strLowestWordRefs.substring(0, intCharPos)
+//                                                                + strLowestWordRefs.substring(intCharPos
+//                                                                + Constants.MAX_DIGITS_IN_VOL_NUM + Constants.MAX_DIGITS_IN_PAGE_NUM + 2);
+//                                                    } else {
+//                                                        intCharPos = intCharPos + Constants.MAX_DIGITS_IN_VOL_NUM + Constants.MAX_DIGITS_IN_PAGE_NUM + 2;
+//                                                    }
+//                                                }//each ref
+//                                            }//not wildcard search
+
+
+
+                    } // end one frequent token and all tokens found
+                } // end searching each author
 
             } catch (IOException ioe) {
                 // TODO error opening results file
@@ -207,6 +258,43 @@ public class VolumeSearch implements Runnable {
 
         } catch (Exception e) {
         }
+
+    }
+
+
+    private String getSearchWords(AuthorIndex authorIndex, String searchString, boolean wildsearch) {
+        // this returns the search words as a comma separated list
+
+        String searchWords = "";
+
+        // check if the search is a wild search
+        if (searchString.contains("*")) {
+            if (wildsearch) {
+
+                // remove the stars from the search string
+                String bareSearchString = searchString.replace("*", "");
+
+                for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
+
+                    if (nextWord.contains(bareSearchString)) {
+
+                        // add the word to the list of words to be searched (with
+                        // a comma if it isn't the first word
+                        if (searchWords.length() > 0) {
+                            searchWords += ",";
+                        }
+                        searchWords += nextWord;
+                    }
+                }
+            } else {
+                logger.log(LogLevel.INFO, "\t\t\tInvalid wildcard search: " + searchString);
+            }
+        } else {
+            // if it's not a wildcard search
+            searchWords += searchString.replace(" ", ",");
+        }
+
+        return searchWords;
 
     }
 
