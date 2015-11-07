@@ -56,6 +56,10 @@ public enum Author {
         return "target" + File.separator + folder + File.separator + filename;
     }
 
+    public String getVolumePath(int volumeNumber) {
+        return getTargetPath(folder + volumeNumber + ".htm");
+    }
+
     public String getContentsName() {
         return folder + "_contents";
     }

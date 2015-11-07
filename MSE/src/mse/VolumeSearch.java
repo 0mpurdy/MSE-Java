@@ -7,9 +7,7 @@ package mse;
 
 import mse.common.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -184,19 +182,72 @@ public class VolumeSearch implements Runnable {
                                         } else {
                                             // not a wildcard search
 
-                                            // if the next reference for the current word is not on the
-                                            // previous, current or next page remove the reference from
-                                            // the list of references to search
+                                            ArrayList currentReferencesList = new ArrayList<String>(Arrays.asList(currentTokenRefs));
+                                            int rtsIndex = 0;
 
-                                        } // end not a wildcard search
+                                            // remove all references to search where the currentTokenRefs does not contain a ref
+                                            // with a page adjacent to each ref in referencesToSearch
+                                            while ((rtsIndex < referencesToSearch.size()) && (currentReferencesList.size() > 0)) { // TODO is second size check necessary
 
-                                    }
+                                                final String currentReferenceToBeSearched = referencesToSearch.get(rtsIndex);
 
-                                }
+                                                // split the current reference (currentReferenceSplit - crs)
 
+                                                String[] crs = currentReferenceToBeSearched.split(":");
+                                                int currentRefPageNum = Integer.parseInt(crs[1]);
+                                                String previousPage = crs[0] + ":" + (currentRefPageNum - 1);
+                                                String nextPage = crs[0] + ":" + (currentRefPageNum + 1);
+
+                                                // if the next reference for the current word is not on an
+                                                // adjacent page remove the reference from the list of
+                                                // references to search
+                                                if ((!(currentReferencesList.contains(crs)))
+                                                        && (!(currentReferencesList.contains(previousPage)))
+                                                        && (!(currentReferencesList.contains(nextPage)))) {
+                                                    referencesToSearch.remove(currentReferenceToBeSearched);
+                                                } else {
+                                                    // move on to next reference
+                                                    rtsIndex++;
+                                                }
+
+                                            } // end checking each reference to be searched
+
+                                        } // end not wildcard search
+
+                                    } // end word has refs
+
+
+                            } // end iterating over each search token
+
+                        } // end multiple search tokens
+
+                        // TODO what is option.fullScan
+
+                        // process each page that contains a match
+                        for (String reference : referencesToSearch) {
+
+                            // get the volume and page number from the reference
+                            String[] refSplit = reference.split(":");
+                            int vol = Integer.parseInt(refSplit[0]);
+                            int page = Integer.parseInt(refSplit[1]);
+
+                            String filename;
+
+                            // get file name
+                            if (nextAuthor.equals(Author.BIBLE)) {
+                                filename = nextAuthor.getTargetPath(BibleBook.values()[vol].getName() + ".htm");
+                            } else {
+                                filename = nextAuthor.getVolumePath(vol);
                             }
 
+                            // read the file
+                            try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 
+                                //
+
+                            } catch (IOException ioe) {
+                                logger.log(LogLevel.HIGH, "Couldn't read " + nextAuthor.getTargetPath(filename));
+                            }
                         }
 
 //                            StringBuffer sbCurrentWordRefs = new StringBuffer();

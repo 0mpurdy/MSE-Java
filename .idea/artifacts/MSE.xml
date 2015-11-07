@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="MSE">
+    <output-path>$PROJECT_DIR$/out/artifacts/MSE</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="mse.MSE" />
+        <option name="description" value="" />
+        <option name="htmlParamFile" value="" />
+        <option name="paramFile" value="" />
+        <option name="title" value="MSE" />
+        <option name="vendor" value="Purdys" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="MSE.jar">
+        <element id="module-output" name="MSE" />
+      </element>
+      <element id="library" level="project" name="gson-2.3.1" />
+    </root>
+  </artifact>
+</component>

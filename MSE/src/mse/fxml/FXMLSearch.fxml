@@ -41,6 +41,7 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesViewLogFile" text="View Log File" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesViewConfigFile" text="View Config File" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLogAndConfig" text="Refresh Log and Config" />
                   <MenuItem mnemonicParsing="false" text="View Memory Usage" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="About Search Engine" />

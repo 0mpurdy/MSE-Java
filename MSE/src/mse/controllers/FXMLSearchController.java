@@ -5,7 +5,6 @@
  */
 package mse.controllers;
 
-import com.google.gson.reflect.TypeToken;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,10 +13,10 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import mse.VolumeSearch;
 import mse.common.*;
-import com.google.gson.Gson;
 
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -68,14 +67,12 @@ public class FXMLSearchController implements Initializable {
         progressBar.setVisible(false);
 
         // open new logger
-        logger = new Logger(new File("Log.txt"), LogLevel.INFO);
+        logger = new Logger(LogLevel.INFO);
         logger.openLog();
 
         // try to recover config options
-        if ((cfg = readConfig()) == null) {
-            cfg = new Config();
-            cfg.save(logger);
-        }
+        cfg = new Config(logger);
+        cfg.save(logger);
 
         // set the setup config flag to true
         cfg.setSetup(true);
@@ -89,14 +86,14 @@ public class FXMLSearchController implements Initializable {
                 nextCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
                         if (!cfg.isSettingUp()) {
-                            cfg.setSelectedAuthor(nextAuthor, true);
+                            cfg.setSelectedAuthor(nextAuthor.getCode(), true);
                             cfg.save(logger);
                         }
                     }
                 });
 
                 // select if it is to be searched or not
-                nextCheckBox.setSelected(cfg.getSelectedAuthor(nextAuthor));
+                nextCheckBox.setSelected(cfg.getSelectedAuthor(nextAuthor.getCode()));
 
                 checkBoxPane.add(nextCheckBox, i % 6, i / 6);
                 i++;
@@ -112,16 +109,43 @@ public class FXMLSearchController implements Initializable {
 
         }
 
+        File mapsFile = new File(cfg.getResDir() + "Maps.txt");
+
         // add menu items for maps
-        try {
-            File f = new File(cfg.getResDir() + "maps.txt");
-            java.util.List<String> jsonLines = Files.readAllLines(Paths.get(f.toURI()));
-            String json = "";
-            for (String line : jsonLines) {
-                json+= line;
+        try (BufferedReader br = new BufferedReader(new FileReader(mapsFile))) {
+
+            ArrayList<Map> maps = new ArrayList<>();
+            String area;
+            String name;
+            String location;
+            Map nextMap;
+
+            boolean eof = false;
+
+            while (!eof) {
+                area = br.readLine();
+                name = br.readLine();
+                location = br.readLine();
+                br.readLine();
+
+                if ((area == null) || (name == null) || (location == null)) {
+                    eof = true;
+                } else {
+                    nextMap = new Map(area, name, location);
+                    maps.add(nextMap);
+                }
             }
-            Gson gson = new Gson();
-            ArrayList<Map> maps = gson.fromJson(json, new TypeToken<ArrayList<Map>>(){}.getType());
+
+            // replaced to allow gson dependency to be removed
+//            File f = new File(cfg.getResDir() + "maps.txt");
+//            java.util.List<String> jsonLines = Files.readAllLines(Paths.get(f.toURI()));
+//            String json = "";
+//            for (String line : jsonLines) {
+//                json+= line;
+//            }
+//            Gson gson = new Gson();
+//            ArrayList<Map> maps = gson.fromJson(json, new TypeToken<ArrayList<Map>>(){}.getType())
+
             for (Map map : maps) {
                 MenuItem nextMenuItem = new MenuItem(map.getArea() + " - " + map.getMapName());
                 nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + "maps" + File.separator + map.getMapLocation()));
@@ -130,11 +154,11 @@ public class FXMLSearchController implements Initializable {
                     mapsMenu.getItems().add(new SeparatorMenuItem());
                 }
             }
+
         } catch (IOException ioe) {
-            logger.log(LogLevel.HIGH, "Could not find maps file.");
-            logger.log(LogLevel.HIGH, ioe.getMessage());
+            logger.log(LogLevel.HIGH, "Could not find maps file - " + mapsFile.getAbsolutePath());
         }
-        
+
         cfg.setSetup(false);
 
         // initialise the search box
@@ -167,10 +191,10 @@ public class FXMLSearchController implements Initializable {
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
 
                 // get which authors to search
-                HashMap<Author, Boolean> authors = cfg.getSelectedAuthors();
-                ArrayList authorsToSearch = new ArrayList();
+                HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
+                ArrayList<Author> authorsToSearch = new ArrayList<>();
                 for (Author nextAuthor : Author.values()) {
-                    if (authors.get(nextAuthor)) {
+                    if (authors.get(nextAuthor.getCode())) {
                         authorsToSearch.add(nextAuthor);
                     }
                 }
@@ -211,22 +235,29 @@ public class FXMLSearchController implements Initializable {
         }
     }
 
-    private void updateSelectedAuthor(ItemEvent itemEvent, Author author) {
-        cfg.setSelectedAuthor(author, true);
+    @FXML
+    public void handlesRefreshLogAndConfig(ActionEvent e) {
+        logger.refresh();
+        cfg.refresh();
     }
 
-    private Config readConfig() {
-        try {
-            Gson gson = new Gson();
-            FileReader fr = new FileReader("config.txt");
-            Path jsonPath = Paths.get("config.txt");
-            String json = new String(Files.readAllBytes(jsonPath));
-            logger.log(LogLevel.INFO, "Config loaded.");
-            return gson.fromJson(json, Config.class);
-        } catch (IOException fnfe) {
-            logger.log(LogLevel.LOW, "Config file could not be read.");
-            return null;
-        }
+    private void updateSelectedAuthor(ItemEvent itemEvent, Author author) {
+        cfg.setSelectedAuthor(author.getCode(), true);
     }
+
+//    removed to save having to use gson lib
+//    private Config readConfig() {
+//        try {
+//            Gson gson = new Gson();
+//            FileReader fr = new FileReader("config.txt");
+//            Path jsonPath = Paths.get("config.txt");
+//            String json = new String(Files.readAllBytes(jsonPath));
+//            logger.log(LogLevel.INFO, "Config loaded.");
+//            return gson.fromJson(json, Config.class);
+//        } catch (IOException fnfe) {
+//            logger.log(LogLevel.LOW, "Config file could not be read.");
+//            return null;
+//        }
+//    }
 
 }

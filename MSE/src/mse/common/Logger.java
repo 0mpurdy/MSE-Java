@@ -10,13 +10,22 @@ import java.util.Date;
  */
 public class Logger {
 
+    private final String logFilePath = "Log.txt";
+
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     File loggingFile;
     PrintWriter pwLog;
     LogLevel logLevel;
 
-    public Logger(File loggingFile, LogLevel logLevel) {
-        this.loggingFile = loggingFile;
+    public Logger(LogLevel logLevel) {
+        loggingFile = new File(logFilePath);
+        try {
+            if (!loggingFile.exists()) {
+                loggingFile.createNewFile();
+            }
+        } catch(IOException ioe) {
+            System.out.println(ioe.getMessage());
+        }
         this.logLevel = logLevel;
     }
 
@@ -43,6 +52,17 @@ public class Logger {
 
     public void closeLog() {
         this.pwLog.close();
+    }
+
+    public void refresh() {
+        closeLog();
+        loggingFile.delete();
+        try {
+            loggingFile.createNewFile();
+            openLog();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 
 }
