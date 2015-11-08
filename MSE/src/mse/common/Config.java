@@ -73,12 +73,12 @@ public class Config {
             for (Author nextAuthor : Author.values()) {
                 if (nextAuthor.isSearchable()) {
                     String[] splitLine = br.readLine().split(":");
-                    selectedAuthors.put(splitLine[0], Boolean.getBoolean(splitLine[1]));
+                    selectedAuthors.put(splitLine[0], Boolean.parseBoolean(splitLine[1]));
                 }
             }
 
 
-        } catch (IOException|ArrayIndexOutOfBoundsException ex) {
+        } catch (IOException ex) {
             logger.log(LogLevel.LOW, "Error reading config - setting defaults");
             setDefaults();
         }

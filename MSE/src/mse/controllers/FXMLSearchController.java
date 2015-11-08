@@ -11,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import mse.VolumeSearch;
+import mse.AuthorSearch;
 import mse.common.*;
 
 import java.awt.*;
@@ -21,9 +21,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -67,7 +64,7 @@ public class FXMLSearchController implements Initializable {
         progressBar.setVisible(false);
 
         // open new logger
-        logger = new Logger(LogLevel.INFO);
+        logger = new Logger(LogLevel.DEBUG);
         logger.openLog();
 
         // try to recover config options
@@ -86,7 +83,7 @@ public class FXMLSearchController implements Initializable {
                 nextCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
                         if (!cfg.isSettingUp()) {
-                            cfg.setSelectedAuthor(nextAuthor.getCode(), true);
+                            cfg.setSelectedAuthor(nextAuthor.getCode(), new_val);
                             cfg.save(logger);
                         }
                     }
@@ -194,13 +191,14 @@ public class FXMLSearchController implements Initializable {
                 HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
                 ArrayList<Author> authorsToSearch = new ArrayList<>();
                 for (Author nextAuthor : Author.values()) {
+                    if (!nextAuthor.isSearchable()) continue;
                     if (authors.get(nextAuthor.getCode())) {
                         authorsToSearch.add(nextAuthor);
                     }
                 }
 
                 // start the thread to search
-                Thread search = new Thread(new VolumeSearch(cfg,logger,searchString, authorsToSearch));
+                Thread search = new Thread(new AuthorSearch(cfg,logger,searchString, authorsToSearch));
                 search.start();
             } else {
                 progressLabel.setText("At least one author must be selected");

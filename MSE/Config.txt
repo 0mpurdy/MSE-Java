@@ -1,29 +1,26 @@
-{
-  "mseVersion": "3.0.0",
-  "defaultBrowser": "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe",
-  "workingDir": "F:\\dev\\Java\\MSE-Java\\WorkingDir\\res\\",
-  "resultsFileName": "search_results.htm",
-  "searchString": "bride",
-  "searchType": "Phrase",
-  "selectedAuthors": {
-    "CHM": true,
-    "BIBLE": true,
-    "AJG": true,
-    "Misc": true,
-    "FER": true,
-    "JND": true,
-    "GRC": true,
-    "HYMNS": true,
-    "CAC": true,
-    "JT": false,
-    "JBS": true,
-    "SMC": true
-  },
-  "beep": false,
-  "splashWindow": false,
-  "autoLoad": false,
-  "fullScan": false,
-  "loggingActions": true,
-  "setup": false,
-  "debugOn": false
-}
+mseVersion:3.0.0
+workingDir:
+resDir:res\
+resultsFileName:search_results.htm
+searchString:
+searchType:Phrase
+synopsis:false
+beep:false
+splashWindow:false
+autoLoad:false
+fullScan:false
+setup:false
+debugOn:false
+ --- Selected Authors --- 
+JND:false
+FER:false
+CAC:false
+Bible:false
+SMC:false
+Misc:false
+CHM:false
+GRC:false
+JBS:false
+JT:false
+Hymns:false
+AJG:false

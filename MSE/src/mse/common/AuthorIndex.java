@@ -10,22 +10,21 @@ import java.util.Map;
  */
 public class AuthorIndex implements Serializable {
 
+    private Logger logger;
+
     private Author author;
     private HashMap<String, Integer> tokenCountMap;
     private HashMap<String, Integer> lastPage;
     private HashMap<String, Integer> nextReferenceIndex;
     private HashMap<String, String[]> references;
 
-    public AuthorIndex(String location) {
-        loadIndex(location);
-    }
-
-    public AuthorIndex(Author author) {
+    public AuthorIndex(Author author, Logger logger) {
         this.author = author;
         tokenCountMap = new HashMap<>();
         lastPage = new HashMap<>();
         nextReferenceIndex = new HashMap<>();
         references = new HashMap<>();
+        this.logger = logger;
     }
 
     public String getAuthorName() {
@@ -131,24 +130,23 @@ public class AuthorIndex implements Serializable {
         return references.get(key);
     }
 
-    public void loadIndex(String location) {
+    public void loadIndex(String resLocation) {
 
         // try to load the index of the current author
         try {
-            InputStream inStream = new FileInputStream(author.getIndexFilePath());
+            InputStream inStream = new FileInputStream(resLocation + author.getIndexFilePath());
             BufferedInputStream bInStream = new BufferedInputStream(inStream);
             ObjectInput input = new ObjectInputStream(bInStream);
-            this.author = ((AuthorIndex) input).author;
-            this.tokenCountMap = ((AuthorIndex) input).tokenCountMap;
-            this.lastPage = ((AuthorIndex) input).lastPage;
-            this.nextReferenceIndex = ((AuthorIndex) input).nextReferenceIndex;
-            this.references = ((AuthorIndex) input).references;
+            this.tokenCountMap = (HashMap<String, Integer>) input.readObject();
+            this.references = (HashMap<String, String[]>) input.readObject();
         } catch (FileNotFoundException fnfe) {
-            System.out.println("Could not file find file: " + author.getIndexFilePath());
+            logger.log(LogLevel.HIGH, "Could not file find file: " + resLocation + author.getIndexFilePath());
         } catch (IOException ioe) {
-            System.out.println("Error loading from: " + location);
+            logger.log(LogLevel.HIGH, "Error loading from: " + author.getIndexFilePath());
         } catch (ClassCastException cce) {
-            System.out.println("Error casting class when loading new index");
+            logger.log(LogLevel.HIGH, "Error casting class when loading new index");
+        } catch (ClassNotFoundException cnfe) {
+            logger.log(LogLevel.HIGH, "Class not found when loading new index");
         }
 
     }
@@ -161,7 +159,8 @@ public class AuthorIndex implements Serializable {
             OutputStream file = new FileOutputStream(location);
             BufferedOutputStream buffer = new BufferedOutputStream(file);
             objectOutputStream = new ObjectOutputStream(buffer);
-            objectOutputStream.writeObject(this);
+            objectOutputStream.writeObject(tokenCountMap);
+            objectOutputStream.writeObject(references);
         }
         catch(IOException ex){
             System.out.println("\nError writing index for " + author.getName() + " at location " + location);

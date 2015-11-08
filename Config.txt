@@ -2,7 +2,7 @@ mseVersion:3.0.0
 workingDir:
 resDir:res\
 resultsFileName:search_results.htm
-searchString:
+searchString:love
 searchType:Phrase
 synopsis:false
 beep:false
@@ -15,7 +15,7 @@ debugOn:false
 JND:false
 FER:false
 CAC:false
-Bible:false
+Bible:true
 SMC:false
 Misc:false
 CHM:false
