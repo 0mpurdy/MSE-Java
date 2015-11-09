@@ -1,7 +1,2 @@
-[INFO] [2015-11-08 00:18:07] - Searched: love
-[INFO] [2015-11-08 00:18:19] - Searched: love
-[INFO] [2015-11-08 00:18:48] - Searched: love
-[DEBUG] [2015-11-08 00:20:13] - No value found
-[DEBUG] [2015-11-08 00:20:13] - Config saved: F:\dev\Java\MSE-Java\Config.txt
-[DEBUG] [2015-11-08 00:20:14] - Config saved: F:\dev\Java\MSE-Java\Config.txt
-[INFO] [2015-11-08 00:20:14] - Searched: love
+[DEBUG] [2015-11-09 19:16:06] - Config saved: F:\dev\Java\MSE-Java\Config.txt
+[INFO] [2015-11-09 19:16:06] - Searched: love

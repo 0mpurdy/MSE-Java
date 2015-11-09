@@ -19,7 +19,7 @@ public class Config {
 
     private final String configFilePath = "Config.txt";
 
-    private Logger logger;
+    private ILogger logger;
 
     private String mseVersion;
 //    private String defaultBrowser;
@@ -129,7 +129,7 @@ public class Config {
 
     }
 
-    public void save(Logger logger) {
+    public void save() {
         if (!setup) {
 
             File configFile = new File(configFilePath);
@@ -317,7 +317,7 @@ public class Config {
 
     public void refresh() {
         setDefaults();
-        save(logger);
+        save();
     }
 
 }

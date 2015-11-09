@@ -5,6 +5,9 @@
       <artifact name="MSE" />
     </artifacts-to-build>
   </component>
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/MSE/src/mse/data/Search.java" line="118" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="b30f29d0-4774-4522-a847-c77157ffbc48" name="Default" comment="" />
     <ignored path="MSE-Java.iws" />
@@ -30,10 +33,33 @@
       <file leaf-file-name="AuthorSearch.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.862069">
-              <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="78" column="54" selection-start-line="78" selection-start-column="54" selection-end-line="78" selection-end-column="54" />
               <folding>
-                <element signature="method#processString#0;class#AuthorSearch#0" expanded="false" />
+                <element signature="docComment;class#AuthorSearch#0" expanded="false" />
+                <element signature="method#AuthorSearch#0;class#AuthorSearch#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Search.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/MSE/src/mse/data/Search.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.34596375">
+              <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#516#517#0" expanded="true" />
+                <element signature="e#549#550#0" expanded="true" />
+                <element signature="e#1418#1419#0" expanded="true" />
+                <element signature="e#1459#1460#0" expanded="true" />
+                <element signature="e#1499#1500#0" expanded="true" />
+                <element signature="e#1533#1534#0" expanded="true" />
+                <element signature="e#2871#2872#0" expanded="true" />
+                <element signature="e#2906#2907#0" expanded="true" />
+                <element signature="e#2964#2965#0" expanded="true" />
+                <element signature="e#3012#3013#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -44,10 +70,7 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="55" column="15" selection-start-line="55" selection-start-column="15" selection-end-line="55" selection-end-column="15" />
-              <folding>
-                <element signature="e#1945#1946#0" expanded="true" />
-                <element signature="e#2012#2013#0" expanded="true" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
@@ -56,8 +79,21 @@
         <entry file="file://$PROJECT_DIR$/MSE/src/mse/controllers/FXMLSearchController.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="66" column="42" selection-start-line="66" selection-start-column="42" selection-end-line="66" selection-end-column="42" />
-              <folding />
+              <caret line="173" column="14" selection-start-line="173" selection-start-column="14" selection-end-line="173" selection-end-column="14" />
+              <folding>
+                <element signature="docComment;class#FXMLSearchController#0" expanded="false" />
+                <element signature="method#initialize#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="e#1824#1862#0" expanded="false" />
+                <element signature="class#2168:2554" expanded="false" />
+                <element signature="method#changed#0;class#2168:2554" expanded="false" />
+                <element signature="e#4174#4224#0" expanded="false" />
+                <element signature="method#handlesRefine#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="method#handlesViewLogFile#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="method#handlesViewConfigFile#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="method#handlesRefreshLogAndConfig#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="method#updateSelectedAuthor#0;class#FXMLSearchController#0" expanded="false" />
+                <element signature="e#8183#8227#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -66,24 +102,31 @@
         <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Config.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="210" column="0" selection-start-line="210" selection-start-column="0" selection-end-line="210" selection-end-column="0" />
-              <folding>
-                <element signature="e#6687#6688#0" expanded="true" />
-              </folding>
+              <caret line="21" column="19" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AuthorIndex.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Logger.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Logger.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="10" column="38" selection-start-line="10" selection-start-column="38" selection-end-line="10" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AuthorIndex.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/AuthorIndex.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.15451577">
-              <caret line="147" column="46" selection-start-line="147" selection-start-column="46" selection-end-line="147" selection-end-column="46" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
               <folding>
-                <element signature="docComment;class#AuthorIndex#0" expanded="false" />
                 <element signature="method#incrementTokenCount#0;class#AuthorIndex#0" expanded="false" />
-                <element signature="e#2437#2468#0" expanded="false" />
-                <element signature="e#2818#2870#0" expanded="false" />
+                <element signature="e#2438#2469#0" expanded="false" />
+                <element signature="e#2819#2871#0" expanded="false" />
                 <element signature="method#getTokenCount#0;class#AuthorIndex#0" expanded="false" />
                 <element signature="method#cleanIndexArrays#0;class#AuthorIndex#0" expanded="false" />
               </folding>
@@ -97,6 +140,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -124,12 +168,14 @@
         <option value="$PROJECT_DIR$/MSE/src/mse/common/Author.java" />
         <option value="$PROJECT_DIR$/MSE/src/mse/common/BibleBook.java" />
         <option value="$PROJECT_DIR$/MSE/src/mse/fxml/FXMLSearch.fxml" />
-        <option value="$PROJECT_DIR$/MSE/src/mse/common/Logger.java" />
         <option value="$PROJECT_DIR$/MSE/src/mse/VolumeSearch.java" />
+        <option value="$PROJECT_DIR$/MSE/src/mse/controllers/FXMLSearchController.java" />
+        <option value="$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java" />
+        <option value="$PROJECT_DIR$/MSE/src/mse/common/ILogger.java" />
+        <option value="$PROJECT_DIR$/MSE/src/mse/common/Logger.java" />
         <option value="$PROJECT_DIR$/MSE/src/mse/common/Config.java" />
         <option value="$PROJECT_DIR$/MSE/src/mse/common/AuthorIndex.java" />
-        <option value="$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java" />
-        <option value="$PROJECT_DIR$/MSE/src/mse/controllers/FXMLSearchController.java" />
+        <option value="$PROJECT_DIR$/MSE/src/mse/data/Search.java" />
       </list>
     </option>
   </component>
@@ -172,8 +218,7 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -228,7 +273,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
+              <option name="myItemId" value="data" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -256,11 +301,12 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../MSE-FilePrep" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="recentsLimit" value="5" />
     <property name="dynamic.classpath" value="false" />
     <property name="FullScreen" value="false" />
@@ -478,7 +524,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32946146" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -521,18 +567,6 @@
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java</url>
-          <line>327</line>
-          <properties />
-          <option name="timeStamp" value="10" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java</url>
-          <line>62</line>
-          <properties />
-          <option name="timeStamp" value="14" />
-        </line-breakpoint>
       </breakpoints>
       <option name="time" value="19" />
     </breakpoint-manager>
@@ -550,6 +584,68 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding>
+            <element signature="docComment;class#AuthorSearch#0" expanded="false" />
+            <element signature="method#AuthorSearch#0;class#AuthorSearch#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Author.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="55" column="15" selection-start-line="55" selection-start-column="15" selection-end-line="55" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/controllers/FXMLSearchController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="66" column="42" selection-start-line="66" selection-start-column="42" selection-end-line="66" selection-end-column="42" />
+          <folding>
+            <element signature="docComment;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#initialize#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="e#1824#1862#0" expanded="false" />
+            <element signature="class#2168:2554" expanded="false" />
+            <element signature="method#changed#0;class#2168:2554" expanded="false" />
+            <element signature="e#4174#4224#0" expanded="false" />
+            <element signature="method#handlesRefine#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesViewLogFile#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesViewConfigFile#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesRefreshLogAndConfig#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#updateSelectedAuthor#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="e#8183#8227#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Config.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="210" column="0" selection-start-line="210" selection-start-column="0" selection-end-line="210" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/AuthorIndex.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="method#incrementTokenCount#0;class#AuthorIndex#0" expanded="false" />
+            <element signature="e#2438#2469#0" expanded="false" />
+            <element signature="e#2819#2871#0" expanded="false" />
+            <element signature="method#getTokenCount#0;class#AuthorIndex#0" expanded="false" />
+            <element signature="method#cleanIndexArrays#0;class#AuthorIndex#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_51/javafx-src.zip!/javafx/fxml/FXMLLoader.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -568,18 +664,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33271718">
           <caret line="1764" column="0" selection-start-line="1764" selection-start-column="0" selection-end-line="1764" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Author.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="55" column="15" selection-start-line="55" selection-start-column="15" selection-end-line="55" selection-end-column="15" />
-          <folding>
-            <element signature="e#1945#1946#0" expanded="true" />
-            <element signature="e#2012#2013#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -591,10 +675,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="78" column="54" selection-start-line="78" selection-start-column="54" selection-end-line="78" selection-end-column="54" />
+          <folding>
+            <element signature="docComment;class#AuthorSearch#0" expanded="false" />
+            <element signature="method#AuthorSearch#0;class#AuthorSearch#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/MSE/src/mse/controllers/FXMLSearchController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="66" column="42" selection-start-line="66" selection-start-column="42" selection-end-line="66" selection-end-column="42" />
+          <caret line="173" column="14" selection-start-line="173" selection-start-column="14" selection-end-line="173" selection-end-column="14" />
+          <folding>
+            <element signature="docComment;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#initialize#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="e#1824#1862#0" expanded="false" />
+            <element signature="class#2168:2554" expanded="false" />
+            <element signature="method#changed#0;class#2168:2554" expanded="false" />
+            <element signature="e#4174#4224#0" expanded="false" />
+            <element signature="method#handlesRefine#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesViewLogFile#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesViewConfigFile#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#handlesRefreshLogAndConfig#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="method#updateSelectedAuthor#0;class#FXMLSearchController#0" expanded="false" />
+            <element signature="e#8183#8227#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/ILogger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Logger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="10" column="38" selection-start-line="10" selection-start-column="38" selection-end-line="10" selection-end-column="38" />
           <folding />
         </state>
       </provider>
@@ -602,34 +726,49 @@
     <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Config.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="210" column="0" selection-start-line="210" selection-start-column="0" selection-end-line="210" selection-end-column="0" />
-          <folding>
-            <element signature="e#6687#6688#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MSE/src/mse/AuthorSearch.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.862069">
-          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
-          <folding>
-            <element signature="method#processString#0;class#AuthorSearch#0" expanded="false" />
-          </folding>
+          <caret line="21" column="19" selection-start-line="21" selection-start-column="19" selection-end-line="21" selection-end-column="19" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/AuthorIndex.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15451577">
-          <caret line="147" column="46" selection-start-line="147" selection-start-column="46" selection-end-line="147" selection-end-column="46" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="12" column="19" selection-start-line="12" selection-start-column="19" selection-end-line="12" selection-end-column="19" />
           <folding>
-            <element signature="docComment;class#AuthorIndex#0" expanded="false" />
             <element signature="method#incrementTokenCount#0;class#AuthorIndex#0" expanded="false" />
-            <element signature="e#2437#2468#0" expanded="false" />
-            <element signature="e#2818#2870#0" expanded="false" />
+            <element signature="e#2438#2469#0" expanded="false" />
+            <element signature="e#2819#2871#0" expanded="false" />
             <element signature="method#getTokenCount#0;class#AuthorIndex#0" expanded="false" />
             <element signature="method#cleanIndexArrays#0;class#AuthorIndex#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/common/Author.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="55" column="15" selection-start-line="55" selection-start-column="15" selection-end-line="55" selection-end-column="15" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MSE/src/mse/data/Search.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.34596375">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#516#517#0" expanded="true" />
+            <element signature="e#549#550#0" expanded="true" />
+            <element signature="e#1418#1419#0" expanded="true" />
+            <element signature="e#1459#1460#0" expanded="true" />
+            <element signature="e#1499#1500#0" expanded="true" />
+            <element signature="e#1533#1534#0" expanded="true" />
+            <element signature="e#2871#2872#0" expanded="true" />
+            <element signature="e#2906#2907#0" expanded="true" />
+            <element signature="e#2964#2965#0" expanded="true" />
+            <element signature="e#3012#3013#0" expanded="true" />
           </folding>
         </state>
       </provider>

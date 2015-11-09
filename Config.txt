@@ -4,7 +4,7 @@ resDir:res\
 resultsFileName:search_results.htm
 searchString:love
 searchType:Phrase
-synopsis:false
+synopsis:true
 beep:false
 splashWindow:false
 autoLoad:false

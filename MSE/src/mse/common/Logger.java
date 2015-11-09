@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by mj_pu_000 on 28/09/2015.
  */
-public class Logger {
+public class Logger implements ILogger {
 
     private final String logFilePath = "Log.txt";
 

@@ -6,6 +6,7 @@
 package mse;
 
 import mse.common.*;
+import mse.data.Search;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -44,165 +45,22 @@ public class AuthorSearch implements Runnable {
     @Override
     public void run() {
 
-        ArrayList<Byte> wordReferences = null;
+        Search search = new Search(cfg, logger, searchString);
 
         logger.log(LogLevel.DEBUG, "\tStarted Search: \"searchString\" in " + authorsToSearch.toString());
 
         // try to open and write to the results file
-        try {
-            PrintWriter pwResults = new PrintWriter(new File(cfg.getWorkingDir() + cfg.getResultsFileName()));
+        try (PrintWriter pwResults = new PrintWriter(new File(cfg.getWorkingDir() + cfg.getResultsFileName()))) {
 
-            // write the html header
-            pwResults.println("<!DOCTYPE html>\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
-            pwResults.println("<body>");
-            pwResults.println("\t<p><img src=\"../images/results.gif\"></p>");
+            writeHtmlHeader(pwResults);
+
+            // check if it's a wild card search
+            search.setWildSearch();
 
             // for each author to be searched
             for (Author nextAuthor : authorsToSearch) {
 
-                AuthorIndex authorIndex = new AuthorIndex(nextAuthor, logger);
-                authorIndex.loadIndex(cfg.getResDir());
-
-                logger.log(LogLevel.DEBUG, "\t\tSearching: " + nextAuthor.getName() + " for " + searchString);
-
-                pwResults.println("\t<p>\n\t\t<hr>\n\t\t<h1>Results of search through " + nextAuthor.getName() + "</h1>\n\t</p>");
-
-                // check if it is a wildcard search
-                boolean wildSearch = checkValidWildcardSearch(searchString);
-
-                // create and populate a list of words to search for
-                String searchWords = getSearchWords(authorIndex, searchString, wildSearch);
-
-                // print out the search words
-                String printableSearchWords = searchWords.replace(", ", ",");
-                pwResults.println(printableSearchWords);
-
-                // log the search strings
-                logger.log(LogLevel.DEBUG, "Search strings: " + printableSearchWords);
-
-                // get the list of words to search
-                String[] searchTokensList = tokenizeArray(searchWords.split(","));
-
-                    /* Search all the words to make sure that all the search tokens are in the author's
-                    * index. log any words that are too frequent, find the least frequent token and
-                    * record the number of infrequent words */
-
-                boolean allTokensFound = true;
-                int lowestNumRefs = cfg.TOO_FREQUENT;
-                String leastFrequentToken = null;
-                int numInfreqTokens = 0;
-
-                // get the least frequent token and check that all the tokens have references
-                for (String nextSearchToken : searchTokensList) {
-
-                    // check that the index contains the words
-                    Integer numReferences = authorIndex.getTokenCount(nextSearchToken);
-
-                    if (numReferences != 0) {
-
-                        // check that the words aren't too frequent
-                        if (numReferences > 0) {
-
-                            if (numReferences < lowestNumRefs) {
-                                // lowest number of references so far
-                                lowestNumRefs = numReferences;
-                                leastFrequentToken = nextSearchToken;
-                            }
-                            numInfreqTokens++;
-
-                        } else {
-                            // word is too frequent
-                            logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " is too frequent");
-                        }
-
-                    } else {
-                        // word not found in author index
-                        logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
-                        allTokensFound = false;
-                    }
-                }
-
-                if ((leastFrequentToken != null) && allTokensFound) {
-                    // at least one searchable token and all tokens in author index
-
-                    int currentVolume = 0;
-                    int currentPage = 0;
-
-                    ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(authorIndex.getReferences(leastFrequentToken)));
-
-                    // if there is more than one infrequent word
-                    // add the references to search to each word
-                    if (numInfreqTokens > 1) {
-
-                        // refine the references to search
-                        referencesToSearch = refineReferences(authorIndex, referencesToSearch,
-                                searchTokensList, leastFrequentToken, wildSearch);
-
-                    } // end multiple search tokens
-
-                    // TODO what is option.fullScan
-
-                    int prevVolume;
-                    boolean foundPage = false;
-
-                    // process each page that contains a match
-                    int refIndex = 0;
-                    while (refIndex < referencesToSearch.size()) {
-
-                        // get the next reference
-                        int[] nextRef = getReference(referencesToSearch, refIndex);
-                        prevVolume = nextRef[0];
-                        refIndex++;
-
-                        String filename;
-
-                        // get file name
-                        if (nextAuthor.equals(Author.BIBLE)) {
-                            filename = nextAuthor.getTargetPath(BibleBook.values()[nextRef[0]].getName() + ".htm");
-                        } else {
-                            filename = nextAuthor.getVolumePath(nextRef[0]);
-                        }
-
-                        // read the file
-                        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
-
-                            String line;
-
-                            while (nextRef[0] == prevVolume) {
-                                // while still in the same volume
-
-                                // read until page number = page ref
-                                while (!foundPage) {
-                                    line = br.readLine();
-                                    if (line.contains("[Page ")) {
-                                        int pageNum = Integer.parseInt(line.substring(line.indexOf("="), line.indexOf('>')));
-                                        if (pageNum == nextRef[1]) foundPage = true;
-                                    }
-                                } // found start of page
-
-                                // get the scope of the search
-                                //if paragraph
-                                br.readLine();
-                                br.readLine();
-                                line = br.readLine();
-
-                                // search for the words
-                                // TODO add scope
-                                boolean foundMatch = wordSearch(tokenizeLine(line), searchTokensList);
-
-                                // print out the paragraph
-                                if (foundMatch) {
-                                    logger.log(LogLevel.HIGH, "found reference in : " + line);
-                                }
-
-                            } // finished references in volume
-
-                        } catch (IOException ioe) {
-                            logger.log(LogLevel.HIGH, "Couldn't read " + nextAuthor.getTargetPath(filename));
-                        }
-                    }
-
-                } // end one frequent token and all tokens found
+                searchAuthor(nextAuthor, pwResults, search);
 
             } // end searching each author
 
@@ -212,13 +70,118 @@ public class AuthorSearch implements Runnable {
 
     }
 
-    private ArrayList<String> refineReferences(AuthorIndex authorIndex, ArrayList<String> referencesToSearch,
-                                               String[] searchTokensList, String leastFrequentToken,
-                                               boolean wildSearch) {
+    private void searchAuthor(Author author, PrintWriter pw, Search search) {
+
+        // get the author index
+        AuthorIndex authorIndex = new AuthorIndex(author, logger);
+        authorIndex.loadIndex(cfg.getResDir());
+
+        logger.log(LogLevel.DEBUG, "\t\tSearching: " + author.getName() + " for " + searchString);
+
+        // get the search words
+        search.setSearchWords(authorIndex);
+
+        // print the title of the author search results and search words
+        pw.println("\t<p>\n\t\t<hr>\n\t\t<h1>Results of search through " + author.getName() + "</h1>\n\t</p>");
+        pw.println(search.printableSearchWords());
+
+        // log the search words
+        logger.log(LogLevel.DEBUG, "Search strings: " + search.printableSearchWords());
+
+        /* Search all the words to make sure that all the search tokens are in the author's
+         * index. log any words that are too frequent, find the least frequent token and
+         * record the number of infrequent words
+         */
+        search.setSearchTokens(tokenizeArray(search.getSearchWords()));
+
+        int numInfrequentTokens = search.setLeastFrequentToken(authorIndex);
+
+        if ((search.getLeastFrequentToken() != null) && (numInfrequentTokens == search.getSearchTokens().length)) {
+            // at least one searchable token and all tokens in author index
+
+            ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(authorIndex.getReferences(search.getLeastFrequentToken())));
+
+            // if there is more than one infrequent word
+            // refine the number of references (combine if wild,
+            // if not wild only use references where each word is found within 1 page
+            if (numInfrequentTokens > 1) {
+
+                // refine the references to search
+                referencesToSearch = refineReferences(authorIndex, search, referencesToSearch, search.getLeastFrequentToken());
+
+            } // end multiple search tokens
+
+            // TODO what is option.fullScan
+
+            int prevVolume;
+            boolean foundPage = false;
+
+            // process each page that contains a match
+            int refIndex = 0;
+            while (refIndex < referencesToSearch.size()) {
+
+                // get the next reference
+                int[] nextRef = getReference(referencesToSearch, refIndex);
+                prevVolume = nextRef[0];
+                refIndex++;
+
+                String filename;
+
+                // get file name
+                if (author.equals(Author.BIBLE)) {
+                    filename = author.getTargetPath(BibleBook.values()[nextRef[0]].getName() + ".htm");
+                } else {
+                    filename = author.getVolumePath(nextRef[0]);
+                }
+
+                // read the file
+                try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+
+                    String line;
+
+                    while (nextRef[0] == prevVolume) {
+                        // while still in the same volume
+
+                        // read until page number = page ref
+                        while (!foundPage) {
+                            line = br.readLine();
+                            if (line.contains("[Page ")) {
+                                int pageNum = Integer.parseInt(line.substring(line.indexOf("="), line.indexOf('>')));
+                                if (pageNum == nextRef[1]) foundPage = true;
+                            }
+                        } // found start of page
+
+                        // get the scope of the search
+                        //if paragraph
+                        br.readLine();
+                        br.readLine();
+                        line = br.readLine();
+
+                        // search for the words
+                        // TODO add scope
+                        boolean foundMatch = wordSearch(tokenizeLine(line), search.getSearchTokens());
+
+                        // print out the paragraph
+                        if (foundMatch) {
+                            logger.log(LogLevel.HIGH, "found reference in : " + line);
+                        }
+
+                    } // finished references in volume
+
+                } catch (IOException ioe) {
+                    logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename));
+                }
+            }
+
+        } // end one frequent token and all tokens found
+
+    }
+
+    private ArrayList<String> refineReferences(AuthorIndex authorIndex, Search search, ArrayList<String> referencesToSearch, String leastFrequentToken) {
 
 
         // for each word
-        for (String token : searchTokensList) {
+        for (String token : search.getSearchTokens()) {
 
             // if it's not the lowest word
             if (!token.equals(leastFrequentToken)) {
@@ -228,7 +191,7 @@ public class AuthorSearch implements Runnable {
                 if ((currentTokenRefs != null) && (currentTokenRefs.length > 1)) {
 
                     // if it is a wildcard search
-                    if (wildSearch) {
+                    if (search.getWildSearch()) {
 
                         // compare the references of each word to find matches
                         // rtsIndex -> referencesToSearchIndex
@@ -390,67 +353,10 @@ public class AuthorSearch implements Runnable {
         return token;
     }
 
-
-
-    private String getSearchWords(AuthorIndex authorIndex, String searchString, boolean wildsearch) {
-        // this returns the search words as a comma separated list
-
-        String searchWords = "";
-
-        // check if the search is a wild search
-        if (searchString.contains("*")) {
-            if (wildsearch) {
-
-                // remove the stars from the search string
-                String bareSearchString = searchString.replace("*", "");
-
-                for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
-
-                    if (nextWord.contains(bareSearchString)) {
-
-                        // add the word to the list of words to be searched (with
-                        // a comma if it isn't the first word
-                        if (searchWords.length() > 0) {
-                            searchWords += ",";
-                        }
-                        searchWords += nextWord;
-                    }
-                }
-            } else {
-                logger.log(LogLevel.INFO, "\t\t\tInvalid wildcard search: " + searchString);
-            }
-        } else {
-            // if it's not a wildcard search
-            searchWords += searchString.replace(" ", ",");
-        }
-
-        return searchWords;
-
-    }
-
-    private boolean checkValidWildcardSearch(String searchText) {
-        ArrayList<Integer> starIndexes = new ArrayList<>();
-
-        if (searchText.contains(" ")) {
-            return false;
-        }
-
-        // get the index of each *
-        for (int i = 0; i < searchString.length(); i++) {
-            if (searchString.charAt(i) == '*') {
-                starIndexes.add(i);
-            }
-        }
-
-        // the stars can only be at the start and/or end of the search text
-        if (starIndexes.size() == 2) {
-            return (starIndexes.get(0) == 0) && (starIndexes.get(1) == searchText.length() - 1);
-        } else if (starIndexes.size() == 1) {
-            return ((starIndexes.get(0) == 0) || (starIndexes.get(0) == searchText.length() - 1));
-        } else {
-            return false;
-        }
-
+    private void writeHtmlHeader(PrintWriter pw) {
+        pw.println("<!DOCTYPE html>\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
+        pw.println("<body>");
+        pw.println("\t<p><img src=\"../images/results.gif\"></p>");
     }
 
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {

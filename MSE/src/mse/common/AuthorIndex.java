@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class AuthorIndex implements Serializable {
 
-    private Logger logger;
+    private ILogger logger;
 
     private Author author;
     private HashMap<String, Integer> tokenCountMap;
