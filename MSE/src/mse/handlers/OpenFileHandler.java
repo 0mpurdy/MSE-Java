@@ -2,8 +2,6 @@ package mse.handlers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.MenuItem;
-import mse.common.Author;
 import mse.common.Config;
 import mse.common.LogLevel;
 import mse.common.Logger;

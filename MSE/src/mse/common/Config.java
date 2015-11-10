@@ -5,6 +5,8 @@
  */
 package mse.common;
 
+import mse.data.Author;
+
 import java.io.*;
 import java.util.HashMap;
 

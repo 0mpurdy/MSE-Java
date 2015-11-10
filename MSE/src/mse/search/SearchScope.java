@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mse;
+package mse.search;
 
 /**
  *
  * @author michael
  */
-public class Constants {
+public enum SearchScope {
     
-    public static final String WORKING_DIR = "res/";
+    WORD, SCENTENCE, PARAGRAPH;
     
 }

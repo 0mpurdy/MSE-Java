@@ -1,1 +1,0 @@
-[DEBUG] [2015-11-10 02:14:01] - Config saved: F:\dev\Java\MSE-Java\Config.txt

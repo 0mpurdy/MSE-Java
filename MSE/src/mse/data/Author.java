@@ -1,4 +1,4 @@
-package mse.common;
+package mse.data;
 
 import java.io.File;
 

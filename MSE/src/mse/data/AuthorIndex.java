@@ -1,4 +1,8 @@
-package mse.common;
+package mse.data;
+
+import mse.common.ILogger;
+import mse.common.LogLevel;
+import mse.common.Logger;
 
 import java.io.*;
 import java.util.Arrays;
@@ -18,7 +22,7 @@ public class AuthorIndex implements Serializable {
     private HashMap<String, Integer> nextReferenceIndex;
     private HashMap<String, String[]> references;
 
-    public AuthorIndex(Author author, Logger logger) {
+    public AuthorIndex(Author author, ILogger logger) {
         this.author = author;
         tokenCountMap = new HashMap<>();
         lastPage = new HashMap<>();

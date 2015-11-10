@@ -3,17 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mse;
+package mse.search;
 
 import mse.common.*;
+import mse.data.Author;
+import mse.data.AuthorIndex;
+import mse.data.BibleBook;
 import mse.data.Search;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
 
 /**
  *
@@ -22,8 +22,8 @@ import java.util.HashMap;
 public class AuthorSearch implements Runnable {
 
     private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
-            "1","2","3","4","5","6","7","8","9","0",";","@",")","(","¦","*","[","]","\u00AC","{","}","\u2019", "~",
-            "\u201D","°","…","†","&","`","$","§","|","\t","=","+","‘","€","/","¶","_","–","½","£","“","%","#"};
+            "1","2","3","4","5","6","7","8","9","0",";","@",")","(","ï¿½","*","[","]","\u00AC","{","}","\u2019", "~",
+            "\u201D","ï¿½","ï¿½","ï¿½","&","`","$","ï¿½","|","\t","=","+","ï¿½","ï¿½","/","ï¿½","_","ï¿½","ï¿½","ï¿½","ï¿½","%","#"};
 
     private final int TOO_FREQUENT = 1000;
 
@@ -32,14 +32,15 @@ public class AuthorSearch implements Runnable {
     //    private SearchScope searchScope;
     private ArrayList<Author> authorsToSearch;
     private Logger logger;
+    private IndexStore indexStore;
 
-    public AuthorSearch(Config cfg, Logger logger, String searchString,
-                        /*SearchScope searchScope,*/ ArrayList<Author> authorsToSearch) {
+    public AuthorSearch(Config cfg, Logger logger, String searchString, ArrayList<Author> authorsToSearch, IndexStore indexStore) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString.toLowerCase();
 //        this.searchScope = searchScope;
         this.authorsToSearch = authorsToSearch;
+        this.indexStore = indexStore;
     }
 
     @Override
@@ -62,21 +63,20 @@ public class AuthorSearch implements Runnable {
             // for each author to be searched
             for (Author nextAuthor : authorsToSearch) {
 
-                searchAuthor(nextAuthor, pwResults, search);
+                searchAuthor(nextAuthor, pwResults, search, indexStore);
 
             } // end searching each author
 
         } catch (IOException ioe) {
-            // TODO error
+            logger.log(LogLevel.HIGH, "Could not write to file: " + cfg.getResDir() + cfg.getResultsFileName());
         }
 
     }
 
-    private void searchAuthor(Author author, PrintWriter pw, Search search) {
+    private void searchAuthor(Author author, PrintWriter pw, Search search, IndexStore indexStore) {
 
         // get the author index
-        AuthorIndex authorIndex = new AuthorIndex(author, logger);
-        authorIndex.loadIndex(cfg.getResDir());
+        AuthorIndex authorIndex = indexStore.getIndex(author, logger);
 
         logger.log(LogLevel.DEBUG, "\tSearching: " + author.getName() + " for \"" + searchString + "\"");
 
@@ -143,7 +143,8 @@ public class AuthorSearch implements Runnable {
                 // read the file
                 try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 
-                    String line;
+                    // line should not be null when first entering loop
+                    String line = br.readLine();
 
                     while (refIndex < referencesToSearch.size() && nextRef[0] == volNum) {
                         // while still in the same volume
@@ -152,7 +153,6 @@ public class AuthorSearch implements Runnable {
 
                         // read until page number = page ref
                         while (!foundPage) {
-                            line = br.readLine();
                             if (line != null) {
                                 if (line.contains("class=\"page-number\"")) {
                                     line = br.readLine();
@@ -168,30 +168,36 @@ public class AuthorSearch implements Runnable {
                                 logger.log(LogLevel.HIGH, "NULL line when reading " + author.getCode() + " vol " + nextRef[0] + " page " + nextRef[1]);
                                 break;
                             }
+                            if (!foundPage) line = br.readLine();
                         } // found start of page
 
-                        // get the scope of the search
-                        //if paragraph
-                        br.readLine();
-                        br.readLine();
-                        line = br.readLine();
-
-                        if (pageNum == 107) {
-                            System.out.println("debug");
-                        }
-
-                        // search for the words
                         // TODO add scope
-                        boolean foundMatch = wordSearch(tokenizeLine(line), search.getSearchTokens());
 
-                        // print out the paragraph
-                        if (foundMatch) {
-                            pw.println("\t<p>");
-                            pw.print("\t\t<a href=\"" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
-                            pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
-                            pw.println(line);
-                            pw.println("\t</p>");
+                        // for each paragraph in the page
+                        // skip a line and check if the next line is a heading or paragraph
+                        br.readLine();
+                        String tempLine = br.readLine();
+                        while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
+
+                                line = br.readLine();
+
+                                // if the current line contains any search terms mark them and print it out
+                                if (wordSearch(tokenizeLine(line), search.getSearchTokens())) {
+
+                                    String markedLine = markLine(line, search.getSearchWords());
+
+                                    pw.println("\t<p>");
+                                    pw.print("\t\t<a href=\"" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
+                                    pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
+                                    pw.println(markedLine);
+                                    pw.println("\t</p>");
+                                }
+
+                            br.readLine();
+                            tempLine = br.readLine();
                         }
+
+                        line = tempLine;
 
                         // keep reading references until a new page
                         while (refIndex < referencesToSearch.size() && volNum == nextRef[0] && pageNum == nextRef[1]) {
@@ -318,19 +324,15 @@ public class AuthorSearch implements Runnable {
     }
 
     private boolean wordSearch(String[] tokensToSearch, String[] searchTokens) {
-        boolean foundSingle;
 
         for (String nextSearchToken : searchTokens) {
-            foundSingle = false;
             for (String nextTokenToSearch : tokensToSearch) {
                 if (nextSearchToken.equals(nextTokenToSearch)) {
-                    foundSingle = true;
-                    break;
+                    return true;
                 }
             }
-            if (!foundSingle) return false;
         }
-        return true;
+        return false;
     }
 
     private String[] tokenizeLine(String line) {
@@ -412,9 +414,9 @@ public class AuthorSearch implements Runnable {
     }
 
     private void writeHtmlHeader(PrintWriter pw) {
-        pw.println("<!DOCTYPE html>\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
+        pw.println("<!DOCTYPE html>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"mseStyle.css\">\n\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
         pw.println("<body>");
-        pw.println("\t<p><img src=\"../images/results.gif\"></p>");
+        pw.println("\t<p><img src=\"img/results.gif\"></p>");
     }
 
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {
@@ -508,6 +510,17 @@ public class AuthorSearch implements Runnable {
             currentPosition++;
         }
         return outString;
+    }
+
+    private String markLine(String line, String[] words) {
+
+        for (String word : words) {
+
+            line = line.replaceAll(word, "<mark>" + word + "</mark>");
+
+        }
+
+        return line;
     }
 
 }

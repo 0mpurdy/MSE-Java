@@ -11,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import mse.AuthorSearch;
+import mse.search.AuthorSearch;
 import mse.common.*;
 
 import java.awt.*;
@@ -30,8 +30,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.GridPane;
+import mse.data.Author;
 import mse.data.Map;
 import mse.handlers.OpenFileHandler;
+import mse.search.IndexStore;
 
 /**
  *
@@ -204,8 +206,10 @@ public class FXMLSearchController implements Initializable {
 //                Thread search = new Thread(new AuthorSearch(cfg,logger,searchString, authorsToSearch));
 //                search.start();
 
+                IndexStore indexStore = new IndexStore(cfg);
+
                 // TODO change running runnable back to starting thread
-                new AuthorSearch(cfg,logger,searchString, authorsToSearch).run();
+                new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore).run();
 
             } else {
                 progressLabel.setText("At least one author must be selected");
