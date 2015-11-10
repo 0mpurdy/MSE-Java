@@ -1,9 +1,9 @@
 mseVersion:3.0.0
 resDir:res\
 resultsFileName:search_results.htm
-searchString:bride Christ
+searchString:
 searchType:Phrase
-synopsis:false
+synopsis:true
 beep:false
 splashWindow:false
 autoLoad:false
@@ -11,15 +11,15 @@ fullScan:false
 setup:false
 debugOn:false
  --- Selected Authors --- 
-JND:true
-FER:true
-CAC:true
+JND:false
+FER:false
+CAC:false
 Bible:true
-SMC:true
-Misc:true
-CHM:true
-GRC:true
-JBS:true
-JT:true
-Hymns:true
-AJG:true
+SMC:false
+Misc:false
+CHM:false
+GRC:false
+JBS:false
+JT:false
+Hymns:false
+AJG:false

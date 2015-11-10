@@ -11,6 +11,7 @@ import mse.data.AuthorIndex;
 import mse.data.BibleBook;
 import mse.data.Search;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
  *
  * @author michael
  */
-public class AuthorSearch implements Runnable {
+public class AuthorSearch extends Thread {
 
     private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
             "1","2","3","4","5","6","7","8","9","0",";","@",")","(","�","*","[","]","\u00AC","{","}","\u2019", "~",
@@ -34,20 +35,20 @@ public class AuthorSearch implements Runnable {
     private ArrayList<Author> authorsToSearch;
     private Logger logger;
     private IndexStore indexStore;
+    private Search search;
 
-    public AuthorSearch(Config cfg, Logger logger, String searchString, ArrayList<Author> authorsToSearch, IndexStore indexStore) {
+    public AuthorSearch(Config cfg, Logger logger, String searchString, ArrayList<Author> authorsToSearch, IndexStore indexStore, Search search) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString.toLowerCase();
 //        this.searchScope = searchScope;
         this.authorsToSearch = authorsToSearch;
         this.indexStore = indexStore;
+        this.search = search;
     }
 
     @Override
     public void run() {
-
-        Search search = new Search(cfg, logger, searchString);
 
         logger.log(LogLevel.DEBUG, "\tStarted Search: \"" + searchString+ "\" in " + authorsToSearch.toString());
 
@@ -64,13 +65,33 @@ public class AuthorSearch implements Runnable {
             // for each author to be searched
             for (Author nextAuthor : authorsToSearch) {
 
+                if (nextAuthor == Author.HYMNS) {
+                    logger.log(LogLevel.LOW, "Hymns search doesn't work yet");
+                    continue;
+                }
+                if (nextAuthor == Author.BIBLE) {
+                    logger.log(LogLevel.LOW, "Bible search doesn't work yet");
+                    continue;
+                }
                 searchAuthor(nextAuthor, pwResults, search, indexStore);
 
             } // end searching each author
 
+            writeHtmlFooter(pwResults);
+
         } catch (IOException ioe) {
             logger.log(LogLevel.HIGH, "Could not write to file: " + cfg.getResDir() + cfg.getResultsFileName());
         }
+
+        search.setProgress("Done", 1.0);
+
+        try {
+            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open results file.");
+        }
+
+        logger.closeLog();
 
     }
 
@@ -85,8 +106,8 @@ public class AuthorSearch implements Runnable {
         search.setSearchWords(authorIndex);
 
         // print the title of the author search results and search words
-        pw.println("\t<p>\n\t\t<hr>\n\t\t<h1>Results of search through " + author.getName() + "</h1>\n\t</p>");
-        pw.println(search.printableSearchWords());
+        pw.println("\n\t<hr>\n\t<h1>Results of search through " + author.getName() + "</h1>");
+        pw.println("\n\t<p>\n\t\tSearched: " + search.printableSearchWords() + "\n\t</p>");
         logger.log(LogLevel.DEBUG, "\tSearch strings: " + search.printableSearchWords());
 
         /* Search all the words to make sure that all the search tokens are in the author's
@@ -126,6 +147,7 @@ public class AuthorSearch implements Runnable {
             int[] nextRef = getReference(referencesToSearch, refIndex);
             refIndex++;
 
+            // for each reference
             while (refIndex < referencesToSearch.size()) {
 
                 volNum = nextRef[0];
@@ -141,8 +163,17 @@ public class AuthorSearch implements Runnable {
 
                 int pageNum = 0;
 
+                // for each volume
                 // read the file
                 try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+
+
+                    // update progress
+                    double fractionPerAuthor = (1.0 / authorsToSearch.size());
+                    double authorOffset = (authorsToSearch.indexOf(author));
+                    double authorProgess = ((double) volNum / author.getNumVols());
+                    double progress = (fractionPerAuthor * authorOffset) + (fractionPerAuthor * authorProgess);
+                    search.setProgress("Searching " + author.getName() + " volume " + volNum, progress);
 
                     // line should not be null when first entering loop
                     String line = br.readLine();
@@ -188,7 +219,7 @@ public class AuthorSearch implements Runnable {
                                     String markedLine = markLine(line, search.getSearchWords());
 
                                     pw.println("\t<p>");
-                                    pw.print("\t\t<a href=\"" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
+                                    pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
                                     pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
                                     pw.println(markedLine);
                                     pw.println("\t</p>");
@@ -212,8 +243,17 @@ public class AuthorSearch implements Runnable {
                     logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename) + volNum + ":" + pageNum);
                 }
             }
-
-        } // end one frequent token and all tokens found
+            // end one frequent token and all tokens found
+        }else {
+            if (search.getLeastFrequentToken() == null) {
+                pw.println("Search words appeared too frequently.");
+                logger.log(LogLevel.LOW, "Too frequent tokens: " + search.printableSearchTokens());
+            }
+            if (numInfrequentTokens < search.getSearchTokens().length) {
+                pw.println("Not all words were found in index.");
+                logger.log(LogLevel.LOW, "Not all tokens were found in index " + search.printableSearchTokens());
+            }
+        }
 
     }
 
@@ -418,6 +458,10 @@ public class AuthorSearch implements Runnable {
         pw.println("<!DOCTYPE html>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"mseStyle.css\">\n\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
         pw.println("<body>");
         pw.println("\t<p><img src=\"img/results.gif\"></p>");
+    }
+
+    private void writeHtmlFooter(PrintWriter pw) {
+        pw.println("\n</body>\n\n</html>");
     }
 
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {

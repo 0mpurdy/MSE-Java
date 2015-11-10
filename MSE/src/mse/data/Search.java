@@ -1,5 +1,8 @@
 package mse.data;
 
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import mse.common.*;
 
 import java.util.ArrayList;
@@ -17,10 +20,15 @@ public class Search {
     boolean wildSearch;
     String leastFrequentToken;
 
-    public Search(Config cfg, Logger logger, String searchString) {
+    ProgressBar progressBar;
+    Label progressLabel;
+
+    public Search(Config cfg, Logger logger, String searchString, ProgressBar progressBar, Label progressLabel) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString;
+        this.progressBar = progressBar;
+        this.progressLabel = progressLabel;
     }
 
     public boolean getWildSearch() {
@@ -163,5 +171,19 @@ public class Search {
         }
 
         return numInfrequentTokens;
+    }
+
+    public void setProgress(double progress) {
+        progressBar.setProgress(progress);
+    }
+
+    public void setProgress(String message, double progress) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                progressLabel.setText(message);
+                progressBar.setProgress(progress);
+            }
+        });
     }
 }

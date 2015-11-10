@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import mse.data.Search;
 import mse.search.AuthorSearch;
 import mse.common.*;
 
@@ -64,7 +65,7 @@ public class FXMLSearchController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         // hide the progress bar
-        progressBar.setVisible(false);
+//        progressBar.setVisible(false);
 
         // open new logger
         logger = new Logger(LogLevel.DEBUG);
@@ -173,6 +174,7 @@ public class FXMLSearchController implements Initializable {
     public void handlesSearch(ActionEvent e) {
 
         logger.openLog();
+        progressBar.setVisible(false);
 
         // save new config
         cfg.setSearchString(searchBox.getText());
@@ -202,32 +204,48 @@ public class FXMLSearchController implements Initializable {
                     }
                 }
 
-                // start the thread to search
-//                Thread search = new Thread(new AuthorSearch(cfg,logger,searchString, authorsToSearch));
-//                search.start();
-
                 IndexStore indexStore = new IndexStore(cfg);
 
+                Search search = new Search(cfg, logger, searchString, progressBar, progressLabel);
+                progressBar.setVisible(true);
+                progressBar.setProgress(0);
+
                 // TODO change running runnable back to starting thread
-                new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore).run();
+//                new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore, search).run();
+
+                // start the thread to search
+                AuthorSearch searchThread = new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore, search);
+                searchThread.start();
 
             } else {
                 progressLabel.setText("At least one author must be selected");
                 logger.log(LogLevel.INFO, "At least one author must be selected");
+                logger.closeLog();
             }
         }
-
-        try {
-            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open results file.");
-        }
-
-        logger.closeLog();
     }
 
     @FXML
     public void handlesRefine(ActionEvent e) {
+    }
+
+    @FXML
+    public void handlesSelectAll(ActionEvent e) {
+
+        boolean allSelected = true;
+
+        for (CheckBox nextCheckBox : checkboxes) {
+            if (!nextCheckBox.isSelected()) {
+                allSelected = false;
+                nextCheckBox.setSelected(true);
+            }
+        }
+
+        if (allSelected) {
+            for (CheckBox nextCheckBox : checkboxes) {
+                nextCheckBox.setSelected(false);
+            }
+        }
     }
 
     @FXML
@@ -264,10 +282,6 @@ public class FXMLSearchController implements Initializable {
         searchBox.setText(cfg.getSearchString());
 
         cfg.setSetup(false);
-    }
-
-    private void updateSelectedAuthor(ItemEvent itemEvent, Author author) {
-        cfg.setSelectedAuthor(author.getCode(), true);
     }
 
 //    removed to save having to use gson lib

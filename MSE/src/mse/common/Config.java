@@ -198,7 +198,7 @@ public class Config {
     }
 
     public String getResultsFileName() {
-        return resultsFileName;
+        return "target" + File.separator + "results" + File.separator + resultsFileName;
     }
 
     public void setResultsFileName(String resultsFileName) {

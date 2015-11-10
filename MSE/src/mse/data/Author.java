@@ -4,31 +4,33 @@ import java.io.File;
 
 public enum Author {
 
-    BIBLE(0, "Bible", "Bible", "bible", true),
-    HYMNS(1, "Hymns", "Hymns", "hymns", true),
-    TUNES(2, "Tunes", "Hymn Tunes", "tunes", false),
-    JND(3, "JND", "J.N.Darby", "jnd", true),
-    JBS(4, "JBS", "J.B.Stoney",  "jbs", true),
-    CHM(5, "CHM", "C.H.Mackintosh", "chm", true),
-    FER(6, "FER", "F.E.Raven", "fer", true),
-    CAC(7, "CAC", "C.A.Coates", "cac", true),
-    JT(8, "JT", "J.Taylor Snr", "jt", true),
-    GRC(9, "GRC", "G.R.Cowell", "grc", true),
-    AJG(10, "AJG", "A.J.Gardiner", "ajg", true),
-    SMC(11, "SMC", "S.McCallum", "smc", true),
-    Misc(12, "Misc", "Various Authors", "misc", true);
+    BIBLE(0, "Bible", "Bible", "bible", 66, true),
+    HYMNS(1, "Hymns", "Hymns", "hymns", 5, true),
+    TUNES(2, "Tunes", "Hymn Tunes", "tunes", 100, false),
+    JND(3, "JND", "J.N.Darby", "jnd", 52, true),
+    JBS(4, "JBS", "J.B.Stoney",  "jbs", 17, true),
+    CHM(5, "CHM", "C.H.Mackintosh", "chm", 18, true),
+    FER(6, "FER", "F.E.Raven", "fer", 21, true),
+    CAC(7, "CAC", "C.A.Coates", "cac", 37, true),
+    JT(8, "JT", "J.Taylor Snr", "jt", 103, true),
+    GRC(9, "GRC", "G.R.Cowell", "grc", 88, true),
+    AJG(10, "AJG", "A.J.Gardiner", "ajg", 11, true),
+    SMC(11, "SMC", "S.McCallum", "smc", 10, true),
+    Misc(12, "Misc", "Various Authors", "misc", 26, true);
 
     private final int index;
     private final String code;
     private final String name;
     private final String folder;
+    private final int numVols;
     private final boolean searchable;
 
-    Author(int index, String code, String name, String folder, boolean searchable) {
+    Author(int index, String code, String name, String folder, int numVols, boolean searchable) {
         this.index = index;
         this.code = code;
         this.name = name;
         this.folder = folder;
+        this.numVols = numVols;
         this.searchable = searchable;
     }
 
@@ -70,6 +72,10 @@ public enum Author {
 
     public boolean isSearchable() {
         return searchable;
+    }
+
+    public int getNumVols() {
+        return numVols;
     }
 
     public int getIndex() {
