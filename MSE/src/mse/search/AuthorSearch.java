@@ -14,6 +14,7 @@ import mse.data.Search;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -516,7 +517,7 @@ public class AuthorSearch implements Runnable {
 
         for (String word : words) {
 
-            line = line.replaceAll(word, "<mark>" + word + "</mark>");
+            line = line.replaceAll("(?i)" + Pattern.quote(word), "<mark>" + word + "</mark>");
 
         }
 
