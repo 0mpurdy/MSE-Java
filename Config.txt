@@ -1,8 +1,7 @@
 mseVersion:3.0.0
-workingDir:
 resDir:res\
 resultsFileName:search_results.htm
-searchString:love
+searchString:
 searchType:Phrase
 synopsis:true
 beep:false

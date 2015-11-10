@@ -59,7 +59,7 @@ public class Index {
         // check the availability of files
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor.isSearchable()) {
-                File nextFile = new File(cfg.getWorkingDir() + nextAuthor.getIndexFilePath());
+                File nextFile = new File(cfg.getResDir() + nextAuthor.getIndexFilePath());
                 if (nextFile.exists()) {
                     indexAvailable.put(nextAuthor, Boolean.TRUE);
                 } else {
@@ -112,7 +112,7 @@ public class Index {
 
         // if the author is not loaded
         if (!indexLoaded.get(author)) {
-            File authorIndexFile = new File(cfg.getWorkingDir() + author.getIndexFilePath());
+            File authorIndexFile = new File(cfg.getResDir() + author.getIndexFilePath());
             if (authorIndexFile.exists()) {
                 // if the index file exists
 

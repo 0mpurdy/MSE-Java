@@ -109,10 +109,22 @@ public class Search {
         StringBuilder printableWords = new StringBuilder();
 
         for (String word : searchWords) {
-            printableWords.append(printableWords + ", ");
+            printableWords.append(word).append(", ");
         }
 
-        return printableWords.toString().substring(0, printableWords.length() -1);
+        return printableWords.toString().substring(0, printableWords.length() -2);
+    }
+
+    public String printableSearchTokens() {
+
+        StringBuilder printableTokens = new StringBuilder();
+
+        for (String word : searchTokens) {
+            printableTokens.append(word).append(", ");
+        }
+
+        if (printableTokens.length() < 2) return "";
+        return printableTokens.toString().substring(0, printableTokens.length() -2);
     }
 
     public int setLeastFrequentToken(AuthorIndex authorIndex) {

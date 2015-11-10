@@ -29,11 +29,15 @@ public class Logger implements ILogger {
         this.logLevel = logLevel;
     }
 
-    public void log(LogLevel logLevel, String message) {
+    public synchronized void log(LogLevel logLevel, String message) {
         if (logLevel.value <= this.logLevel.value) {
             Date date = new Date();
             pwLog.printf("%s [%s] - %s\n", logLevel.tag, dateFormat.format(date), message);
         }
+    }
+
+    public void flush() {
+        pwLog.flush();
     }
 
     public void setLogLevel(LogLevel logLevel) {

@@ -1,2 +1,1 @@
-[DEBUG] [2015-11-09 19:16:06] - Config saved: F:\dev\Java\MSE-Java\Config.txt
-[INFO] [2015-11-09 19:16:06] - Searched: love
+[DEBUG] [2015-11-10 02:14:01] - Config saved: F:\dev\Java\MSE-Java\Config.txt

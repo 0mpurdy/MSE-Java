@@ -41,8 +41,13 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# =========================
+# Personal
+# =========================
+
 /MSE/build/
 /MSE/dist/
-
 out/
 res/
+.idea/workspace.xml

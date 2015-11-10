@@ -41,6 +41,7 @@ public class FXMLSearchController implements Initializable {
 
     private Logger logger;
     private Config cfg;
+    private ArrayList<CheckBox> checkboxes;
 
     @FXML
     Button refineButton;
@@ -69,13 +70,14 @@ public class FXMLSearchController implements Initializable {
 
         // try to recover config options
         cfg = new Config(logger);
-        cfg.save(logger);
+        cfg.save();
 
         // set the setup config flag to true
         cfg.setSetup(true);
 
         // add checkboxes for searching author
         // TODO check if they're available first
+        checkboxes = new ArrayList<>();
         int i = 0;
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor.isSearchable()) {
@@ -84,7 +86,7 @@ public class FXMLSearchController implements Initializable {
                     public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
                         if (!cfg.isSettingUp()) {
                             cfg.setSelectedAuthor(nextAuthor.getCode(), new_val);
-                            cfg.save(logger);
+                            cfg.save();
                         }
                     }
                 });
@@ -93,6 +95,7 @@ public class FXMLSearchController implements Initializable {
                 nextCheckBox.setSelected(cfg.getSelectedAuthor(nextAuthor.getCode()));
 
                 checkBoxPane.add(nextCheckBox, i % 6, i / 6);
+                checkboxes.add(nextCheckBox);
                 i++;
             }
 
@@ -171,7 +174,7 @@ public class FXMLSearchController implements Initializable {
 
         // save new config
         cfg.setSearchString(searchBox.getText());
-        cfg.save(logger);
+        cfg.save();
 
         String searchString = searchBox.getText();
 
@@ -183,7 +186,7 @@ public class FXMLSearchController implements Initializable {
             logger.log(LogLevel.INFO, "Invalid search string: " + searchString);
         } else {
             // if any authors are selected            
-            if (cfg.isAuthorSelected()) {
+            if (cfg.isAnyAuthorSelected()) {
                 // TODO progress window
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
 
@@ -198,12 +201,22 @@ public class FXMLSearchController implements Initializable {
                 }
 
                 // start the thread to search
-                Thread search = new Thread(new AuthorSearch(cfg,logger,searchString, authorsToSearch));
-                search.start();
+//                Thread search = new Thread(new AuthorSearch(cfg,logger,searchString, authorsToSearch));
+//                search.start();
+
+                // TODO change running runnable back to starting thread
+                new AuthorSearch(cfg,logger,searchString, authorsToSearch).run();
+
             } else {
                 progressLabel.setText("At least one author must be selected");
                 logger.log(LogLevel.INFO, "At least one author must be selected");
             }
+        }
+
+        try {
+            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open results file.");
         }
 
         logger.closeLog();
@@ -216,7 +229,7 @@ public class FXMLSearchController implements Initializable {
     @FXML
     public void handlesViewLogFile(ActionEvent e) {
         try {
-            File logFile = new File(cfg.getWorkingDir() + "log.txt");
+            File logFile = new File("Log.txt");
             Desktop.getDesktop().open(logFile);
         } catch (IOException ioe) {
             logger.log(LogLevel.LOW, "Could not open log file.");
@@ -226,7 +239,7 @@ public class FXMLSearchController implements Initializable {
     @FXML
     public void handlesViewConfigFile(ActionEvent e) {
         try {
-            File logFile = new File(cfg.getWorkingDir() + "config.txt");
+            File logFile = new File("Config.txt");
             Desktop.getDesktop().open(logFile);
         } catch (IOException ioe) {
             logger.log(LogLevel.LOW, "Could not open log file.");
@@ -237,6 +250,16 @@ public class FXMLSearchController implements Initializable {
     public void handlesRefreshLogAndConfig(ActionEvent e) {
         logger.refresh();
         cfg.refresh();
+        logger.closeLog();
+
+        cfg.setSetup(true);
+
+        for (CheckBox nextCheckBox : checkboxes) {
+            nextCheckBox.setSelected(cfg.getSelectedAuthor(nextCheckBox.getText()));
+        }
+        searchBox.setText(cfg.getSearchString());
+
+        cfg.setSetup(false);
     }
 
     private void updateSelectedAuthor(ItemEvent itemEvent, Author author) {

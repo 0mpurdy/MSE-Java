@@ -19,11 +19,10 @@ public class Config {
 
     private final String configFilePath = "Config.txt";
 
-    private ILogger logger;
+    private Logger logger;
 
     private String mseVersion;
 //    private String defaultBrowser;
-    private String workingDir;
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -50,19 +49,18 @@ public class Config {
 
         try(BufferedReader br = new BufferedReader(new FileReader(configFile))) {
 
-            mseVersion = getNextOption(br);
-            workingDir = getNextOption(br);
-            resDir = getNextOption(br);
-            resultsFileName = getNextOption(br);
-            searchString = getNextOption(br);
-            searchType = getNextOption(br);
-            synopsis = getNextBooleanOption(br);
-            beep = getNextBooleanOption(br);
-            splashWindow = getNextBooleanOption(br);
-            autoLoad = getNextBooleanOption(br);
-            fullScan = getNextBooleanOption(br);
-            setup = getNextBooleanOption(br);
-            debugOn = getNextBooleanOption(br);
+            mseVersion = getNextOption(br, "mseVersion");
+            resDir = getNextOption(br, "mseVersion");
+            resultsFileName = getNextOption(br, "resultsFileName");
+            searchString = getNextOption(br, "searchString");
+            searchType = getNextOption(br, "searchType");
+            synopsis = getNextBooleanOption(br, "synopsis");
+            beep = getNextBooleanOption(br, "beep");
+            splashWindow = getNextBooleanOption(br, "splashWindow");
+            autoLoad = getNextBooleanOption(br, "autoLoad");
+            fullScan = getNextBooleanOption(br, "fullScan");
+            setup = getNextBooleanOption(br, "setup");
+            debugOn = getNextBooleanOption(br, "debugOn");
 
             // skip selected authors line
             br.readLine();
@@ -78,31 +76,30 @@ public class Config {
             }
 
 
-        } catch (IOException ex) {
+        } catch (IOException | ArrayIndexOutOfBoundsException ex) {
             logger.log(LogLevel.LOW, "Error reading config - setting defaults");
             setDefaults();
         }
 
     }
 
-    private String getNextOption(BufferedReader br) throws IOException {
+    private String getNextOption(BufferedReader br, String optionName) throws IOException {
         String option = "";
         try {
             option = br.readLine().split(":")[1];
         } catch (ArrayIndexOutOfBoundsException ex) {
-            logger.log(LogLevel.DEBUG, "No value found");
+            logger.log(LogLevel.DEBUG, "No value found for config option " + optionName);
         }
         return option;
     }
 
-    private boolean getNextBooleanOption(BufferedReader br) throws IOException {
-        return Boolean.getBoolean(getNextOption(br));
+    private boolean getNextBooleanOption(BufferedReader br, String optionName) throws IOException {
+        return Boolean.getBoolean(getNextOption(br, optionName));
     }
 
     private void setDefaults() {
 
         mseVersion = "3.0.0";
-        workingDir = "";
         resDir = "res" + File.separator;
 //        defaultBrowser = "/usr/bin/firefox";
 //        defaultBrowser = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
@@ -137,7 +134,6 @@ public class Config {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
 
                 writeOption(bw,"mseVersion",mseVersion);
-                writeOption(bw,"workingDir",workingDir);
                 writeOption(bw,"resDir",resDir);
                 writeOption(bw,"resultsFileName",resultsFileName);
                 writeOption(bw,"searchString",searchString);
@@ -195,24 +191,8 @@ public class Config {
         return mseVersion;
     }
 
-//    public String getDefaultBrowser() {
-//        return defaultBrowser;
-//    }
-//
-//    public void setDefaultBrowser(String defaultBrowser) {
-//        this.defaultBrowser = defaultBrowser;
-//    }
-
-    public String getWorkingDir() {
-        return workingDir;
-    }
-
     public String getResDir() {
         return resDir;
-    }
-
-    public void setWorkingDir(String workingDir) {
-        this.workingDir = workingDir;
     }
 
     public String getResultsFileName() {
@@ -255,7 +235,7 @@ public class Config {
         return selectedAuthors.get(authorCode);
     }
 
-    public boolean isAuthorSelected() {
+    public boolean isAnyAuthorSelected() {
         boolean check = false;
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor != Author.TUNES) {
