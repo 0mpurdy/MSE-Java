@@ -16,7 +16,7 @@ import mse.search.AuthorSearch;
 import mse.common.*;
 
 import java.awt.*;
-import java.awt.event.ItemEvent;
+import java.beans.EventHandler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -60,6 +60,8 @@ public class FXMLSearchController implements Initializable {
     Label progressLabel;
     @FXML
     Menu mapsMenu;
+    @FXML
+    Menu logLevelMenu;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -68,7 +70,7 @@ public class FXMLSearchController implements Initializable {
 //        progressBar.setVisible(false);
 
         // open new logger
-        logger = new Logger(LogLevel.DEBUG);
+        logger = new Logger(LogLevel.INFO);
         logger.openLog();
 
         // try to recover config options
@@ -149,6 +151,20 @@ public class FXMLSearchController implements Initializable {
 //            Gson gson = new Gson();
 //            ArrayList<Map> maps = gson.fromJson(json, new TypeToken<ArrayList<Map>>(){}.getType())
 
+            // add log levels to log level menu
+            ToggleGroup logLevelToggleGroup = new ToggleGroup();
+            for (LogLevel nextLogLevel : LogLevel.values()) {
+                RadioMenuItem nextLevelRadioItem = new RadioMenuItem(nextLogLevel.name());
+                if (nextLogLevel == LogLevel.INFO) nextLevelRadioItem.setSelected(true);
+                nextLevelRadioItem.setToggleGroup(logLevelToggleGroup);
+                nextLevelRadioItem.setOnAction(event -> {
+                    int i1 = logLevelMenu.getItems().indexOf(event.getSource());
+                    logger.setLogLevel(LogLevel.values()[i1]);
+                });
+                logLevelMenu.getItems().add(nextLevelRadioItem);
+            }
+
+            // add maps to maps menu
             for (Map map : maps) {
                 MenuItem nextMenuItem = new MenuItem(map.getArea() + " - " + map.getMapName());
                 nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + "maps" + File.separator + map.getMapLocation()));

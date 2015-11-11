@@ -23,9 +23,9 @@ import java.util.regex.Pattern;
  */
 public class AuthorSearch extends Thread {
 
-    private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
+       private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
             "1","2","3","4","5","6","7","8","9","0",";","@",")","(","�","*","[","]","\u00AC","{","}","\u2019", "~",
-            "\u201D","�","�","�","&","`","$","�","|","\t","=","+","�","�","/","�","_","�","�","�","�","%","#"};
+            "\u201D","\u00A6","…","†","&","`","$","\u00A7","|","\t","=","+","\u2018","\u20AC","/","\u00B6","_","�","�","�","�","%","#"};
 
     private final int TOO_FREQUENT = 1000;
 
@@ -53,7 +53,16 @@ public class AuthorSearch extends Thread {
         logger.log(LogLevel.DEBUG, "\tStarted Search: \"" + searchString+ "\" in " + authorsToSearch.toString());
 
         // try to open and write to the results file
-        try (PrintWriter pwResults = new PrintWriter(new File(cfg.getResDir() + cfg.getResultsFileName()))) {
+        File resultsFile = new File(cfg.getResDir() + cfg.getResultsFileName());
+        if (!resultsFile.exists()) {
+            resultsFile.getParentFile().mkdirs();
+            try {
+                resultsFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
             logger.log(LogLevel.DEBUG, "\tOpened file: " + cfg.getResDir() + cfg.getResultsFileName());
 
@@ -87,8 +96,8 @@ public class AuthorSearch extends Thread {
 
         try {
             Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open results file.");
+        } catch (IOException | IllegalArgumentException ioe) {
+            logger.log(LogLevel.HIGH, "Could not open results file.");
         }
 
         logger.closeLog();
@@ -108,14 +117,14 @@ public class AuthorSearch extends Thread {
         // print the title of the author search results and search words
         pw.println("\n\t<hr>\n\t<h1>Results of search through " + author.getName() + "</h1>");
         pw.println("\n\t<p>\n\t\tSearched: " + search.printableSearchWords() + "\n\t</p>");
-        logger.log(LogLevel.DEBUG, "\tSearch strings: " + search.printableSearchWords());
+        logger.log(LogLevel.TRACE, "\tSearch strings: " + search.printableSearchWords());
 
         /* Search all the words to make sure that all the search tokens are in the author's
          * index. log any words that are too frequent, find the least frequent token and
          * record the number of infrequent words
          */
-        search.setSearchTokens(tokenizeArray(search.getSearchWords()));
-        logger.log(LogLevel.DEBUG, "\tSearch tokens: " + search.printableSearchTokens());
+        search.setSearchTokens(tokenizeArray(search.getSearchWords(), author.getCode(), 0, 0));
+        logger.log(LogLevel.TRACE, "\tSearch tokens: " + search.printableSearchTokens());
         logger.flush();
 
         int numInfrequentTokens = search.setLeastFrequentToken(authorIndex);
@@ -209,12 +218,15 @@ public class AuthorSearch extends Thread {
                         // skip a line and check if the next line is a heading or paragraph
                         br.readLine();
                         String tempLine = br.readLine();
+                        if (tempLine == null) {
+                            logger.log(LogLevel.HIGH, "Null line " + author.getCode() + "vol " + volNum + ":" + pageNum);
+                        }
                         while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
 
                                 line = br.readLine();
 
                                 // if the current line contains any search terms mark them and print it out
-                                if (wordSearch(tokenizeLine(line), search.getSearchTokens())) {
+                                if (wordSearch(tokenizeLine(line, author.getCode(), volNum, pageNum), search.getSearchTokens())) {
 
                                     String markedLine = markLine(line, search.getSearchWords());
 
@@ -247,11 +259,11 @@ public class AuthorSearch extends Thread {
         }else {
             if (search.getLeastFrequentToken() == null) {
                 pw.println("Search words appeared too frequently.");
-                logger.log(LogLevel.LOW, "Too frequent tokens: " + search.printableSearchTokens());
+                logger.log(LogLevel.LOW, "\tToo frequent tokens in " + author.getCode() + ": " + search.printableSearchTokens());
             }
             if (numInfrequentTokens < search.getSearchTokens().length) {
                 pw.println("Not all words were found in index.");
-                logger.log(LogLevel.LOW, "Not all tokens were found in index " + search.printableSearchTokens());
+                logger.log(LogLevel.LOW, "\tTokens in " + author.getCode() + " not all found: " + search.printableSearchTokens());
             }
         }
 
@@ -376,7 +388,7 @@ public class AuthorSearch extends Thread {
         return false;
     }
 
-    private String[] tokenizeLine(String line) {
+    private String[] tokenizeLine(String line, String authorCode, int volNum, int pageNum) {
 
         // if the line contains html - remove the html tag
         while (line.contains("<")) {
@@ -397,10 +409,10 @@ public class AuthorSearch extends Thread {
         }
 
         // split the line into tokens (words) by " " characters
-        return tokenizeArray(line.split(" "));
+        return tokenizeArray(line.split(" "), authorCode, volNum, pageNum);
     }
 
-    private String[] tokenizeArray(String[] tokens) {
+    private String[] tokenizeArray(String[] tokens, String authorCode, int volNum, int pageNum) {
 
         ArrayList<String> newTokens = new ArrayList<>();
 
@@ -413,7 +425,7 @@ public class AuthorSearch extends Thread {
             if (!isAlpha(token)) {
                 token = processUncommonString(token);
                 if (!isAlpha(token)) {
-                    logger.log(LogLevel.HIGH, "Error processing token: " + token);
+                    logger.log(LogLevel.HIGH, "Error processing token " + authorCode + " " + volNum + ":" + pageNum + ": " + token);
                     token = "";
                 }
             }
@@ -438,12 +450,18 @@ public class AuthorSearch extends Thread {
     }
 
     private String processString(String token) {
-        for (String c : deleteChars) {
-            if (token.contains(c)) {
-                token = token.replace(c, "");
-                return token;
+        for (char c : token.toCharArray()) {
+            if (!Character.isLetter(c)) {
+                token = token.replace(Character.toString(c), "");
             }
         }
+
+//        for (String c : deleteChars) {
+//            if (token.contains(c)) {
+//                token = token.replace(c, "");
+//                return token;
+//            }
+//        }
         return token;
     }
 
@@ -455,9 +473,9 @@ public class AuthorSearch extends Thread {
     }
 
     private void writeHtmlHeader(PrintWriter pw) {
-        pw.println("<!DOCTYPE html>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"mseStyle.css\">\n\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
+        pw.println("<!DOCTYPE html>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../../mseStyle.css\">\n\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
         pw.println("<body>");
-        pw.println("\t<p><img src=\"img/results.gif\"></p>");
+        pw.println("\t<p><img src=\"../../img/results.gif\"></p>");
     }
 
     private void writeHtmlFooter(PrintWriter pw) {

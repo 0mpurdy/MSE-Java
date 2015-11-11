@@ -27,21 +27,26 @@
           <Menu fx:id="booksMenu" mnemonicParsing="false" text="Books" />
           <Menu mnemonicParsing="false" text="Search Type">
                <items>
-                  <RadioMenuItem mnemonicParsing="false" text="Phrase" />
+                  <RadioMenuItem mnemonicParsing="false" text="Phrase"/>
                   <RadioMenuItem mnemonicParsing="false" text="Scentence contains words" />
                   <RadioMenuItem mnemonicParsing="false" text="Paragraph contains words" />
-                  <RadioMenuItem mnemonicParsing="false" text="Page contains words" />
+                  <RadioMenuItem mnemonicParsing="true" text="Page contains words" />
                </items>
           </Menu>
             <Menu fx:id="mapsMenu" mnemonicParsing="false" text="Maps" />
+            <Menu mnemonicParsing="false" text="Advanced">
+               <items>
+                  <Menu fx:id="logLevelMenu" mnemonicParsing="false" text="Set Log Level"/>
+                  <MenuItem mnemonicParsing="false" onAction="#handlesViewLogFile" text="View Log File" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesViewConfigFile" text="View Config File" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLogAndConfig" text="Refresh Log and Config" />
+               </items>
+            </Menu>
             <Menu mnemonicParsing="false" text="Help">
               <items>
                 <MenuItem mnemonicParsing="false" text="Search Engine Help" />
                   <MenuItem mnemonicParsing="false" text="Technical Support" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" onAction="#handlesViewLogFile" text="View Log File" />
-                  <MenuItem mnemonicParsing="false" onAction="#handlesViewConfigFile" text="View Config File" />
-                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLogAndConfig" text="Refresh Log and Config" />
                   <MenuItem mnemonicParsing="false" text="View Memory Usage" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="About Search Engine" />

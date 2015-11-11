@@ -161,12 +161,12 @@ public class Search {
 
                 } else {
                     // word is too frequent
-                    logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " is too frequent");
+                    logger.log(LogLevel.DEBUG, "\tToken: " + nextSearchToken + " is too frequent");
                 }
 
             } else {
                 // word not found in author index
-                logger.log(LogLevel.INFO, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
+                logger.log(LogLevel.DEBUG, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
             }
         }
 
