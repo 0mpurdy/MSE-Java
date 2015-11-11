@@ -40,6 +40,8 @@ public class AuthorSearch extends Thread {
     private double fractionPerAuthor;
     private double progress;
 
+    private ArrayList<String> stringsToSearch = new ArrayList<>();
+
     public AuthorSearch(Config cfg, Logger logger, String searchString, ArrayList<Author> authorsToSearch, IndexStore indexStore, Search search) {
         this.cfg = cfg;
         this.logger = logger;
@@ -353,22 +355,37 @@ public class AuthorSearch extends Thread {
                 if (tempLine == null) {
                     logger.log(LogLevel.HIGH, "NULL line " + author.getCode() + "vol " + volNum + ":" + pageNum);
                 } else {
+
+                    // while still on the same page (class != page-number)
                     while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
 
                         line = br.readLine();
 
-                        // if the current scope contains all search terms mark them and print it out
-                        if (wordSearch(tokenizeLine(line, author.getCode(), volNum, pageNum), search.getSearchTokens())) {
+                        stringsToSearch.clear();
 
-                            String markedLine = markLine(new StringBuilder(line), search.getSearchWords());
+                        // get the searchLine based on the search scope
+                        if (search.getSearchScope() == SearchScope.SENTENCE) {
+                            stringsToSearch = convertLineIntoSentences(line);
+                        } else {
+                            stringsToSearch.add(line);
+                        }
 
-                            pw.println("\t<p>");
-                            pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
-                            pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
-                            pw.println(markedLine);
-                            pw.println("\t</p>");
+                        // for each string to search
+                        for (String scope : stringsToSearch) {
 
-                            search.incrementResults();
+                            // if the current scope contains all search terms mark them and print it out
+                            if (wordSearch(tokenizeLine(scope, author.getCode(), volNum, pageNum), search.getSearchTokens())) {
+
+                                String markedLine = markLine(new StringBuilder(scope), search.getSearchWords());
+
+                                pw.println("\t<p>");
+                                pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
+                                pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
+                                pw.println(markedLine);
+                                pw.println("\t</p>");
+
+                                search.incrementResults();
+                            }
                         }
 
                         br.readLine();
@@ -396,21 +413,25 @@ public class AuthorSearch extends Thread {
     int startOfSentencePos;
     int endOfSentencePos;
 
-    private ArrayList<String> convertLineIntoScentences(String line) {
+    private ArrayList<String> convertLineIntoSentences(String line) {
 
         sentences.clear();
         startOfSentencePos = 0;
         endOfSentencePos = 0;
 
-        while (endOfSentencePos < line.length()) {
+        while (endOfSentencePos >= 0 && endOfSentencePos < line.length()) {
 
-            endOfSentencePos = line.indexOf("<name=") -1;
+            endOfSentencePos = line.indexOf("<a name=", startOfSentencePos) -1;
 
             if (endOfSentencePos < 0) continue;
 
+
+
             sentences.add(line.substring(startOfSentencePos, endOfSentencePos));
 
+            // skip the a tags
             startOfSentencePos = line.indexOf('>', endOfSentencePos) + 1;
+            startOfSentencePos = line.indexOf('>', startOfSentencePos) + 1;
             endOfSentencePos = startOfSentencePos;
 
         }
@@ -539,7 +560,7 @@ public class AuthorSearch extends Thread {
     }
 
     private void writeHtmlHeader(PrintWriter pw) {
-        pw.println("<!DOCTYPE html>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../../mseStyle.css\">\n\n<html>\n\n<head>\n\t<title>Search Results</title>\n</head>\n");
+        pw.println("<!DOCTYPE html>\n\n<html>\n\n<head>\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../mseStyle.css\" />\n\t<title>Search Results</title>\n</head>\n");
         pw.println("<body>");
         pw.println("\t<p><img src=\"../../img/results.gif\"></p>");
     }

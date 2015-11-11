@@ -6,6 +6,7 @@
 package mse.common;
 
 import mse.data.Author;
+import mse.search.SearchScope;
 
 import java.io.*;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ public class Config {
     private String resDir;
     private String resultsFileName;
     private String searchString;
-    private String searchType;
+    private SearchScope searchScope;
     private HashMap<String, Boolean> selectedAuthors;
     private boolean synopsis;
     private boolean beep;
@@ -55,7 +56,6 @@ public class Config {
             resDir = getNextOption(br, "mseVersion");
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
-            searchType = getNextOption(br, "searchType");
             synopsis = getNextBooleanOption(br, "synopsis");
             beep = getNextBooleanOption(br, "beep");
             splashWindow = getNextBooleanOption(br, "splashWindow");
@@ -107,7 +107,7 @@ public class Config {
 //        defaultBrowser = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
         resultsFileName = "SearchResults.htm";
         searchString = "";
-        searchType = "Phrase";
+        searchScope = SearchScope.SENTENCE;
 
         // set the selected books to be searched to only the bible
         selectedAuthors = new HashMap<>();
@@ -139,7 +139,6 @@ public class Config {
                 writeOption(bw,"resDir",resDir);
                 writeOption(bw,"resultsFileName",resultsFileName);
                 writeOption(bw,"searchString",searchString);
-                writeOption(bw,"searchType",searchType);
                 writeOption(bw,"synopsis",synopsis);
                 writeOption(bw,"beep",beep);
                 writeOption(bw,"splashWindow",splashWindow);
@@ -213,12 +212,12 @@ public class Config {
         this.searchString = searchString;
     }
 
-    public String getSearchType() {
-        return searchType;
+    public SearchScope getSearchScope() {
+        return searchScope;
     }
 
-    public void setSearchType(String searchType) {
-        this.searchType = searchType;
+    public void setSearchScope(SearchScope searchScope) {
+        this.searchScope = searchScope;
     }
 
     public HashMap<String, Boolean> getSelectedAuthors() {

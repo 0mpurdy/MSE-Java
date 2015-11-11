@@ -2,7 +2,6 @@ mseVersion:3.0.0
 resDir:..\MSE-Res\res\
 resultsFileName:SearchResults.htm
 searchString:
-searchType:Phrase
 synopsis:true
 beep:false
 splashWindow:false

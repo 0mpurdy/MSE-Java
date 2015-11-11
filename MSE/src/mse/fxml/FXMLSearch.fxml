@@ -25,14 +25,7 @@
             </items>
           </Menu>
           <Menu fx:id="booksMenu" mnemonicParsing="false" text="Books" />
-          <Menu mnemonicParsing="false" text="Search Type">
-               <items>
-                  <RadioMenuItem mnemonicParsing="false" text="Phrase"/>
-                  <RadioMenuItem mnemonicParsing="false" text="Scentence contains words" />
-                  <RadioMenuItem mnemonicParsing="false" text="Paragraph contains words" />
-                  <RadioMenuItem mnemonicParsing="true" text="Page contains words" />
-               </items>
-          </Menu>
+          <Menu fx:id="scopeMenu" mnemonicParsing="false" text="Search Type"/>
             <Menu fx:id="mapsMenu" mnemonicParsing="false" text="Maps" />
             <Menu mnemonicParsing="false" text="Advanced">
                <items>

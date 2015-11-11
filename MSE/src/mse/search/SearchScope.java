@@ -11,6 +11,16 @@ package mse.search;
  */
 public enum SearchScope {
     
-    WORD, SCENTENCE, PARAGRAPH;
+    PHRASE("Phrase"), SENTENCE("Sentence contains words"), PARAGRAPH("Paragraph contains words"), PAGE("Page contains words");
+
+    String menuName;
+
+    SearchScope(String menuName) {
+        this.menuName = menuName;
+    }
+
+    public String getMenuName() {
+        return menuName;
+    }
     
 }

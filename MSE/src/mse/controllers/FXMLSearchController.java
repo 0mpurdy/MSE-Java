@@ -35,6 +35,7 @@ import mse.data.Author;
 import mse.data.Map;
 import mse.handlers.OpenFileHandler;
 import mse.search.IndexStore;
+import mse.search.SearchScope;
 
 /**
  *
@@ -63,6 +64,8 @@ public class FXMLSearchController implements Initializable {
     Menu mapsMenu;
     @FXML
     Menu logLevelMenu;
+    @FXML
+    Menu scopeMenu;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -162,10 +165,23 @@ public class FXMLSearchController implements Initializable {
                 if (nextLogLevel == LogLevel.INFO) nextLevelRadioItem.setSelected(true);
                 nextLevelRadioItem.setToggleGroup(logLevelToggleGroup);
                 nextLevelRadioItem.setOnAction(event -> {
-                    int i1 = logLevelMenu.getItems().indexOf(event.getSource());
-                    logger.setLogLevel(LogLevel.values()[i1]);
+                    int logLevelIndex = logLevelMenu.getItems().indexOf(event.getSource());
+                    logger.setLogLevel(LogLevel.values()[logLevelIndex]);
                 });
                 logLevelMenu.getItems().add(nextLevelRadioItem);
+            }
+
+            // add search scopes to menu
+            ToggleGroup scopeToggleGroup = new ToggleGroup();
+            for (SearchScope scope : SearchScope.values()) {
+                RadioMenuItem nextScopeRadioMenuItem = new RadioMenuItem(scope.getMenuName());
+                if (scope == SearchScope.SENTENCE) nextScopeRadioMenuItem.setSelected(true);
+                nextScopeRadioMenuItem.setToggleGroup(scopeToggleGroup);
+                nextScopeRadioMenuItem.setOnAction(event -> {
+                    int scopeIndex = scopeMenu.getItems().indexOf(event.getSource());
+                    cfg.setSearchScope(SearchScope.values()[scopeIndex]);
+                });
+                scopeMenu.getItems().add(nextScopeRadioMenuItem);
             }
 
             // add maps to maps menu
@@ -183,6 +199,8 @@ public class FXMLSearchController implements Initializable {
         }
 
         cfg.setSetup(false);
+
+        cfg.setSearchScope(SearchScope.SENTENCE);
 
         // initialise the search box
         searchBox.setText(cfg.getSearchString());
@@ -233,6 +251,9 @@ public class FXMLSearchController implements Initializable {
 
                 // check if it's a wild card search
                 search.setWildSearch();
+
+                // check the search scope
+                search.setSearchScope(cfg.getSearchScope());
 
                 progressBar.setVisible(true);
                 progressBar.setProgress(0);
