@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import mse.common.*;
+import mse.search.SearchScope;
 
 import java.util.ArrayList;
 
@@ -15,11 +16,16 @@ public class Search {
     private Config cfg;
     private ILogger logger;
     private String searchString;
+
     private String[] searchWords;
     private String[] searchTokens;
+
     private ArrayList<String> infrequentTokens;
-    private boolean wildSearch;
     private String leastFrequentToken;
+
+    private boolean wildSearch;
+
+    private SearchScope searchScope;
 
     private ProgressBar progressBar;
     private Label progressLabel;
@@ -209,6 +215,14 @@ public class Search {
 
     public int getNumInfrequentTokens() {
         return numInfrequentTokens;
+    }
+
+    public SearchScope getSearchScope() {
+        return searchScope;
+    }
+
+    public void setSearchScope(SearchScope searchScope) {
+        this.searchScope = searchScope;
     }
 
     public void setProgress(double progress) {

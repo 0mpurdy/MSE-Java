@@ -68,7 +68,10 @@ public class FXMLSearchController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
 
         // hide the progress bar
-//        progressBar.setVisible(false);
+        progressBar.setVisible(false);
+
+        // set the progress text to something helpful
+        progressLabel.setText("From the menu bar you can select a book to browse.");
 
         // open new logger
         logger = new Logger(LogLevel.INFO);
@@ -202,16 +205,18 @@ public class FXMLSearchController implements Initializable {
 
         String searchString = searchBox.getText();
 
-        if ((searchString.contains("*")) && (searchString.contains(" "))) {
-            logger.log(LogLevel.INFO, "Wildcard searches must only have one word");
-            progressLabel.setText("Wildcard searches must only have one word");
-        } else if (searchString.equals("")) {
+        if (searchString.equals("")) {
+            // check if there is any string to search
             progressLabel.setText("Invalid search string");
             logger.log(LogLevel.INFO, "Invalid search string: " + searchString);
+        } else if ((searchString.contains("*")) && (searchString.contains(" "))) {
+            // check if it is a valid wild card search
+            logger.log(LogLevel.INFO, "Wildcard searches must only have one word");
+            progressLabel.setText("Wildcard searches must only have one word");
         } else {
-            // if any authors are selected
+            // check if any authors are selected
             if (cfg.isAnyAuthorSelected()) {
-                // TODO progress window
+
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
 
                 // get which authors to search
@@ -225,11 +230,12 @@ public class FXMLSearchController implements Initializable {
                 }
 
                 Search search = new Search(cfg, logger, searchString, progressBar, progressLabel);
+
+                // check if it's a wild card search
+                search.setWildSearch();
+
                 progressBar.setVisible(true);
                 progressBar.setProgress(0);
-
-                // TODO change running runnable back to starting thread
-//                new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore, search).run();
 
                 // start the thread to search
                 AuthorSearch searchThread = new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore, search);
@@ -245,6 +251,7 @@ public class FXMLSearchController implements Initializable {
 
     @FXML
     public void handlesRefine(ActionEvent e) {
+        progressLabel.setText("This functionality hasn't been implemented yet");
     }
 
     @FXML
