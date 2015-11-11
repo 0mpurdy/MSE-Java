@@ -24,3 +24,11 @@
 [LOW  ] [2015-11-11 16:06:44] - Bible search doesn't work yet
 [LOW  ] [2015-11-11 16:06:44] - Hymns search doesn't work yet
 [HIGH ] [2015-11-11 16:06:49] - Error formatting page number in search: JT 39:209
+[INFO ] [2015-11-11 19:54:27] - Searched: bride
+[LOW  ] [2015-11-11 19:54:27] - Bible search doesn't work yet
+[LOW  ] [2015-11-11 19:54:27] - Hymns search doesn't work yet
+[INFO ] [2015-11-11 19:55:10] - Searched: love
+[LOW  ] [2015-11-11 19:55:10] - Bible search doesn't work yet
+[LOW  ] [2015-11-11 19:55:10] - Hymns search doesn't work yet
+[LOW  ] [2015-11-11 19:55:10] - 	Too frequent tokens in JND: LOVE
+[LOW  ] [2015-11-11 19:55:12] - 	Too frequent tokens in JT: LOVE

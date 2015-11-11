@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
  */
 public class AuthorSearch extends Thread {
 
-       private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
+    private final String[] deleteChars = {"?","\"","!",",",".","-","\'",":",
             "1","2","3","4","5","6","7","8","9","0",";","@",")","(","�","*","[","]","\u00AC","{","}","\u2019", "~",
             "\u201D","\u00A6","…","†","&","`","$","\u00A7","|","\t","=","+","\u2018","\u20AC","/","\u00B6","_","�","�","�","�","%","#"};
 
@@ -83,8 +83,12 @@ public class AuthorSearch extends Thread {
                     continue;
                 }
                 searchAuthor(nextAuthor, pwResults, search, indexStore);
+                pwResults.println("Number of results for " + nextAuthor.getName() + ": " + search.getNumAuthorResults());
+                search.clearAuthorValues();
 
             } // end searching each author
+
+            pwResults.println("Number of total results: " + search.getNumTotalResults());
 
             writeHtmlFooter(pwResults);
 
@@ -107,6 +111,7 @@ public class AuthorSearch extends Thread {
     private void searchAuthor(Author author, PrintWriter pw, Search search, IndexStore indexStore) {
 
         // get the author index
+        search.setProgress("Loading index for " + author.getName());
         AuthorIndex authorIndex = indexStore.getIndex(author, logger);
 
         logger.log(LogLevel.DEBUG, "\tSearching: " + author.getName() + " for \"" + searchString + "\"");
@@ -127,17 +132,18 @@ public class AuthorSearch extends Thread {
         logger.log(LogLevel.TRACE, "\tSearch tokens: " + search.printableSearchTokens());
         logger.flush();
 
-        int numInfrequentTokens = search.setLeastFrequentToken(authorIndex);
+        boolean foundAllTokens = search.setLeastFrequentToken(authorIndex);
 
-        if ((search.getLeastFrequentToken() != null) && (numInfrequentTokens == search.getSearchTokens().length)) {
+        if ((search.getLeastFrequentToken() != null) && (foundAllTokens)) {
             // at least one searchable token and all tokens in author index
 
-            ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(authorIndex.getReferences(search.getLeastFrequentToken())));
+            String[] referencesToSearchArray = authorIndex.getReferences(search.getLeastFrequentToken());
+            ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(referencesToSearchArray));
 
             // if there is more than one infrequent word
             // refine the number of references (combine if wild,
             // if not wild only use references where each word is found within 1 page
-            if (numInfrequentTokens > 1) {
+            if (search.getNumInfrequentTokens() > 1) {
 
                 // refine the references to search
                 referencesToSearch = refineReferences(authorIndex, search, referencesToSearch, search.getLeastFrequentToken());
@@ -146,82 +152,86 @@ public class AuthorSearch extends Thread {
 
             // TODO what is option.fullScan
 
-            int volNum;
-            boolean foundPage = false;
+            // if there are still any references to search
 
-            // process each page that contains a match
-            int refIndex = 0;
+            if (referencesToSearch.size() > 0) {
 
-            // read the first reference
-            int[] nextRef = getReference(referencesToSearch, refIndex);
-            refIndex++;
+                int volNum;
+                boolean foundPage = false;
 
-            // for each reference
-            while (refIndex < referencesToSearch.size()) {
+                // process each page that contains a match
+                int refIndex = 0;
 
-                volNum = nextRef[0];
+                // read the first reference
+                int[] nextRef = getReference(referencesToSearch, refIndex);
+                refIndex++;
 
-                String filename = cfg.getResDir();
+                // for each reference
+                while (refIndex < referencesToSearch.size() && nextRef != null) {
 
-                // get file name
-                if (author.equals(Author.BIBLE)) {
-                    filename += author.getTargetPath(BibleBook.values()[nextRef[0]].getName() + ".htm");
-                } else {
-                    filename += author.getVolumePath(nextRef[0]);
-                }
+                    volNum = nextRef[0];
 
-                int pageNum = 0;
+                    String filename = cfg.getResDir();
 
-                // for each volume
-                // read the file
-                try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+                    // get file name
+                    if (author.equals(Author.BIBLE)) {
+                        filename += author.getTargetPath(BibleBook.values()[nextRef[0]].getName() + ".htm");
+                    } else {
+                        filename += author.getVolumePath(nextRef[0]);
+                    }
+
+                    int pageNum = 0;
+
+                    // for each volume
+                    // read the file
+                    try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
 
 
-                    // update progress
-                    double fractionPerAuthor = (1.0 / authorsToSearch.size());
-                    double authorOffset = (authorsToSearch.indexOf(author));
-                    double authorProgess = ((double) volNum / author.getNumVols());
-                    double progress = (fractionPerAuthor * authorOffset) + (fractionPerAuthor * authorProgess);
-                    search.setProgress("Searching " + author.getName() + " volume " + volNum, progress);
+                        // update progress
+                        double fractionPerAuthor = (1.0 / authorsToSearch.size());
+                        double authorOffset = (authorsToSearch.indexOf(author));
+                        double authorProgess = ((double) volNum / author.getNumVols());
+                        double progress = (fractionPerAuthor * authorOffset) + (fractionPerAuthor * authorProgess);
+                        search.setProgress("Searching " + author.getName() + " volume " + volNum, progress);
 
-                    // line should not be null when first entering loop
-                    String line = br.readLine();
+                        // line should not be null when first entering loop
+                        String line = br.readLine();
 
-                    while (refIndex < referencesToSearch.size() && nextRef[0] == volNum) {
-                        // while still in the same volume
+                        while (refIndex < referencesToSearch.size() && nextRef[0] == volNum) {
+                            // while still in the same volume
 
-                        foundPage = false;
+                            foundPage = false;
 
-                        // read until page number = page ref
-                        while (!foundPage) {
-                            if (line != null) {
-                                if (line.contains("class=\"page-number\"")) {
-                                    line = br.readLine();
-                                    try {
-                                        pageNum = Integer.parseInt(line.substring(line.indexOf("=") + 1, line.indexOf('>')));
-                                        if (pageNum == nextRef[1]) foundPage = true;
-                                    } catch (NumberFormatException nfe) {
-                                        logger.log(LogLevel.HIGH, "Error formatting page number in search: " + author.getCode() + " " + volNum + ":" + pageNum);
-                                        return;
+                            // read until page number = page ref
+                            while (!foundPage) {
+                                if (line != null) {
+                                    if (line.contains("class=\"page-number\"")) {
+                                        line = br.readLine();
+                                        try {
+                                            pageNum = Integer.parseInt(line.substring(line.indexOf("=") + 1, line.indexOf('>')));
+                                            if (pageNum == nextRef[1]) foundPage = true;
+                                        } catch (NumberFormatException nfe) {
+                                            logger.log(LogLevel.HIGH, "Error formatting page number in search: " + author.getCode() + " " + volNum + ":" + pageNum);
+                                            return;
+                                        }
                                     }
+                                } else {
+                                    logger.log(LogLevel.HIGH, "NULL line when reading " + author.getCode() + " vol " + nextRef[0] + " page " + nextRef[1]);
+                                    break;
                                 }
-                            } else {
-                                logger.log(LogLevel.HIGH, "NULL line when reading " + author.getCode() + " vol " + nextRef[0] + " page " + nextRef[1]);
-                                break;
+                                if (!foundPage) line = br.readLine();
+                            } // found start of page
+
+                            // TODO add scope
+
+                            // for each paragraph in the page
+                            // skip a line and check if the next line is a heading or paragraph
+                            br.readLine();
+                            String tempLine = br.readLine();
+                            if (tempLine == null) {
+                                logger.log(LogLevel.HIGH, "Null line " + author.getCode() + "vol " + volNum + ":" + pageNum);
                             }
-                            if (!foundPage) line = br.readLine();
-                        } // found start of page
-
-                        // TODO add scope
-
-                        // for each paragraph in the page
-                        // skip a line and check if the next line is a heading or paragraph
-                        br.readLine();
-                        String tempLine = br.readLine();
-                        if (tempLine == null) {
-                            logger.log(LogLevel.HIGH, "Null line " + author.getCode() + "vol " + volNum + ":" + pageNum);
-                        }
-                        while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
+                            while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
 
                                 line = br.readLine();
 
@@ -235,33 +245,40 @@ public class AuthorSearch extends Thread {
                                     pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
                                     pw.println(markedLine);
                                     pw.println("\t</p>");
+
+                                    search.incrementResults();
                                 }
 
-                            br.readLine();
-                            tempLine = br.readLine();
-                        }
+                                br.readLine();
+                                tempLine = br.readLine();
+                            }
 
-                        line = tempLine;
+                            line = tempLine;
 
-                        // keep reading references until a new page
-                        while (refIndex < referencesToSearch.size() && volNum == nextRef[0] && pageNum == nextRef[1]) {
-                            nextRef = getReference(referencesToSearch, refIndex);
-                            refIndex++;
-                        }
+                            // keep reading references until a new page
+                            while (refIndex < referencesToSearch.size() && volNum == nextRef[0] && pageNum == nextRef[1]) {
+                                    nextRef = getReference(referencesToSearch, refIndex);
+                                refIndex++;
+                            }
 
-                    } // finished references in volume
+                        } // finished references in volume
 
-                } catch (IOException ioe) {
-                    logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename) + volNum + ":" + pageNum);
-                }
+                    } catch (IOException ioe) {
+                        logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename) + volNum + ":" + pageNum);
+                    }
+                } // end one frequent token and all tokens found
+
+            } // end had references to search
+            else {
+                logger.log(LogLevel.LOW, "No overlap in references for " + author.getCode());
             }
-            // end one frequent token and all tokens found
-        }else {
+
+        } else {
             if (search.getLeastFrequentToken() == null) {
                 pw.println("Search words appeared too frequently.");
                 logger.log(LogLevel.LOW, "\tToo frequent tokens in " + author.getCode() + ": " + search.printableSearchTokens());
             }
-            if (numInfrequentTokens < search.getSearchTokens().length) {
+            if (!foundAllTokens) {
                 pw.println("Not all words were found in index.");
                 logger.log(LogLevel.LOW, "\tTokens in " + author.getCode() + " not all found: " + search.printableSearchTokens());
             }
@@ -270,6 +287,8 @@ public class AuthorSearch extends Thread {
     }
 
     private ArrayList<String> refineReferences(AuthorIndex authorIndex, Search search, ArrayList<String> referencesToSearch, String leastFrequentToken) {
+
+        ArrayList currentReferencesList;
 
         // for each word
         for (String token : search.getSearchTokens()) {
@@ -325,7 +344,7 @@ public class AuthorSearch extends Thread {
                     } else {
                         // not a wildcard search
 
-                        ArrayList currentReferencesList = new ArrayList<String>(Arrays.asList(currentTokenRefs));
+                        currentReferencesList = new ArrayList<String>(Arrays.asList(currentTokenRefs));
                         int rtsIndex = 0;
 
                         // remove all references to search where the currentTokenRefs does not contain a ref
@@ -366,10 +385,10 @@ public class AuthorSearch extends Thread {
         return referencesToSearch;
     }
 
+    private int[] ref = new int[2];
+
     private int[] getReference(ArrayList<String> referencesToSearch, int refIndex) {
         // returns reference in the form [volume number, page number]
-
-        int[] ref = new int[2];
         String[] refString = referencesToSearch.get(refIndex).split(":");
         ref[0] = Integer.parseInt(refString[0]);
         ref[1] = Integer.parseInt(refString[1]);
@@ -388,17 +407,23 @@ public class AuthorSearch extends Thread {
         return false;
     }
 
+    StringBuilder lineBuilder = new StringBuilder();
+    int startHtml;
+    int endHtml;
+
     private String[] tokenizeLine(String line, String authorCode, int volNum, int pageNum) {
 
         // if the line contains html - remove the html tag
         while (line.contains("<")) {
 
-            StringBuilder lineBuilder = new StringBuilder(line);
-            int startHtml = 0;
+            // set the lineBuilder to the string passed in
+            lineBuilder.setLength(0);
+            lineBuilder.append(line);
+            startHtml = 0;
             while ((startHtml < lineBuilder.length()) && (lineBuilder.charAt(startHtml) != '<')) {
                 startHtml++;
             }
-            int endHtml = startHtml + 1;
+            endHtml = startHtml + 1;
             while ((endHtml < lineBuilder.length()) && (lineBuilder.charAt(endHtml) != '>')) {
                 endHtml++;
             }
@@ -412,9 +437,12 @@ public class AuthorSearch extends Thread {
         return tokenizeArray(line.split(" "), authorCode, volNum, pageNum);
     }
 
+    String[] newTokensArray;
+    ArrayList<String> newTokens = new ArrayList<>();
+
     private String[] tokenizeArray(String[] tokens, String authorCode, int volNum, int pageNum) {
 
-        ArrayList<String> newTokens = new ArrayList<>();
+        newTokens.clear();
 
         // make each token into a word that can be searched
         for (String token : tokens) {
@@ -432,7 +460,7 @@ public class AuthorSearch extends Thread {
             newTokens.add(token);
         } // end for each token
 
-        String[] newTokensArray = new String[newTokens.size()];
+        newTokensArray = new String[newTokens.size()];
         newTokensArray = newTokens.toArray(newTokensArray);
 
         return newTokensArray;

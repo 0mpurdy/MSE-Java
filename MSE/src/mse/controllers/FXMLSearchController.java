@@ -45,6 +45,7 @@ public class FXMLSearchController implements Initializable {
     private Logger logger;
     private Config cfg;
     private ArrayList<CheckBox> checkboxes;
+    private IndexStore indexStore;
 
     @FXML
     Button refineButton;
@@ -183,6 +184,9 @@ public class FXMLSearchController implements Initializable {
         // initialise the search box
         searchBox.setText(cfg.getSearchString());
 
+        // initialise the index store
+        indexStore = new IndexStore(cfg);
+
         logger.closeLog();
     }
 
@@ -205,7 +209,7 @@ public class FXMLSearchController implements Initializable {
             progressLabel.setText("Invalid search string");
             logger.log(LogLevel.INFO, "Invalid search string: " + searchString);
         } else {
-            // if any authors are selected            
+            // if any authors are selected
             if (cfg.isAnyAuthorSelected()) {
                 // TODO progress window
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
@@ -219,8 +223,6 @@ public class FXMLSearchController implements Initializable {
                         authorsToSearch.add(nextAuthor);
                     }
                 }
-
-                IndexStore indexStore = new IndexStore(cfg);
 
                 Search search = new Search(cfg, logger, searchString, progressBar, progressLabel);
                 progressBar.setVisible(true);

@@ -1,7 +1,7 @@
 mseVersion:3.0.0
 resDir:..\MSE-Res\res\
 resultsFileName:SearchResults.htm
-searchString:bride
+searchString:love
 searchType:Phrase
 synopsis:false
 beep:false

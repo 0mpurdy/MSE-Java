@@ -12,16 +12,22 @@ import java.util.ArrayList;
  */
 public class Search {
 
-    Config cfg;
-    ILogger logger;
-    String searchString;
-    String[] searchWords;
-    String[] searchTokens;
-    boolean wildSearch;
-    String leastFrequentToken;
+    private Config cfg;
+    private ILogger logger;
+    private String searchString;
+    private String[] searchWords;
+    private String[] searchTokens;
+    private ArrayList<String> infrequentTokens;
+    private boolean wildSearch;
+    private String leastFrequentToken;
 
-    ProgressBar progressBar;
-    Label progressLabel;
+    private ProgressBar progressBar;
+    private Label progressLabel;
+
+    private int numInfrequentTokens;
+
+    private int numAuthorResults;
+    private int numTotalResults;
 
     public Search(Config cfg, Logger logger, String searchString, ProgressBar progressBar, Label progressLabel) {
         this.cfg = cfg;
@@ -29,6 +35,33 @@ public class Search {
         this.searchString = searchString;
         this.progressBar = progressBar;
         this.progressLabel = progressLabel;
+        this.leastFrequentToken = null;
+        this.numAuthorResults = 0;
+        this.numTotalResults = 0;
+
+        infrequentTokens = new ArrayList<>();
+    }
+
+    public void clearAuthorValues() {
+        searchWords = new String[0];
+        searchTokens = new String[0];
+        infrequentTokens.clear();
+        leastFrequentToken = null;
+        numInfrequentTokens = 0;
+        numAuthorResults = 0;
+    }
+
+    public void incrementResults() {
+        numAuthorResults++;
+        numTotalResults++;
+    }
+
+    public int getNumAuthorResults() {
+        return numAuthorResults;
+    }
+
+    public int getNumTotalResults() {
+        return numTotalResults;
     }
 
     public boolean getWildSearch() {
@@ -135,11 +168,10 @@ public class Search {
         return printableTokens.toString().substring(0, printableTokens.length() -2);
     }
 
-    public int setLeastFrequentToken(AuthorIndex authorIndex) {
+    public boolean setLeastFrequentToken(AuthorIndex authorIndex) {
         // sets the least frequent token and returns the number of infrequent tokens found
 
         int lowestNumRefs = cfg.TOO_FREQUENT;
-        int numInfrequentTokens = 0;
 
         // get the least frequent token and check that all the tokens have references
         for (String nextSearchToken : searchTokens) {
@@ -157,6 +189,7 @@ public class Search {
                         lowestNumRefs = numReferences;
                         leastFrequentToken = nextSearchToken;
                     }
+                    infrequentTokens.add(nextSearchToken);
                     numInfrequentTokens++;
 
                 } else {
@@ -167,14 +200,24 @@ public class Search {
             } else {
                 // word not found in author index
                 logger.log(LogLevel.DEBUG, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
+                return false;
             }
         }
 
+        return true;
+    }
+
+    public int getNumInfrequentTokens() {
         return numInfrequentTokens;
     }
 
     public void setProgress(double progress) {
-        progressBar.setProgress(progress);
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setProgress(progress);
+            }
+        });
     }
 
     public void setProgress(String message, double progress) {
@@ -183,6 +226,15 @@ public class Search {
             public void run() {
                 progressLabel.setText(message);
                 progressBar.setProgress(progress);
+            }
+        });
+    }
+
+    public void setProgress(String message) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                progressLabel.setText(message);
             }
         });
     }
