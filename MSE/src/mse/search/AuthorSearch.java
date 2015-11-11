@@ -235,10 +235,10 @@ public class AuthorSearch extends Thread {
 
                                 line = br.readLine();
 
-                                // if the current line contains any search terms mark them and print it out
+                                // if the current scope contains all search terms mark them and print it out
                                 if (wordSearch(tokenizeLine(line, author.getCode(), volNum, pageNum), search.getSearchTokens())) {
 
-                                    String markedLine = markLine(line, search.getSearchWords());
+                                    String markedLine = markLine(new StringBuilder(line), search.getSearchWords());
 
                                     pw.println("\t<p>");
                                     pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
@@ -395,16 +395,21 @@ public class AuthorSearch extends Thread {
         return ref;
     }
 
-    private boolean wordSearch(String[] tokensToSearch, String[] searchTokens) {
+    boolean foundCurrentSearchToken;
+
+    private boolean wordSearch(String[] currentLineTokens, String[] searchTokens) {
+
 
         for (String nextSearchToken : searchTokens) {
-            for (String nextTokenToSearch : tokensToSearch) {
-                if (nextSearchToken.equals(nextTokenToSearch)) {
-                    return true;
+            foundCurrentSearchToken = false;
+            for (String nextLineToken : currentLineTokens) {
+                if (nextSearchToken.equals(nextLineToken)) {
+                    foundCurrentSearchToken = true;
                 }
             }
+            if (!foundCurrentSearchToken) return false;
         }
-        return false;
+        return true;
     }
 
     StringBuilder lineBuilder = new StringBuilder();
@@ -603,15 +608,37 @@ public class AuthorSearch extends Thread {
         return outString;
     }
 
-    private String markLine(String line, String[] words) {
+    int charPos = 0;
+    int startOfWord = 0;
+    int endOfWord = 0;
+
+    private String markLine(StringBuilder line, String[] words) {
+        // highlight all the search words in the line with an html <mark/> tag
 
         for (String word : words) {
 
-            line = line.replaceAll("(?i)" + Pattern.quote(word), "<mark>" + word + "</mark>");
+            charPos = 0;
 
+            // while there are still more words matching the current word in the line
+            // and the char position hasn't exceeded the line
+            while (charPos < line.length() && ((startOfWord = line.indexOf(word, charPos)) != -1)) {
+
+                endOfWord = startOfWord + word.length();
+                charPos = endOfWord;
+
+                // if the word has a letter before it or after it then skip it
+                if (Character.isLetter(line.charAt(startOfWord -1))) continue;
+                if (endOfWord < line.length() && Character.isLetter(line.charAt(endOfWord))) continue;
+
+                // otherwise mark the word
+                line.replace(startOfWord, endOfWord, "<mark>" + word + "</mark>");
+
+                // set the char position to after the word
+                charPos = endOfWord + 13;
+            }
         }
 
-        return line;
+        return line.toString();
     }
 
 }
