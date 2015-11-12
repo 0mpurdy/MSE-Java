@@ -113,6 +113,9 @@ public class AuthorSearch extends Thread {
 
     private void searchAuthor(Author author, PrintWriter pw, Search search, IndexStore indexStore) {
 
+        // get a new search cache
+        AuthorSearchCache asc = new AuthorSearchCache();
+
         // get the author index
         search.setProgress("Loading index for " + author.getName());
         AuthorIndex authorIndex = indexStore.getIndex(author, logger);
@@ -141,7 +144,7 @@ public class AuthorSearch extends Thread {
             // at least one searchable token and all tokens in author index
 
             String[] referencesToSearchArray = authorIndex.getReferences(search.getLeastFrequentToken());
-            ArrayList<String> referencesToSearch = new ArrayList<>(Arrays.asList(referencesToSearchArray));
+            asc.referencesToSearch = new ArrayList<>(Arrays.asList(referencesToSearchArray));
 
             // if there is more than one infrequent word
             // refine the number of references (combine if wild,
@@ -149,7 +152,7 @@ public class AuthorSearch extends Thread {
             if (search.getNumInfrequentTokens() > 1) {
 
                 // refine the references to search
-                referencesToSearch = refineReferences(authorIndex, search, referencesToSearch, search.getLeastFrequentToken());
+                asc.referencesToSearch = refineReferences(authorIndex, search, asc.referencesToSearch, search.getLeastFrequentToken());
 
             } // end multiple search tokens
 
@@ -157,23 +160,21 @@ public class AuthorSearch extends Thread {
 
             // if there are still any references to search
 
-            if (referencesToSearch.size() > 0) {
-
-                int volNum;
+            if (asc.referencesToSearch.size() > 0) {
 
                 // process each page that contains a match
-                int refIndex = 0;
+                asc.refIndex = 0;
 
                 // read the first reference
-                int[] nextRef = getReference(referencesToSearch, refIndex);
-                refIndex++;
+                asc.nextRef = getReference(asc.referencesToSearch, asc.refIndex);
+                asc.refIndex++;
 
                 // for each reference
-                while (refIndex < referencesToSearch.size() && nextRef != null) {
+                while (asc.refIndex < asc.referencesToSearch.size() && asc.nextRef != null) {
 
-                    volNum = nextRef[0];
+                    asc.volNum = asc.nextRef[0];
 
-                    refIndex = searchSingleVolume(pw, author, nextRef, volNum, referencesToSearch, refIndex);
+                    asc.refIndex = searchSingleVolume(pw, author, asc);
 
                 } // end one frequent token and all tokens found
 
@@ -294,18 +295,18 @@ public class AuthorSearch extends Thread {
         return referencesToSearch;
     }
 
-    private int searchSingleVolume(PrintWriter pw, Author author, int[] nextRef, int volNum, ArrayList<String> referencesToSearch, int refIndex) {
+    private int searchSingleVolume(PrintWriter pw, Author author, AuthorSearchCache asc) {
         // for each volume
 
         // get file name
         String filename = cfg.getResDir();
         if (author.equals(Author.BIBLE)) {
-            filename += author.getTargetPath(BibleBook.values()[nextRef[0]].getName() + ".htm");
+            filename += author.getTargetPath(BibleBook.values()[asc.nextRef[0]].getName() + ".htm");
         } else {
-            filename += author.getVolumePath(nextRef[0]);
+            filename += author.getVolumePath(asc.nextRef[0]);
         }
 
-        int pageNum = 0;
+        asc.pageNum = 0;
         boolean foundPage;
 
         // read the file
@@ -315,105 +316,186 @@ public class AuthorSearch extends Thread {
 //            double authorOffset = (authorsToSearch.indexOf(author));
 //            double authorProgess = ((double) volNum / author.getNumVols());
 //            double progress = (fractionPerAuthor * authorOffset) + (fractionPerAuthor * authorProgess);
-            progress = (fractionPerAuthor * (authorsToSearch.indexOf(author))) + (fractionPerAuthor * ((double) volNum / author.getNumVols()));
-            search.setProgress("Searching " + author.getName() + " volume " + volNum, progress);
+            progress = (fractionPerAuthor * (authorsToSearch.indexOf(author))) + (fractionPerAuthor * ((double) asc.volNum / author.getNumVols()));
+            search.setProgress("Searching " + author.getName() + " volume " + asc.volNum, progress);
 
             // line should not be null when first entering loop
-            String line = br.readLine();
+            asc.line = br.readLine();
 
-            while (refIndex < referencesToSearch.size() && nextRef[0] == volNum) {
+            while (asc.refIndex < asc.referencesToSearch.size() && asc.nextRef[0] == asc.volNum) {
                 // while still in the same volume
+                // loop through references
 
                 foundPage = false;
+                asc.prevLine = "";
 
                 // read until page number = page ref
+                // or if page number is page before next reference get the last line
                 while (!foundPage) {
-                    if (line != null) {
-                        if (line.contains("class=\"page-number\"")) {
-                            line = br.readLine();
+                    if (asc.line != null) {
+                        if (asc.line.contains("class=\"page-number\"")) {
+                            asc.line = br.readLine();
                             try {
-                                pageNum = Integer.parseInt(line.substring(line.indexOf("=") + 1, line.indexOf('>')));
-                                if (pageNum == nextRef[1]) foundPage = true;
+                                asc.pageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
+                                if (asc.pageNum == asc.nextRef[1]) foundPage = true;
+
+                                if (asc.volNum == 1 && asc.pageNum == 24) {
+                                    System.out.println("debug this");
+                                }
+
+                                // if it is the previous page
+                                if (asc.pageNum == asc.nextRef[1]  -1) {
+                                    asc.prevLine = getLastLineOfPage(br);
+
+                                    // set found page get page number
+                                    asc.line = br.readLine();
+
+                                    // if the line is a footnote then skip it
+                                    if (asc.line.contains("class=\"footnote\"")) {
+                                        br.readLine();
+                                        br.readLine();
+                                        asc.line = br.readLine();
+                                    }
+
+                                    asc.pageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
+                                    foundPage = true;
+                                }
                             } catch (NumberFormatException nfe) {
-                                logger.log(LogLevel.HIGH, "Error formatting page number in search: " + author.getCode() + " " + volNum + ":" + pageNum);
+                                logger.log(LogLevel.HIGH, "Error formatting page number in search: " + author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
                                 return -1;
                             }
                         }
                     } else {
-                        logger.log(LogLevel.HIGH, "NULL line when reading " + author.getCode() + " vol " + nextRef[0] + " page " + nextRef[1]);
+                        logger.log(LogLevel.HIGH, "NULL line when reading " + author.getCode() + " vol " + asc.nextRef[0] + " page " + asc.nextRef[1]);
                         break;
                     }
-                    if (!foundPage) line = br.readLine();
+                    if (!foundPage) asc.line = br.readLine();
                 } // found start of page
-
-                // TODO add scope
 
                 // for each paragraph in the page
                 // skip a line and check if the next line is a heading or paragraph
                 br.readLine();
-                String tempLine = br.readLine();
-                if (tempLine == null) {
-                    logger.log(LogLevel.HIGH, "NULL line " + author.getCode() + "vol " + volNum + ":" + pageNum);
+                asc.tempLine = br.readLine();
+                if (asc.tempLine == null) {
+                    logger.log(LogLevel.HIGH, "NULL line " + author.getCode() + "vol " + asc.volNum + ":" + asc.pageNum);
                 } else {
-
-                    // while still on the same page (class != page-number)
-                    while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
-
-                        line = br.readLine();
-
-                        stringsToSearch.clear();
-
-                        // get the searchLine based on the search scope
-                        if (search.getSearchScope() == SearchScope.SENTENCE) {
-                            stringsToSearch = convertLineIntoSentences(line);
-                        } else {
-                            stringsToSearch.add(line);
-                        }
-
-                        // for each string to search
-                        for (String scope : stringsToSearch) {
-
-                            // if the current scope contains all search terms mark them and print it out
-                            if (wordSearch(tokenizeLine(scope, author.getCode(), volNum, pageNum), search.getSearchTokens())) {
-
-                                String markedLine = markLine(new StringBuilder(scope), search.getSearchWords());
-
-                                pw.println("\t<p>");
-                                pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + volNum + ".htm#" + pageNum) + "\"> ");
-                                pw.print(author.getCode() + " volume " + volNum + " page " + pageNum + "</a> ");
-                                pw.println(markedLine);
-                                pw.println("\t</p>");
-
-                                search.incrementResults();
-                            }
-                        }
-
-                        br.readLine();
-                        tempLine = br.readLine();
-                    }
+                    searchSinglePage(pw, br, author, asc);
                 }
-                line = tempLine;
+                asc.line = asc.tempLine;
+
+                // clear the previousLine
+                asc.prevLine = "";
 
                 // keep reading references until a new page
-                while (refIndex < referencesToSearch.size() && volNum == nextRef[0] && pageNum == nextRef[1]) {
-                    nextRef = getReference(referencesToSearch, refIndex);
-                    refIndex++;
+                while (asc.refIndex < asc.referencesToSearch.size() && asc.volNum == asc.nextRef[0] && asc.pageNum == asc.nextRef[1]) {
+                    asc.nextRef = getReference(asc.referencesToSearch, asc.refIndex);
+                    asc.refIndex++;
                 }
 
             } // finished references in volume
 
         } catch (IOException ioe) {
-            logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename) + volNum + ":" + pageNum);
+            logger.log(LogLevel.HIGH, "Couldn't read " + author.getTargetPath(filename) + asc.volNum + ":" + asc.pageNum);
         }
 
-        return refIndex;
+        return asc.refIndex;
+    }
+
+    private void searchSinglePage(PrintWriter pw, BufferedReader br, Author author, AuthorSearchCache asc) throws IOException {
+
+        // while still on the same page (class != page-number)
+        while (asc.tempLine.contains("class=\"heading\"") || asc.tempLine.contains("class=\"paragraph\"")) {
+
+            asc.line = br.readLine();
+
+            stringsToSearch.clear();
+
+            // get the searchLine based on the search scope
+            if (search.getSearchScope() == SearchScope.SENTENCE) {
+                stringsToSearch = convertLineIntoSentences(asc.line, getTrailingIncompleteSentence(asc.prevLine));
+            } else {
+                stringsToSearch.add(asc.line);
+            }
+
+            // for each string to search
+            for (String scope : stringsToSearch) {
+
+                // if the current scope contains all search terms mark them and print it out
+                if (wordSearch(tokenizeLine(scope, author.getCode(), asc.volNum, asc.pageNum), search.getSearchTokens())) {
+
+                    String markedLine = markLine(new StringBuilder(scope), search.getSearchWords());
+
+                    pw.println("\t<p>");
+                    pw.print("\t\t<a href=\"..\\..\\" + author.getTargetPath(author.getCode() + asc.volNum + ".htm#" + asc.pageNum) + "\"> ");
+                    pw.print(author.getCode() + " volume " + asc.volNum + " page " + asc.pageNum + "</a> ");
+                    pw.println(markedLine);
+                    pw.println("\t</p>");
+
+                    search.incrementResults();
+                }
+            }
+
+            // set the current line as the previous line if it is a paragraph
+            if (asc.tempLine.contains("class=\"paragraph\"")) {
+                asc.prevLine = asc.line;
+            } else {
+                asc.prevLine = "";
+            }
+
+            br.readLine();
+            asc.tempLine = br.readLine();
+        }
+    }
+
+    private String getLastLineOfPage(BufferedReader br) throws IOException {
+
+        // for each paragraph in the page
+        // skip a line and check if the next line is a heading or paragraph
+        br.readLine();
+
+        String tempLine = br.readLine();
+        String lastLine = "";
+
+        // while not the last line
+        while (tempLine.contains("class=\"heading\"") || tempLine.contains("class=\"paragraph\"")) {
+
+            // read the line of text
+            lastLine = br.readLine();
+
+            // skip the </div> tag line
+            br.readLine();
+
+            // read the next line class
+            tempLine = br.readLine();
+        }
+
+        return lastLine;
+
+    }
+
+    int startOfLastSentencePos;
+
+    private String getTrailingIncompleteSentence(String line) {
+
+        if (line.isEmpty()) return "";
+
+        startOfLastSentencePos = line.lastIndexOf("<a name=");
+
+        // no sentence break in line
+        if (startOfLastSentencePos <0) return line;
+
+        startOfLastSentencePos = line.indexOf('>', startOfLastSentencePos) + 1;
+        startOfLastSentencePos = line.indexOf('>', startOfLastSentencePos) + 1;
+
+        if (startOfLastSentencePos < line.length()) return line.substring(startOfLastSentencePos);
+        return "";
     }
 
     ArrayList<String> sentences = new ArrayList<>();
     int startOfSentencePos;
     int endOfSentencePos;
 
-    private ArrayList<String> convertLineIntoSentences(String line) {
+    private ArrayList<String> convertLineIntoSentences(String line, String trailingIncompleteSentence) {
 
         sentences.clear();
         startOfSentencePos = 0;
@@ -435,6 +517,8 @@ public class AuthorSearch extends Thread {
             endOfSentencePos = startOfSentencePos;
 
         }
+
+        if (sentences.size() > 0) sentences.set(0, trailingIncompleteSentence + " " + sentences.get(0));
 
         return sentences;
     }
@@ -665,6 +749,7 @@ public class AuthorSearch extends Thread {
     int charPos = 0;
     int startOfWord = 0;
     int endOfWord = 0;
+    String currentCapitalisation;
 
     private String markLine(StringBuilder line, String[] words) {
         // highlight all the search words in the line with an html <mark/> tag
@@ -675,7 +760,7 @@ public class AuthorSearch extends Thread {
 
             // while there are still more words matching the current word in the line
             // and the char position hasn't exceeded the line
-            while (charPos < line.length() && ((startOfWord = line.indexOf(word, charPos)) != -1)) {
+            while (charPos < line.length() && ((startOfWord = line.toString().toLowerCase().indexOf(word.toLowerCase(), charPos)) != -1)) {
 
                 endOfWord = startOfWord + word.length();
                 charPos = endOfWord;
@@ -685,7 +770,8 @@ public class AuthorSearch extends Thread {
                 if (endOfWord < line.length() && Character.isLetter(line.charAt(endOfWord))) continue;
 
                 // otherwise mark the word
-                line.replace(startOfWord, endOfWord, "<mark>" + word + "</mark>");
+                currentCapitalisation = line.substring(startOfWord, endOfWord);
+                line.replace(startOfWord, endOfWord, "<mark>" + currentCapitalisation + "</mark>");
 
                 // set the char position to after the word
                 charPos = endOfWord + 13;
