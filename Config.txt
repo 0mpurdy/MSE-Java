@@ -10,15 +10,15 @@ fullScan:false
 setup:false
 debugOn:false
  --- Selected Authors --- 
-JND:false
-FER:false
-CAC:false
+JND:true
+FER:true
+CAC:true
 Bible:true
-SMC:false
-Misc:false
-CHM:false
-GRC:false
-JBS:false
-JT:false
-Hymns:false
+SMC:true
+Misc:true
+CHM:true
+GRC:true
+JBS:true
+JT:true
+Hymns:true
 AJG:true
