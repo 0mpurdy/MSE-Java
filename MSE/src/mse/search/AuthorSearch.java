@@ -414,11 +414,7 @@ public class AuthorSearch extends Thread {
                             try {
                                 cPageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
                                 if (asc.pageNum == cPageNum) foundPage = true;
-
-                                if (cPageNum == 377) {
-                                    System.out.println("debug");
-                                }
-
+                                
                                 // if it is the previous page
                                 if (asc.pageNum == cPageNum  -1) {
                                     asc.prevLine = getLastLineOfPage(br);
@@ -426,8 +422,8 @@ public class AuthorSearch extends Thread {
                                     // set found page get page number
                                     asc.line = br.readLine();
 
-                                    // if the line is a footnote then skip it
-                                    if (asc.line.contains("class=\"footnote\"")) {
+                                    // skip any footnotes
+                                    while (asc.line.contains("class=\"footnote\"")) {
                                         br.readLine();
                                         br.readLine();
                                         asc.line = br.readLine();
