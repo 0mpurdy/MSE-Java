@@ -259,7 +259,7 @@ public class FXMLSearchController implements Initializable {
                 progressBar.setProgress(0);
 
                 // start the thread to search
-                AuthorSearch searchThread = new AuthorSearch(cfg,logger,searchString, authorsToSearch,indexStore, search);
+                AuthorSearch searchThread = new AuthorSearch(cfg,logger, authorsToSearch,indexStore, search);
                 searchThread.start();
 
             } else {

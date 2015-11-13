@@ -6,5 +6,6 @@ package mse.common;
 public interface ILogger {
 
     void log(LogLevel logLevel, String message);
+    void closeLog();
 
 }

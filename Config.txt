@@ -1,8 +1,8 @@
 mseVersion:3.0.0
 resDir:..\MSE-Res\res\
 resultsFileName:SearchResults.htm
-searchString:
-synopsis:true
+searchString:love
+synopsis:false
 beep:false
 splashWindow:false
 autoLoad:false
@@ -21,4 +21,4 @@ GRC:false
 JBS:false
 JT:false
 Hymns:false
-AJG:false
+AJG:true

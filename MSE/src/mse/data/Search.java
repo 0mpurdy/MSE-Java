@@ -35,7 +35,7 @@ public class Search {
     private int numAuthorResults;
     private int numTotalResults;
 
-    public Search(Config cfg, Logger logger, String searchString, ProgressBar progressBar, Label progressLabel) {
+    public Search(Config cfg, ILogger logger, String searchString, ProgressBar progressBar, Label progressLabel) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString;
@@ -98,6 +98,14 @@ public class Search {
             wildSearch = false;
         }
 
+    }
+
+    public String getSearchString() {
+        return searchString;
+    }
+
+    public void setSearchString(String searchString) {
+        this.searchString = searchString;
     }
 
     public String getLeastFrequentToken() {
