@@ -25,10 +25,16 @@ public class AuthorSearchCache {
     public String prevLine;
 
     public void getNextPage() {
+        if (refIndex >= referencesToSearch.length) {
+            volNum = 0;
+            pageNum = 0;
+            return;
+        }
+
         nextRef = referencesToSearch[refIndex++];
 
         if (nextRef < 0) {
-            volNum = nextRef * -1;
+            volNum = -nextRef;
             nextRef = referencesToSearch[refIndex++];
             pageNum = nextRef;
         } else {

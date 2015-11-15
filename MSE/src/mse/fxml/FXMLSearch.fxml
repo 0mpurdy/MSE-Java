@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane minHeight="260.0" minWidth="570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mse.controllers.FXMLSearchController">
+<GridPane minHeight="300.0" minWidth="570.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mse.controllers.FXMLSearchController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
    </columnConstraints>
@@ -25,14 +25,16 @@
             </items>
           </Menu>
           <Menu fx:id="booksMenu" mnemonicParsing="false" text="Books" />
-          <Menu fx:id="scopeMenu" mnemonicParsing="false" text="Search Type"/>
+          <Menu fx:id="scopeMenu" mnemonicParsing="false" text="Search Type" />
             <Menu fx:id="mapsMenu" mnemonicParsing="false" text="Maps" />
             <Menu mnemonicParsing="false" text="Advanced">
                <items>
-                  <Menu fx:id="logLevelMenu" mnemonicParsing="false" text="Set Log Level"/>
+                  <Menu fx:id="logLevelMenu" mnemonicParsing="false" text="Set Log Level" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesViewLogFile" text="View Log File" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesViewConfigFile" text="View Config File" />
-                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLogAndConfig" text="Refresh Log and Config" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLog" text="Refresh Log" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshConfig" text="Refresh Config" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
@@ -54,7 +56,7 @@
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="90.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -98,6 +100,7 @@
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <GridPane.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

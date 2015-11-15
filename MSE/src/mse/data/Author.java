@@ -16,7 +16,8 @@ public enum Author {
     GRC(9, "GRC", "G.R.Cowell", "grc", 88, true),
     AJG(10, "AJG", "A.J.Gardiner", "ajg", 11, true),
     SMC(11, "SMC", "S.McCallum", "smc", 10, true),
-    Misc(12, "Misc", "Various Authors", "misc", 26, true);
+    WJH(12, "WJH", "W.J.House", "wjh", 8, true),
+    Misc(13, "Misc", "Various Authors", "misc", 26, true);
 
     private final int index;
     private final String code;

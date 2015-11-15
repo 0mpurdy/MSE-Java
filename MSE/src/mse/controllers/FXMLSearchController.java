@@ -315,10 +315,13 @@ public class FXMLSearchController implements Initializable {
     }
 
     @FXML
-    public void handlesRefreshLogAndConfig(ActionEvent e) {
+    public void handlesRefreshLog(ActionEvent e) {
         logger.refresh();
+    }
+
+    @FXML
+    public void handlesRefreshConfig(ActionEvent e) {
         cfg.refresh();
-        logger.closeLog();
 
         cfg.setSetup(true);
 

@@ -35,6 +35,8 @@ public class Search {
     private int numAuthorResults;
     private int numTotalResults;
 
+    private String tooFrequentTokens;
+
     public Search(Config cfg, ILogger logger, String searchString, ProgressBar progressBar, Label progressLabel) {
         this.cfg = cfg;
         this.logger = logger;
@@ -45,10 +47,17 @@ public class Search {
         this.numAuthorResults = 0;
         this.numTotalResults = 0;
 
+        tooFrequentTokens = "";
+
         infrequentTokens = new ArrayList<>();
     }
 
+    public ArrayList<String> getInfrequentTokens() {
+        return infrequentTokens;
+    }
+
     public void clearAuthorValues() {
+        tooFrequentTokens = "";
         searchWords = new String[0];
         searchTokens = new String[0];
         infrequentTokens.clear();
@@ -92,11 +101,8 @@ public class Search {
         // the stars can only be at the start and/or end of the search text
         if (starIndexes.size() == 2) {
             wildSearch = (starIndexes.get(0) == 0) && (starIndexes.get(1) == searchString.length() - 1);
-        } else if (starIndexes.size() == 1) {
-            wildSearch = ((starIndexes.get(0) == 0) || (starIndexes.get(0) == searchString.length() - 1));
-        } else {
-            wildSearch = false;
-        }
+        } else
+            wildSearch = starIndexes.size() == 1 && ((starIndexes.get(0) == 0) || (starIndexes.get(0) == searchString.length() - 1));
 
     }
 
@@ -127,6 +133,7 @@ public class Search {
 
                 // remove the stars from the search string
                 String bareSearchString = searchString.replace("*", "");
+                bareSearchString = bareSearchString.toUpperCase();
 
                 for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
 
@@ -160,30 +167,46 @@ public class Search {
     }
 
     public String printableSearchWords() {
-
-        StringBuilder printableWords = new StringBuilder();
-
-        for (String word : searchWords) {
-            printableWords.append(word).append(", ");
-        }
-
-        return printableWords.toString().substring(0, printableWords.length() -2);
+        return printableArray(searchWords);
     }
 
     public String printableSearchTokens() {
-
-        StringBuilder printableTokens = new StringBuilder();
-
-        for (String word : searchTokens) {
-            printableTokens.append(word).append(", ");
-        }
-
-        if (printableTokens.length() < 2) return "";
-        return printableTokens.toString().substring(0, printableTokens.length() -2);
+        return printableArray(searchTokens);
     }
 
-    public boolean setLeastFrequentToken(AuthorIndex authorIndex) {
+    public String printableArray(String[] array) {
+        StringBuilder printableArray = new StringBuilder();
+
+        for (String word : array) {
+            printableArray.append(word).append(", ");
+        }
+
+        if (printableArray.length() < 2) return "";
+
+        // remove last comma
+        return printableArray.toString().substring(0, printableArray.length() - 2);
+    }
+
+    public String getTooFrequentTokens() {
+        return tooFrequentTokens;
+    }
+
+    public int setLeastFrequentToken(AuthorIndex authorIndex) {
         // sets the least frequent token and returns the number of infrequent tokens found
+
+        boolean foundToken = false;
+        boolean tooFrequent = false;
+        boolean notFound = false;
+
+        /* returns:
+                1 : all tokens found (no errors)
+                2 : all tokens not found
+                3 : some tokens not found
+                4 : all tokens too frequent
+                5 : some tokens too frequent
+                6 : all tokens not found or too frequent
+                7 : some tokens not found and some tokens too frequent
+         */
 
         int lowestNumRefs = cfg.TOO_FREQUENT;
 
@@ -206,19 +229,30 @@ public class Search {
                     infrequentTokens.add(nextSearchToken);
                     numInfrequentTokens++;
 
+                    // found at least one token
+                    foundToken = true;
+
                 } else {
                     // word is too frequent
                     logger.log(LogLevel.DEBUG, "\tToken: " + nextSearchToken + " is too frequent");
+                    if (tooFrequent) tooFrequentTokens += ", ";
+                    tooFrequentTokens += nextSearchToken;
+                    tooFrequent = true;
                 }
 
             } else {
                 // word not found in author index
                 logger.log(LogLevel.DEBUG, "Token: " + nextSearchToken + " not found in author " + authorIndex.getAuthorName());
-                return false;
+                notFound = true;
             }
         }
 
-        return true;
+        int errorNum = 0;
+        if (!foundToken) errorNum = 1;
+        if (notFound) errorNum += 2;
+        if (tooFrequent) errorNum += 4;
+
+        return errorNum;
     }
 
     public int getNumInfrequentTokens() {
