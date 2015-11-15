@@ -5,25 +5,27 @@
  */
 package mse.search;
 
+// gui
+
+import java.awt.*;
+
+// java
+import java.io.*;
+import java.util.ArrayList;
+
+// mse
 import mse.common.*;
 import mse.data.Author;
 import mse.data.AuthorIndex;
 import mse.data.BibleBook;
 import mse.data.Search;
 
-import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
-
 /**
  * @author michael
  */
 public class AuthorSearch extends Thread {
 
-    private final int TOO_FREQUENT = 1000;
-
     private Config cfg;
-    //    private SearchScope searchScope;
     private ArrayList<Author> authorsToSearch;
     private ILogger logger;
     private IndexStore indexStore;
@@ -66,14 +68,13 @@ public class AuthorSearch extends Thread {
                 logger.log(LogLevel.LOW, "Bible search doesn't work yet");
                 continue;
             }
-            searchAuthor(nextAuthor, resultText, search, indexStore);
+            searchAuthor(resultText, nextAuthor, search, indexStore);
             resultText.add("Number of results for " + nextAuthor.getName() + ": " + search.getNumAuthorResults());
             search.clearAuthorValues();
 
         } // end searching each author
 
         resultText.add("Number of total results: " + search.getNumTotalResults());
-
         resultText.add(writeHtmlFooter());
 
         // try to open and write to the results file
@@ -106,7 +107,7 @@ public class AuthorSearch extends Thread {
 
     }
 
-    private void searchAuthor(Author author, ArrayList<String> resultText, Search search, IndexStore indexStore) {
+    private void searchAuthor(ArrayList<String> resultText, Author author, Search search, IndexStore indexStore) {
 
         // get a new search cache
         AuthorSearchCache asc = new AuthorSearchCache();
@@ -158,6 +159,7 @@ public class AuthorSearch extends Thread {
                         asc.referencesToSearch = refineReferences(authorIndex, token, asc.referencesToSearch);
                     }
                 }
+
             } // end multiple search tokens
 
             // TODO what is option.fullScan
@@ -293,7 +295,7 @@ public class AuthorSearch extends Thread {
             }
 
             // search the scope
-            foundToken = searchScope(stringsToSearch, asc, resultText, foundToken);
+            foundToken = searchScope(resultText, stringsToSearch, asc, foundToken);
 
             // set the current line as the previous line if it is a paragraph
             if (asc.tempLine.contains("class=\"paragraph\"")) {
@@ -310,7 +312,7 @@ public class AuthorSearch extends Thread {
             logger.log(LogLevel.DEBUG, "Did not find token " + asc.author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
     }
 
-    private boolean searchScope(ArrayList<String> stringsToSearch, AuthorSearchCache asc, ArrayList<String> resultText, boolean foundToken) {
+    private boolean searchScope(ArrayList<String> resultText, ArrayList<String> stringsToSearch, AuthorSearchCache asc, boolean foundToken) {
 
         for (String scope : stringsToSearch) {
 
@@ -356,7 +358,6 @@ public class AuthorSearch extends Thread {
         int crtsIndex;
         int cerIndex;
 
-
         // if it has references in the index and it is infrequent
         short[] extraTokenRefs = authorIndex.getReferences(token);
         if ((extraTokenRefs != null) && (extraTokenRefs.length > 1)) {
@@ -364,13 +365,8 @@ public class AuthorSearch extends Thread {
             // if it is a wildcard search
             if (search.getWildSearch()) {
 
-//                newListOfReferences.ensureCapacity(referencesToSearch.length + extraTokenRefs.length);
-
                 crtsIndex = 0;
                 cerIndex = 0;
-
-                short crtsPrevVol = 0;
-                short cerPrevVol = 0;
 
                 // add any references in the current references list
                 // to the list of references to search
@@ -403,8 +399,6 @@ public class AuthorSearch extends Thread {
 
                     // add the reference that is closest to the beginning of the author
                     // only add same references once
-
-
 
                     if (crtsVolNum < cerVolNum) {
                         // ref to search volume number is larger (more negative) so add cer
