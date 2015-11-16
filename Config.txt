@@ -1,5 +1,5 @@
 mseVersion:3.0.0
-resDir:..\MSE-Res\res\
+resDir:..\MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
 searchString:
 synopsis:true
