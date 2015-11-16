@@ -96,7 +96,7 @@ public class FXMLSearchController implements Initializable {
                 CheckBox nextCheckBox = new CheckBox(nextAuthor.getCode());
                 nextCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
                     public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
-                        if (!cfg.isSettingUp()) {
+                        if (!cfg.isSetup()) {
                             cfg.setSelectedAuthor(nextAuthor.getCode(), new_val);
                             cfg.save();
                         }
