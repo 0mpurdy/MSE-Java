@@ -22,7 +22,7 @@ public class IndexStore {
         authorIndexes = new HashMap<>();
     }
 
-    public AuthorIndex getIndex(Author author, ILogger logger) {
+    public AuthorIndex getIndex(ILogger logger, Author author) {
 
         AuthorIndex authorIndex = authorIndexes.get(author.getCode());
 

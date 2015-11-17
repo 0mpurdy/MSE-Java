@@ -1,6 +1,7 @@
 package mse.search;
 
 import mse.data.Author;
+import mse.data.AuthorIndex;
 
 import java.util.ArrayList;
 
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 public class AuthorSearchCache {
 
     // public variables are a bad idea but if it works it is faster
+    public AuthorIndex authorIndex;
     public Author author;
 
     public short[] referencesToSearch;
@@ -23,6 +25,11 @@ public class AuthorSearchCache {
     public String line;
     public String tempLine;
     public String prevLine;
+
+    public AuthorSearchCache(AuthorIndex authorIndex) {
+        this.authorIndex = authorIndex;
+        this.author = authorIndex.getAuthor();
+    }
 
     public void getNextPage() {
         if (refIndex >= referencesToSearch.length) {

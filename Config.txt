@@ -2,13 +2,7 @@ mseVersion:3.0.0
 resDir:..\MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
 searchString:
-synopsis:true
-beep:false
-splashWindow:false
-autoLoad:false
-fullScan:false
 setup:false
-debugOn:false
  --- Selected Authors --- 
 JND:false
 CAC:false

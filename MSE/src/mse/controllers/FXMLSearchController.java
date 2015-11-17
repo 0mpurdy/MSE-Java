@@ -12,11 +12,10 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import mse.data.Search;
-import mse.search.AuthorSearch;
+import mse.search.*;
 import mse.common.*;
 
 import java.awt.*;
-import java.beans.EventHandler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,6 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -34,8 +35,6 @@ import javafx.scene.layout.GridPane;
 import mse.data.Author;
 import mse.data.Map;
 import mse.handlers.OpenFileHandler;
-import mse.search.IndexStore;
-import mse.search.SearchScope;
 
 /**
  *
@@ -247,7 +246,7 @@ public class FXMLSearchController implements Initializable {
                     }
                 }
 
-                Search search = new Search(cfg, logger, searchString, progressBar, progressLabel);
+                Search search = new Search(cfg, logger, searchString);
 
                 // check if it's a wild card search
                 search.setWildSearch();
@@ -258,8 +257,13 @@ public class FXMLSearchController implements Initializable {
                 progressBar.setVisible(true);
                 progressBar.setProgress(0);
 
+                AtomicInteger progress = new AtomicInteger();
+
+                SearchProgressThread searchProgressThread = new SearchProgressThread(progressBar, progressLabel, progress, authorsToSearch.size());
+                searchProgressThread.start();
+
                 // start the thread to search
-                AuthorSearch searchThread = new AuthorSearch(cfg,logger, authorsToSearch,indexStore, search);
+                SearchThread searchThread = new SearchThread(cfg,logger, authorsToSearch,indexStore, search, progress);
                 searchThread.start();
 
             } else {
