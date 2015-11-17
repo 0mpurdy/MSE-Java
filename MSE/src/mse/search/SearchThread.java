@@ -58,14 +58,14 @@ public class SearchThread extends Thread {
 
             if (!nextAuthor.isMinistry()) continue;
 
-            Search nextSearch = new Search(search);
-
             ArrayList<LogRow> searchLog = new ArrayList<>();
             searchLogs.add(searchLog);
 
             AuthorIndex nextAuthorIndex = indexStore.getIndex(logger, nextAuthor);
 
-            AuthorSearchThread nextAuthorSearchThread = new AuthorSearchThread(cfg, nextAuthorIndex, nextSearch, progress);
+            AuthorSearchCache nextAsc = new AuthorSearchCache(cfg, nextAuthorIndex, search);
+
+            AuthorSearchThread nextAuthorSearchThread = new AuthorSearchThread(cfg, nextAsc, progress);
             singleSearchThreads.add(nextAuthorSearchThread);
 
             nextAuthorSearchThread.start();

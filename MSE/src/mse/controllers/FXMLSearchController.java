@@ -37,7 +37,6 @@ import mse.data.Map;
 import mse.handlers.OpenFileHandler;
 
 /**
- *
  * @author michael
  */
 public class FXMLSearchController implements Initializable {
@@ -45,6 +44,7 @@ public class FXMLSearchController implements Initializable {
     private Logger logger;
     private Config cfg;
     private ArrayList<CheckBox> checkboxes;
+    private RadioMenuItem defaultSearchScope;
     private IndexStore indexStore;
 
     @FXML
@@ -174,7 +174,10 @@ public class FXMLSearchController implements Initializable {
             ToggleGroup scopeToggleGroup = new ToggleGroup();
             for (SearchScope scope : SearchScope.values()) {
                 RadioMenuItem nextScopeRadioMenuItem = new RadioMenuItem(scope.getMenuName());
-                if (scope == SearchScope.SENTENCE) nextScopeRadioMenuItem.setSelected(true);
+                if (scope == cfg.getSearchScope()) {
+                    nextScopeRadioMenuItem.setSelected(true);
+                    defaultSearchScope = nextScopeRadioMenuItem;
+                }
                 nextScopeRadioMenuItem.setToggleGroup(scopeToggleGroup);
                 nextScopeRadioMenuItem.setOnAction(event -> {
                     int scopeIndex = scopeMenu.getItems().indexOf(event.getSource());
@@ -263,7 +266,7 @@ public class FXMLSearchController implements Initializable {
                 searchProgressThread.start();
 
                 // start the thread to search
-                SearchThread searchThread = new SearchThread(cfg,logger, authorsToSearch,indexStore, search, progress);
+                SearchThread searchThread = new SearchThread(cfg, logger, authorsToSearch, indexStore, search, progress);
                 searchThread.start();
 
             } else {
@@ -333,6 +336,8 @@ public class FXMLSearchController implements Initializable {
             nextCheckBox.setSelected(cfg.getSelectedAuthor(nextCheckBox.getText()));
         }
         searchBox.setText(cfg.getSearchString());
+
+        defaultSearchScope.setSelected(true);
 
         cfg.setSetup(false);
     }

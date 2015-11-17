@@ -2,7 +2,7 @@ mseVersion:3.0.0
 resDir:..\MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
 searchString:
-setup:false
+searchScope:Sentence contains words in order
  --- Selected Authors --- 
 JND:false
 CAC:false

@@ -8,8 +8,9 @@ package mse.search;
 // gui
 
 // java
+
 import java.io.*;
-        import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // mse
@@ -26,20 +27,20 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     private Config cfg;
     private ArrayList<LogRow> searchLog;
-    private AuthorIndex authorIndex;
-    private Search search;
+
+    AuthorSearchCache asc;
 
     private ArrayList<String> authorResults;
 
     private AtomicInteger progress;
 
-    public AuthorSearchThread(Config cfg, AuthorIndex authorIndex, Search search, AtomicInteger progress) {
+    public AuthorSearchThread(Config cfg, AuthorSearchCache asc, AtomicInteger progress) {
         this.cfg = cfg;
-        this.authorIndex = authorIndex;
-        this.search = search;
         this.searchLog = new ArrayList<>();
         this.authorResults = new ArrayList<>();
         this.progress = progress;
+
+        this.asc = asc;
     }
 
     @Override
@@ -60,20 +61,18 @@ public class AuthorSearchThread extends SingleSearchThread {
 //                continue;
 //            }
 
-        AuthorSearchCache asc = new AuthorSearchCache(cfg, authorIndex, search);
+        searchAuthor(authorResults, asc);
 
-        searchAuthor(authorResults, asc, search);
-
-        authorResults.add("Number of results for " + authorIndex.getAuthorName() + ": " + asc.numAuthorResults);
+        authorResults.add("Number of results for " + asc.getAuthorName() + ": " + asc.numAuthorResults);
 
     }
 
-    private void searchAuthor(ArrayList<String> resultText, AuthorSearchCache asc, Search search) {
+    private void searchAuthor(ArrayList<String> resultText, AuthorSearchCache asc) {
 
-        searchLog.add(new LogRow(LogLevel.DEBUG, "\tSearching: " + asc.author.getName() + " for \"" + search.getSearchString() + "\""));
+        searchLog.add(new LogRow(LogLevel.DEBUG, "\tSearching: " + asc.author.getName() + " for \"" + asc.getSearchString() + "\""));
 
         // get the search words
-        asc.setSearchWords(authorIndex);
+        asc.setSearchWords();
 
         // print the title of the author search results and search words
         resultText.add("\n\t<hr>\n\t<h1>Results of search through " + asc.author.getName() + "</h1>");
@@ -84,36 +83,25 @@ public class AuthorSearchThread extends SingleSearchThread {
          * index. log any words that are too frequent, find the least frequent token and
          * record the number of infrequent words
          */
-        if (search.getWildSearch()) {
+        if (asc.getWildSearch()) {
             asc.setSearchTokens(asc.getSearchWords());
         } else {
             asc.setSearchTokens(tokenizeArray(asc.getSearchWords(), asc.author.getCode(), 0, 0));
         }
         searchLog.add(new LogRow(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens()));
 
-        int errorNum = asc.setLeastFrequentToken(authorIndex);
+        int errorNum = asc.setLeastFrequentToken();
 
         if ((asc.getLeastFrequentToken() != null) && (errorNum % 4 < 2)) {
             // at least one searchable token and all tokens in author index
 
             // add all the references for the least frequent token to the referencesToSearch array
-            asc.referencesToSearch = authorIndex.getReferences(asc.getLeastFrequentToken());
+            asc.setReferencesToSearch();
 
             // if there is more than one infrequent word
             // refine the number of references (combine if wild,
             // if not wild only use references where each word is found within 1 page
-            if (asc.getNumInfrequentTokens() > 1) {
-
-                // refine the references to search
-                for (String token : asc.getInfrequentTokens()) {
-
-                    if (!token.equals(asc.getLeastFrequentToken())) {
-//                        search.setProgress("Refining references");
-                        asc.referencesToSearch = search.refineReferences(authorIndex, token, asc.referencesToSearch);
-                    }
-                }
-
-            } // end multiple search tokens
+            asc.refineReferences();
 
             // TODO what is option.fullScan
 
@@ -242,7 +230,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             ArrayList<String> stringsToSearch = new ArrayList<>();
 
             // get the searchLine based on the search scope
-            if (search.getSearchScope() == SearchScope.SENTENCE) {
+            if ((asc.getSearchScope() == SearchScope.SENTENCE) || asc.getSearchScope() == SearchScope.CLAUSE) {
                 stringsToSearch = convertLineIntoSentences(asc.line, getTrailingIncompleteSentence(asc.prevLine));
             } else {
                 stringsToSearch.add(asc.line);
@@ -271,7 +259,10 @@ public class AuthorSearchThread extends SingleSearchThread {
         for (String scope : stringsToSearch) {
 
             // if the current scope contains all search terms mark them and print it out (or one if it is a wildcard search)
-            if (wordSearch(tokenizeLine(scope, asc.author.getCode(), asc.volNum, asc.pageNum), asc.getSearchTokens(), search.getWildSearch())) {
+            SearchScope tempSearchScope = asc.getSearchScope();
+            boolean validSentence = (tempSearchScope.equals(SearchScope.SENTENCE));
+            if (validSentence && checkSentenceSearch(scope, asc) ||
+                    asc.getSearchScope().equals(SearchScope.CLAUSE) && clauseSearch(tokenizeLine(scope, asc), asc.getSearchTokens())) {
 
                 foundToken = true;
 
@@ -286,11 +277,71 @@ public class AuthorSearchThread extends SingleSearchThread {
                 resultText.add(markedLine);
                 resultText.add("\t</p>");
 
-                search.incrementResults();
+                asc.incrementResults();
             }
         }
 
         return foundToken;
+    }
+
+    // check sentence search
+    private boolean checkSentenceSearch(String scope, AuthorSearchCache asc) {
+        return wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+    }
+
+    boolean foundCurrentSearchToken;
+
+    private boolean wordSearch(String[] currentLineTokens, String[] searchTokens, boolean wildSearch) {
+
+        for (String nextSearchToken : searchTokens) {
+            foundCurrentSearchToken = false;
+            for (String nextLineToken : currentLineTokens) {
+                if (nextSearchToken.equals(nextLineToken)) {
+                    foundCurrentSearchToken = true;
+                    if (wildSearch) return true;
+                }
+            }
+            if (!foundCurrentSearchToken && !asc.getWildSearch()) return false;
+        }
+
+        // if it reaches this point as a wild search then no tokens were found
+        if (wildSearch) return false;
+        return true;
+    }
+
+    private boolean clauseSearch(String[] currentLineTokens, String[] searchTokens) {
+
+        boolean toggle = false;
+
+        // read through the clause finding each word in order
+        // return false if reached the end without finding every word
+
+        // true if the next word should be next word in the search tokens
+        boolean currentWordIsSearchToken;
+
+        // position of the next token to find in the search tokens array
+        int j = 0;
+
+        for (int i = 0; i < currentLineTokens.length; i++) {
+            currentWordIsSearchToken = false;
+            if (currentLineTokens[i].equalsIgnoreCase(searchTokens[j])) {
+                j++;
+                currentWordIsSearchToken = true;
+            }
+
+            if (j>0) {
+
+                // if all words found in order return true
+                if (j == searchTokens.length) return true;
+
+                // if current word wasn't a search token reset j
+                if (!currentWordIsSearchToken) j = 0;
+            }
+
+        }
+
+        return false;
+
     }
 
     private int findNextPage(AuthorSearchCache asc, BufferedReader br) throws IOException {
@@ -442,31 +493,11 @@ public class AuthorSearchThread extends SingleSearchThread {
         return sentences;
     }
 
-    boolean foundCurrentSearchToken;
-
-    private boolean wordSearch(String[] currentLineTokens, String[] searchTokens, boolean wildSearch) {
-
-        for (String nextSearchToken : searchTokens) {
-            foundCurrentSearchToken = false;
-            for (String nextLineToken : currentLineTokens) {
-                if (nextSearchToken.equals(nextLineToken)) {
-                    foundCurrentSearchToken = true;
-                    if (wildSearch) return true;
-                }
-            }
-            if (!foundCurrentSearchToken && !search.getWildSearch()) return false;
-        }
-
-        // if it reaches this point as a wild search then no tokens were found
-        if (wildSearch) return false;
-        return true;
-    }
-
     StringBuilder lineBuilder = new StringBuilder();
     int startHtml;
     int endHtml;
 
-    private String[] tokenizeLine(String line, String authorCode, int volNum, int pageNum) {
+    private String[] tokenizeLine(String line, AuthorSearchCache asc) {
 
         // if the line contains html - remove the html tag
         while (line.contains("<")) {
@@ -489,7 +520,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
 
         // split the line into tokens (words) by " " characters
-        return tokenizeArray(line.split(" "), authorCode, volNum, pageNum);
+        return tokenizeArray(line.split(" "), asc.getAuthorCode(), asc.volNum, asc.pageNum);
     }
 
     String[] newTokensArray;

@@ -47,9 +47,11 @@ public class Config {
         try(BufferedReader br = new BufferedReader(new FileReader(configFile))) {
 
             mseVersion = getNextOption(br, "mseVersion");
-            resDir = getNextOption(br, "mseVersion");
+            resDir = getNextOption(br, "resDir");
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
+            searchScope = SearchScope.fromString(getNextOption(br, "searchScope"));
+            if (searchScope == null) searchScope = SearchScope.CLAUSE;
 
             // skip selected authors line
             br.readLine();
@@ -65,7 +67,7 @@ public class Config {
             }
 
 
-        } catch (IOException | ArrayIndexOutOfBoundsException ex) {
+        } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException ex) {
             logger.log(LogLevel.LOW, "Error reading config - setting defaults");
             setDefaults();
         }
@@ -94,7 +96,7 @@ public class Config {
 //        defaultBrowser = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
         resultsFileName = "SearchResults.htm";
         searchString = "";
-        searchScope = SearchScope.SENTENCE;
+        searchScope = SearchScope.CLAUSE;
 
         // set the selected books to be searched to only the bible
         selectedAuthors = new HashMap<>();
@@ -119,7 +121,7 @@ public class Config {
                 writeOption(bw,"resDir",resDir);
                 writeOption(bw,"resultsFileName",resultsFileName);
                 writeOption(bw,"searchString",searchString);
-                writeOption(bw,"setup",setup);
+                writeOption(bw,"searchScope", searchScope.getMenuName());
 
                 bw.write(" --- Selected Authors --- ");
                 bw.newLine();
