@@ -60,11 +60,11 @@ public class AuthorSearchThread extends SingleSearchThread {
 //                continue;
 //            }
 
-        AuthorSearchCache asc = new AuthorSearchCache(authorIndex);
+        AuthorSearchCache asc = new AuthorSearchCache(cfg, authorIndex, search);
 
         searchAuthor(authorResults, asc, search);
 
-        authorResults.add("Number of results for " + authorIndex.getAuthorName() + ": " + search.getNumAuthorResults());
+        authorResults.add("Number of results for " + authorIndex.getAuthorName() + ": " + asc.numAuthorResults);
 
     }
 
@@ -73,41 +73,41 @@ public class AuthorSearchThread extends SingleSearchThread {
         searchLog.add(new LogRow(LogLevel.DEBUG, "\tSearching: " + asc.author.getName() + " for \"" + search.getSearchString() + "\""));
 
         // get the search words
-        search.setSearchWords(authorIndex);
+        asc.setSearchWords(authorIndex);
 
         // print the title of the author search results and search words
         resultText.add("\n\t<hr>\n\t<h1>Results of search through " + asc.author.getName() + "</h1>");
-        resultText.add("\n\t<p>\n\t\tSearched: " + search.printableSearchWords() + "\n\t</p>");
-        searchLog.add(new LogRow(LogLevel.TRACE, "\tSearch strings: " + search.printableSearchWords()));
+        resultText.add("\n\t<p>\n\t\tSearched: " + asc.printableSearchWords() + "\n\t</p>");
+        searchLog.add(new LogRow(LogLevel.TRACE, "\tSearch strings: " + asc.printableSearchWords()));
 
         /* Search all the words to make sure that all the search tokens are in the author's
          * index. log any words that are too frequent, find the least frequent token and
          * record the number of infrequent words
          */
         if (search.getWildSearch()) {
-            search.setSearchTokens(search.getSearchWords());
+            asc.setSearchTokens(asc.getSearchWords());
         } else {
-            search.setSearchTokens(tokenizeArray(search.getSearchWords(), asc.author.getCode(), 0, 0));
+            asc.setSearchTokens(tokenizeArray(asc.getSearchWords(), asc.author.getCode(), 0, 0));
         }
-        searchLog.add(new LogRow(LogLevel.TRACE, "\tSearch tokens: " + search.printableSearchTokens()));
+        searchLog.add(new LogRow(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens()));
 
-        int errorNum = search.setLeastFrequentToken(authorIndex);
+        int errorNum = asc.setLeastFrequentToken(authorIndex);
 
-        if ((search.getLeastFrequentToken() != null) && (errorNum % 4 < 2)) {
+        if ((asc.getLeastFrequentToken() != null) && (errorNum % 4 < 2)) {
             // at least one searchable token and all tokens in author index
 
             // add all the references for the least frequent token to the referencesToSearch array
-            asc.referencesToSearch = authorIndex.getReferences(search.getLeastFrequentToken());
+            asc.referencesToSearch = authorIndex.getReferences(asc.getLeastFrequentToken());
 
             // if there is more than one infrequent word
             // refine the number of references (combine if wild,
             // if not wild only use references where each word is found within 1 page
-            if (search.getNumInfrequentTokens() > 1) {
+            if (asc.getNumInfrequentTokens() > 1) {
 
                 // refine the references to search
-                for (String token : search.getInfrequentTokens()) {
+                for (String token : asc.getInfrequentTokens()) {
 
-                    if (!token.equals(search.getLeastFrequentToken())) {
+                    if (!token.equals(asc.getLeastFrequentToken())) {
 //                        search.setProgress("Refining references");
                         asc.referencesToSearch = search.refineReferences(authorIndex, token, asc.referencesToSearch);
                     }
@@ -146,11 +146,11 @@ public class AuthorSearchThread extends SingleSearchThread {
             resultText.add("\t<p>");
             if (errorNum % 4 > 1) {
                 resultText.add("\t\tNot all words were found in index.<br>");
-                searchLog.add(new LogRow(LogLevel.LOW, "\tTokens in " + asc.author.getCode() + " not all found: " + search.printableSearchTokens()));
+                searchLog.add(new LogRow(LogLevel.LOW, "\tTokens in " + asc.author.getCode() + " not all found: " + asc.printableSearchTokens()));
             }
             if (errorNum >= 4) {
-                resultText.add("\t\tSome words appeared too frequently: " + search.getTooFrequentTokens());
-                searchLog.add(new LogRow(LogLevel.LOW, "\tToo frequent tokens in " + asc.author.getCode() + ": " + search.getTooFrequentTokens()));
+                resultText.add("\t\tSome words appeared too frequently: " + asc.getTooFrequentTokens());
+                searchLog.add(new LogRow(LogLevel.LOW, "\tToo frequent tokens in " + asc.author.getCode() + ": " + asc.getTooFrequentTokens()));
             }
             resultText.add("\t</p>");
         }
@@ -271,11 +271,11 @@ public class AuthorSearchThread extends SingleSearchThread {
         for (String scope : stringsToSearch) {
 
             // if the current scope contains all search terms mark them and print it out (or one if it is a wildcard search)
-            if (wordSearch(tokenizeLine(scope, asc.author.getCode(), asc.volNum, asc.pageNum), search.getSearchTokens(), search.getWildSearch())) {
+            if (wordSearch(tokenizeLine(scope, asc.author.getCode(), asc.volNum, asc.pageNum), asc.getSearchTokens(), search.getWildSearch())) {
 
                 foundToken = true;
 
-                String markedLine = markLine(new StringBuilder(scope), search.getSearchWords());
+                String markedLine = markLine(new StringBuilder(scope), asc.getSearchWords());
 
                 // close any opened blockquote tags
                 if (markedLine.contains("<blockquote>")) markedLine += "</blockquote>";
