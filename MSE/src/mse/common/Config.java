@@ -20,12 +20,11 @@ public class Config {
     // the number of times a word has to appear before it is too frequent
     public final int TOO_FREQUENT = 10000;
 
-    private final String configFilePath = "Config.txt";
+    private final String configFilePath;
 
     private Logger logger;
 
     private String mseVersion;
-//    private String defaultBrowser;
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -37,10 +36,13 @@ public class Config {
 
         this.logger = logger;
 
+        this.configFilePath = "Config.txt";
+
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
             logger.log(LogLevel.LOW, "No config file found - setting defaults");
             setDefaults();
+            save();
             return;
         }
 
@@ -92,8 +94,6 @@ public class Config {
 
         mseVersion = "3.0.0";
         resDir = ".." + File.separator + "MSE-Res-Lite" + File.separator + "res" + File.separator;
-//        defaultBrowser = "/usr/bin/firefox";
-//        defaultBrowser = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
         resultsFileName = "SearchResults.htm";
         searchString = "";
         searchScope = SearchScope.CLAUSE;
@@ -129,14 +129,6 @@ public class Config {
                 for (String nextAuthorCode : selectedAuthors.keySet()) {
                     writeOption(bw, nextAuthorCode, selectedAuthors.get(nextAuthorCode).toString());
                 }
-
-//                changed to remove dependecy on gson
-//                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                String json = gson.toJson(this);
-//                File f = new File("config.txt");
-//                PrintWriter pw = new PrintWriter(f);
-//                pw.write(json);
-//                pw.close();
 
                 logger.log(LogLevel.DEBUG, "Config saved: " + configFile.getCanonicalPath());
 

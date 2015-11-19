@@ -32,7 +32,7 @@ public class Logger implements ILogger {
     public synchronized void log(LogLevel logLevel, String message) {
         if (logLevel.value <= this.logLevel.value) {
             Date date = new Date();
-            String tag = getOffsetWithTag(logLevel.tag);
+            String tag = logLevel.tag;
             pwLog.printf("%s [%s] - %s\n", tag, dateFormat.format(date), message);
         }
     }
@@ -40,17 +40,9 @@ public class Logger implements ILogger {
     public synchronized void log(LogRow logRow) {
         if (logRow.logLevel.value <= this.logLevel.value) {
             Date date = new Date();
-            String tag = getOffsetWithTag(logRow.logLevel.tag);
+            String tag = logRow.logLevel.tag;
             pwLog.printf("%s [%s] - %s\n", tag, dateFormat.format(date),logRow.message);
         }
-    }
-
-    private String getOffsetWithTag(String tag) {
-        int offset = 7 - tag.length();
-        for (int i=0; i<(offset); i++) {
-            tag = tag.replace("]", " ]");
-        }
-        return tag;
     }
 
     public void flush() {

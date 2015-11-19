@@ -4,13 +4,20 @@ package mse.common;
  * Created by mj_pu_000 on 28/09/2015.
  */
 public enum LogLevel {
-    CRITICAL (0), HIGH(1), LOW(2), INFO(3), DEBUG(4), TRACE(5);
+
+    CRITICAL (0, "[CRITICAL]"),
+    HIGH(1, "[HIGH    ]"),
+    LOW(2, "[LOW     ]"),
+    INFO(3, "[INFO    ]"),
+    DEBUG(4, "[DEBUG   ]"),
+    TRACE(5, "[TRACE   ]");
 
     int value;
     String tag;
 
-    LogLevel(int value) {
-        this.tag = "[" + this.name().toUpperCase() + "]";
+    LogLevel(int value, String tag) {
+        this.tag = tag;
         this.value = value;
     }
+
 }

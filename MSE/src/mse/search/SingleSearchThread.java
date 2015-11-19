@@ -13,4 +13,6 @@ public abstract class SingleSearchThread extends Thread {
 
     abstract ArrayList<String> getResults();
 
+    abstract int getNumberOfResults();
+
 }

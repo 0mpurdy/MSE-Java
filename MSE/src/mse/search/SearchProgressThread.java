@@ -17,14 +17,11 @@ public class SearchProgressThread extends Thread {
     ProgressBar progressBar;
     Label progressLabel;
 
-    private boolean stickyInterrupted;
-
     public SearchProgressThread(ProgressBar progressBar, Label progressLabel, AtomicInteger progress, int numAuthors) {
         this.progressBar = progressBar;
         this.progressLabel = progressLabel;
         this.progress = progress;
         this.numAuthors = numAuthors;
-        stickyInterrupted = false;
     }
 
     @Override

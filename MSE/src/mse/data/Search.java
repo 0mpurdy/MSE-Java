@@ -21,24 +21,22 @@ public class Search {
 
     private SearchScope searchScope;
 
+    private int numTotalResults;
+
     public Search(Config cfg, ILogger logger, String searchString) {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString;
+        this.searchScope = cfg.getSearchScope();
+        this.numTotalResults = 0;
+        setWildSearch();
     }
-
-//    public Search(Search oldSearch) {
-//        this.cfg = oldSearch.cfg;
-//        this.logger = oldSearch.logger;
-//        this.searchString = oldSearch.searchString;
-//        this.searchScope = oldSearch.getSearchScope();
-//    }
 
     public boolean getWildSearch() {
         return wildSearch;
     }
 
-    public void setWildSearch() {
+    private void setWildSearch() {
 
         ArrayList<Integer> starIndexes = new ArrayList<>();
 
@@ -73,7 +71,11 @@ public class Search {
         return searchScope;
     }
 
-    public void setSearchScope(SearchScope searchScope) {
-        this.searchScope = searchScope;
+    public int getTotalSearchResults() {
+        return numTotalResults;
+    }
+
+    public void addAuthorSearchResults(int authorResults) {
+        numTotalResults+= authorResults;
     }
 }

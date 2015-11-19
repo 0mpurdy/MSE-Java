@@ -174,10 +174,8 @@ public class FXMLSearchController implements Initializable {
             ToggleGroup scopeToggleGroup = new ToggleGroup();
             for (SearchScope scope : SearchScope.values()) {
                 RadioMenuItem nextScopeRadioMenuItem = new RadioMenuItem(scope.getMenuName());
-                if (scope == cfg.getSearchScope()) {
-                    nextScopeRadioMenuItem.setSelected(true);
-                    defaultSearchScope = nextScopeRadioMenuItem;
-                }
+                if (scope == cfg.getSearchScope()) nextScopeRadioMenuItem.setSelected(true);
+                if (scope == SearchScope.CLAUSE) defaultSearchScope = nextScopeRadioMenuItem;
                 nextScopeRadioMenuItem.setToggleGroup(scopeToggleGroup);
                 nextScopeRadioMenuItem.setOnAction(event -> {
                     int scopeIndex = scopeMenu.getItems().indexOf(event.getSource());
@@ -201,8 +199,6 @@ public class FXMLSearchController implements Initializable {
         }
 
         cfg.setSetup(false);
-
-        cfg.setSearchScope(SearchScope.SENTENCE);
 
         // initialise the search box
         searchBox.setText(cfg.getSearchString());
@@ -250,12 +246,6 @@ public class FXMLSearchController implements Initializable {
                 }
 
                 Search search = new Search(cfg, logger, searchString);
-
-                // check if it's a wild card search
-                search.setWildSearch();
-
-                // check the search scope
-                search.setSearchScope(cfg.getSearchScope());
 
                 progressBar.setVisible(true);
                 progressBar.setProgress(0);

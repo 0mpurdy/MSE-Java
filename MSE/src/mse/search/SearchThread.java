@@ -90,8 +90,6 @@ public class SearchThread extends Thread {
             }
         }
 
-        int totalResults = 0;
-
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
             pwResults.println(getHtmlHeader());
@@ -103,13 +101,14 @@ public class SearchThread extends Thread {
 
                     nextThread.getResults().forEach(pwResults::println);
                     nextThread.getLog().forEach(logger::log);
+                    search.addAuthorSearchResults(nextThread.getNumberOfResults());
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            pwResults.println("Number of total results: " + totalResults);
+            pwResults.println("\n\t<p>\n\t\tNumber of total results: " + search.getTotalSearchResults() + "\n\t</p>");
             pwResults.println(getHtmlFooter());
 
         } catch (FileNotFoundException fnfe) {

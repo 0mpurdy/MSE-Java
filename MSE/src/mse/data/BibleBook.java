@@ -3,7 +3,7 @@ package mse.data;
 public enum BibleBook {
 
     GENESIS("Genesis",50),
-    EXODUS("Exdodus",40),
+    EXODUS("Exodus",40),
     LEVITICUS("Leviticus",27),
     NUMBERS("Numbers", 36),
     DEUTERONOMY("Deuteronomy", 34),
@@ -36,7 +36,7 @@ public enum BibleBook {
     JONAH("Jonah", 4),
     MICAH("Micah", 7),
     NAHUM("Nahum", 3),
-    HABAKKUK("Habbakkuk", 3),
+    HABAKKUK("Habakkuk", 3),
     ZEPHANIAH("Zephaniah", 3),
     HAGGAI("Haggai", 2),
     ZECHARIAH("Zechariah", 14),
@@ -51,7 +51,7 @@ public enum BibleBook {
     CORINTHIANS2("2 Corinthians", 13),
     GALATIANS("Galatians", 6),
     EPHESIANS("Ephesians", 6),
-    PHILIPPIANS("Phillipians", 4),
+    PHILIPPIANS("Philipians", 4),
     COLOSSIANS("Colossians", 4),
     THESSALONIANS1("1 Thessalonians", 5),
     THESSALONIANS2("2 Thessalonians", 3),

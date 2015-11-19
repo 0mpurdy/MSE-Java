@@ -329,7 +329,7 @@ public class AuthorSearchThread extends SingleSearchThread {
                 currentWordIsSearchToken = true;
             }
 
-            if (j>0) {
+            if (j > 0) {
 
                 // if all words found in order return true
                 if (j == searchTokens.length) return true;
@@ -671,6 +671,16 @@ public class AuthorSearchThread extends SingleSearchThread {
     private String markLine(StringBuilder line, String[] words) {
         // highlight all the search words in the line with an html <mark/> tag
 
+        // remove any html already in the page
+        charPos = 0;
+        while (++charPos < line.length()) {
+            if (line.charAt(charPos) == '<') {
+                int tempCharIndex = charPos + 1;
+                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
+                line.replace(charPos, tempCharIndex, "");
+            }
+        }
+
         for (String word : words) {
 
             charPos = 0;
@@ -706,5 +716,10 @@ public class AuthorSearchThread extends SingleSearchThread {
     @Override
     public ArrayList<String> getResults() {
         return authorResults;
+    }
+
+    @Override
+    int getNumberOfResults() {
+        return asc.numAuthorResults;
     }
 }

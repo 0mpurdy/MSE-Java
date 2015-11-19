@@ -48,7 +48,7 @@ public class AuthorSearchCache {
     public String prevLine;
     private SearchScope searchScope;
 
-    public AuthorSearchCache(Config cfg, AuthorIndex authorIndex,Search search) {
+    public AuthorSearchCache(Config cfg, AuthorIndex authorIndex, Search search) {
         this.cfg = cfg;
         this.authorIndex = authorIndex;
         this.author = authorIndex.getAuthor();
@@ -322,8 +322,8 @@ public class AuthorSearchCache {
                     }
 
                     // if the volume number is zero then error
-                    if (crtsVolNum == 0 || cerVolNum == 0)
-                        // TODO re-add logging
+//                    if (crtsVolNum == 0 || cerVolNum == 0)
+                    // TODO re-add logging
 //                        logger.log(LogLevel.HIGH, "Invalid references " + authorIndex.getAuthorName());
 
                     // add the reference that is closest to the beginning of the author
