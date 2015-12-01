@@ -26,6 +26,13 @@ public class AuthorSearchCache {
 
     private boolean wildSearch;
 
+    private boolean writtenBibleSearchTableHeader;
+    private boolean writtenBibleSearchTableFooter;
+    private boolean searchingDarby;
+    public String previousDarbyLine;
+
+    private int bibleVerseNum;
+
     String[] searchWords;
     private String[] searchTokens;
 
@@ -44,7 +51,7 @@ public class AuthorSearchCache {
     public short nextRef;
 
     public String line;
-    public String tempLine;
+    public String currentSectionHeader;
     public String prevLine;
     private SearchScope searchScope;
 
@@ -59,6 +66,12 @@ public class AuthorSearchCache {
         this.wildSearch = search.getWildSearch();
 
         this.searchScope = search.getSearchScope();
+
+        this.writtenBibleSearchTableHeader = false;
+        this.writtenBibleSearchTableFooter = false;
+        this.searchingDarby = true;
+
+        this.bibleVerseNum = 0;
 
         tooFrequentTokens = "";
 
@@ -466,5 +479,76 @@ public class AuthorSearchCache {
 
     public void incrementResults() {
         numAuthorResults++;
+    }
+
+    public boolean isWrittenBibleSearchTableHeader() {
+        return writtenBibleSearchTableHeader;
+    }
+
+    public boolean isWrittenBibleSearchTableFooter() {
+        return writtenBibleSearchTableFooter;
+    }
+
+    public void setWrittenBibleSearchTableHeader(boolean writtenBibleSearchTableHeader) {
+        this.writtenBibleSearchTableHeader = writtenBibleSearchTableHeader;
+    }
+
+    public void setWrittenBibleSearchTableFooter(boolean writtenBibleSearchTableFooter) {
+        this.writtenBibleSearchTableFooter = writtenBibleSearchTableFooter;
+    }
+
+    public boolean isSearchingDarby() {
+        return searchingDarby;
+    }
+
+    public ArrayList<String> finishSearchingSingleBibleScope(String line, ArrayList<String> resultText, boolean foundToken) {
+
+        if (writtenBibleSearchTableHeader && !searchingDarby) {
+
+            if (!foundToken) {
+                resultText.add("<td>" + removeHtml(line) + "</td>");
+            }
+
+            resultText.add("\t\t</tr>");
+            resultText.add("\t</table>");
+
+            writtenBibleSearchTableHeader = false;
+        } else if (searchingDarby && !writtenBibleSearchTableHeader) previousDarbyLine = line;
+
+        searchingDarby = !searchingDarby;
+
+        return resultText;
+    }
+
+    public int getBibleVerseNum() {
+        return bibleVerseNum;
+    }
+
+    public void setBibleVerseNum(int bibleVerseNum) {
+        this.bibleVerseNum = bibleVerseNum;
+    }
+
+    private String removeHtml(String line) {
+        return removeHtml(new StringBuilder(line)).toString();
+    }
+
+    private StringBuilder removeHtml(StringBuilder line) {
+        int charPos = 0;
+
+        while (++charPos < line.length()) {
+            if (line.charAt(charPos) == '<') {
+                int tempCharIndex = charPos + 1;
+                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
+                tempCharIndex++;
+                line.replace(charPos, tempCharIndex, "");
+            }
+        }
+
+        return line;
+    }
+
+    public void incrementVerseNum() {
+
+        if (searchingDarby) bibleVerseNum++;
     }
 }

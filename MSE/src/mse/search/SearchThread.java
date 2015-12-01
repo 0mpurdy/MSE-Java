@@ -47,16 +47,22 @@ public class SearchThread extends Thread {
     @Override
     public void run() {
 
-        if (authorsToSearch.contains(Author.BIBLE)) {
-
-            // search the bible
-
-        }
+//        if (authorsToSearch.contains(Author.BIBLE)) {
+//
+//            // search the bible
+//            AuthorSearchCache asc = new AuthorSearchCache(cfg, indexStore.getIndex(logger, Author.BIBLE),search);
+//
+//            BibleSearchThread bibleSearchThread = new BibleSearchThread(cfg, asc, progress);
+//            singleSearchThreads.add(bibleSearchThread);
+//
+//            bibleSearchThread.start();
+//
+//        }
 
         // for each author to be searched
         for (Author nextAuthor : authorsToSearch) {
 
-            if (!nextAuthor.isMinistry()) continue;
+            if (!nextAuthor.isSearchable() || nextAuthor.equals(Author.HYMNS)) continue;
 
             ArrayList<LogRow> searchLog = new ArrayList<>();
             searchLogs.add(searchLog);

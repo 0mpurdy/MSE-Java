@@ -3,38 +3,62 @@ package mse.search;
 import mse.common.Config;
 import mse.common.ILogger;
 import mse.common.LogLevel;
+import mse.common.LogRow;
 import mse.data.Author;
 import mse.data.Search;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Michael on 17/11/2015.
  */
-public class BibleSearchThread extends Thread {
+public class BibleSearchThread extends SingleSearchThread {
 
     private Config cfg;
     private ILogger logger;
-    private IndexStore indexStore;
-    private Search search;
 
-    // progress fraction per author
-    private double fractionPerAuthor;
-    private double progress;
+    private ArrayList<LogRow> searchLog;
+    private ArrayList<String> authorResults;
 
-    public BibleSearchThread(Config cfg, ILogger logger, IndexStore indexStore, Search search) {
+    AuthorSearchCache asc;
+
+    private AtomicInteger progress;
+
+    public BibleSearchThread(Config cfg, AuthorSearchCache asc, AtomicInteger progress) {
         this.cfg = cfg;
-        this.logger = logger;
-        this.indexStore = indexStore;
-        this.search = search;
+        this.searchLog = new ArrayList<>();
+        this.authorResults = new ArrayList<>();
+        this.progress = progress;
+
+        this.asc = asc;
     }
 
     @Override
     public void run() {
 
-        logger.log(LogLevel.DEBUG, "Started search ... ");
+        searchBible(authorResults, asc);
 
+        authorResults.add("Number of results for " + asc.getAuthorName() + ": " + asc.numAuthorResults);
 
+    }
 
+    private void searchBible(ArrayList<String> authorResults, AuthorSearchCache asc){
+
+    }
+
+    @Override
+    ArrayList<LogRow> getLog() {
+        return searchLog;
+    }
+
+    @Override
+    ArrayList<String> getResults() {
+        return authorResults;
+    }
+
+    @Override
+    int getNumberOfResults() {
+        return asc.numAuthorResults;
     }
 }

@@ -67,7 +67,7 @@ public class FXMLSearchController implements Initializable {
     Menu scopeMenu;
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle rb)  {
 
         // hide the progress bar
         progressBar.setVisible(false);
