@@ -5,7 +5,7 @@ package mse.common;
  */
 public enum LogLevel {
 
-    CRITICAL (0, "[CRITICAL]"),
+    CRITICAL(0, "[CRITICAL]"),
     HIGH(1, "[HIGH    ]"),
     LOW(2, "[LOW     ]"),
     INFO(3, "[INFO    ]"),

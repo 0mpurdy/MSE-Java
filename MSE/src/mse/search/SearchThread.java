@@ -30,7 +30,7 @@ public class SearchThread extends Thread {
     // the progress of the current search (0 - 1000)
     private AtomicInteger progress;
 
-    public SearchThread(Config cfg, ILogger logger,  ArrayList<Author> authorsToSearch, IndexStore indexStore, Search search, AtomicInteger progress) {
+    public SearchThread(Config cfg, ILogger logger, ArrayList<Author> authorsToSearch, IndexStore indexStore, Search search, AtomicInteger progress) {
         this.cfg = cfg;
         this.logger = logger;
         this.authorsToSearch = authorsToSearch;

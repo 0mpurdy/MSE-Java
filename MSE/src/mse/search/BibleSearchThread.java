@@ -43,7 +43,7 @@ public class BibleSearchThread extends SingleSearchThread {
 
     }
 
-    private void searchBible(ArrayList<String> authorResults, AuthorSearchCache asc){
+    private void searchBible(ArrayList<String> authorResults, AuthorSearchCache asc) {
 
     }
 

@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.HashMap;
 
 /**
- *
  * @author michael
  */
 public class Config {
@@ -46,7 +45,7 @@ public class Config {
             return;
         }
 
-        try(BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
 
             mseVersion = getNextOption(br, "mseVersion");
             resDir = getNextOption(br, "resDir");
@@ -117,11 +116,11 @@ public class Config {
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
 
-                writeOption(bw,"mseVersion",mseVersion);
-                writeOption(bw,"resDir",resDir);
-                writeOption(bw,"resultsFileName",resultsFileName);
-                writeOption(bw,"searchString",searchString);
-                writeOption(bw,"searchScope", searchScope.getMenuName());
+                writeOption(bw, "mseVersion", mseVersion);
+                writeOption(bw, "resDir", resDir);
+                writeOption(bw, "resultsFileName", resultsFileName);
+                writeOption(bw, "searchString", searchString);
+                writeOption(bw, "searchScope", searchScope.getMenuName());
 
                 bw.write(" --- Selected Authors --- ");
                 bw.newLine();

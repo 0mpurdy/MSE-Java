@@ -2,9 +2,9 @@ package mse.data;
 
 public enum BibleBook {
 
-    GENESIS("Genesis",50),
-    EXODUS("Exodus",40),
-    LEVITICUS("Leviticus",27),
+    GENESIS("Genesis", 50),
+    EXODUS("Exodus", 40),
+    LEVITICUS("Leviticus", 27),
     NUMBERS("Numbers", 36),
     DEUTERONOMY("Deuteronomy", 34),
     JOSHUA("Joshua", 24),

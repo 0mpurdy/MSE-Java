@@ -215,7 +215,7 @@ public class AuthorSearchThread extends SingleSearchThread {
     private String getFileName() {
         String filename = cfg.getResDir();
         if (asc.author.equals(Author.BIBLE)) {
-            filename += asc.author.getTargetPath(BibleBook.values()[asc.volNum-1].getName() + ".htm");
+            filename += asc.author.getTargetPath(BibleBook.values()[asc.volNum - 1].getName() + ".htm");
         } else {
             filename += asc.author.getVolumePath(asc.volNum);
         }
@@ -279,9 +279,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             return sectionHeader.contains("class=\"heading\"") || sectionHeader.contains("class=\"paragraph\"") || sectionHeader.contains("class=\"footnote\"");
         } else if (asc.author.equals(Author.BIBLE)) {
             return sectionHeader.contains("<tr");
-        }
-
-        else return false;
+        } else return false;
     }
 
     private boolean searchScope(ArrayList<String> resultText, ArrayList<String> stringsToSearch, AuthorSearchCache asc, boolean foundToken) {
@@ -320,7 +318,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             resultText.add("\t</p>");
         } else if (asc.author.equals(Author.BIBLE)) {
 
-            if (!asc.isWrittenBibleSearchTableHeader())  {
+            if (!asc.isWrittenBibleSearchTableHeader()) {
                 resultText.add("\t<p><a href=\"..\\..\\" + asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum + ":" + asc.getBibleVerseNum()) + "\"> "
                         + getReadableReference() + "</a></p>");
                 resultText.add("\t<table class=\"bible-searchResult\">");
@@ -349,7 +347,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         if (asc.author.isMinistry()) {
             return asc.author.getCode() + " volume " + asc.volNum + " page " + asc.pageNum;
         } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum-1].getName() + " chapter " + asc.pageNum + ":" + asc.getBibleVerseNum();
+            return BibleBook.values()[asc.volNum - 1].getName() + " chapter " + asc.pageNum + ":" + asc.getBibleVerseNum();
         }
 
         return "";
@@ -359,7 +357,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         if (asc.author.isMinistry()) {
             return asc.author.getCode() + asc.volNum + ".htm";
         } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum-1].getName() + ".htm";
+            return BibleBook.values()[asc.volNum - 1].getName() + ".htm";
         } else {
             return "";
         }
@@ -382,7 +380,9 @@ public class AuthorSearchThread extends SingleSearchThread {
         return null;
 
     }
-String debugLine;
+
+    String debugLine;
+
     private String getNextSectionHeader(BufferedReader br) throws IOException {
         // returns the line that contains the class of the next section
 
@@ -418,10 +418,10 @@ String debugLine;
                 br.readLine();
 
                 // read jnd
-                line =  br.readLine();
+                line = br.readLine();
 
             } else {
-                line =  br.readLine();
+                line = br.readLine();
             }
             return line;
         }
@@ -992,8 +992,8 @@ String debugLine;
     public String getShortReadableReference() {
         if (asc.author.isMinistry()) {
             return asc.author.getCode() + "vol " + asc.volNum + ":" + asc.pageNum;
-        } else if (asc.author.equals(Author.BIBLE)){
-            return BibleBook.values()[asc.volNum-1].getName() + " " + asc.pageNum;
+        } else if (asc.author.equals(Author.BIBLE)) {
+            return BibleBook.values()[asc.volNum - 1].getName() + " " + asc.pageNum;
         }
         return "Can't get short readable reference";
     }

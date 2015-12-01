@@ -76,6 +76,6 @@ public class Search {
     }
 
     public void addAuthorSearchResults(int authorResults) {
-        numTotalResults+= authorResults;
+        numTotalResults += authorResults;
     }
 }
