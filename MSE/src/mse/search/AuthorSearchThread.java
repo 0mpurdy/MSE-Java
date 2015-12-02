@@ -124,6 +124,13 @@ public class AuthorSearchThread extends SingleSearchThread {
                 // for each reference
                 while (asc.volNum != 0 && volumeSuccess) {
 
+                    if (asc.author.equals(Author.HYMNS)) {
+                        resultText.add(String.format("\t\t<p class=\"%s\">\n\t\t\t<a href=\"%s\">%s</a>",
+                                "results-hymnbook-name",
+                                "..\\..\\" + asc.author.getTargetPath(getVolumeName()),
+                                HymnBook.values()[asc.volNum-1].getName()));
+                    }
+
                     volumeSuccess = searchSingleVolume(resultText, asc);
 
                 } // end one frequent token and all tokens found
@@ -364,7 +371,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         } else if (asc.author.equals(Author.BIBLE)) {
             return BibleBook.values()[asc.volNum - 1].getName() + " chapter " + asc.pageNum + ":" + asc.getBibleVerseNum();
         } else if (asc.author.equals(Author.HYMNS)) {
-            return HymnBook.values()[asc.volNum - 1].getName() + " number " + asc.pageNum;
+            return Integer.toString(asc.pageNum);
         }
 
         return "";

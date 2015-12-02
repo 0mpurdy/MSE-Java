@@ -54,7 +54,7 @@ public enum Author {
     }
 
     public String getContentsName() {
-        return folder + "_contents";
+        return code + "-Contents";
     }
 
     public String getIndexFilePath() {
