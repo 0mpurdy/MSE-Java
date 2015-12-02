@@ -62,10 +62,10 @@ public class SearchThread extends Thread {
         // for each author to be searched
         for (Author nextAuthor : authorsToSearch) {
 
-            if (!nextAuthor.isSearchable() || nextAuthor.equals(Author.HYMNS)) continue;
+            if (!nextAuthor.isSearchable()) continue;
 
-            ArrayList<LogRow> searchLog = new ArrayList<>();
-            searchLogs.add(searchLog);
+//            ArrayList<LogRow> searchLog = new ArrayList<>();
+//            searchLogs.add(searchLog);
 
             AuthorIndex nextAuthorIndex = indexStore.getIndex(logger, nextAuthor);
 

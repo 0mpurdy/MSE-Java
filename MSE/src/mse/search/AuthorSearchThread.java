@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import mse.common.*;
 import mse.data.Author;
 import mse.data.BibleBook;
+import mse.data.HymnBook;
 
 /**
  * @author michael
@@ -156,7 +157,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         final int cVolNum = asc.volNum;
 
         // get file name
-        String filename = getFileName();
+        String filename = getHtmlFileName();
 
         // read the file
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
@@ -212,13 +213,16 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     }
 
-    private String getFileName() {
+    private String getHtmlFileName() {
         String filename = cfg.getResDir();
         if (asc.author.equals(Author.BIBLE)) {
             filename += asc.author.getTargetPath(BibleBook.values()[asc.volNum - 1].getName() + ".htm");
+        } else if (asc.author.equals(Author.HYMNS)) {
+            filename += asc.author.getTargetPath(HymnBook.values()[asc.volNum - 1].getOutputFilename());
         } else {
             filename += asc.author.getVolumePath(asc.volNum);
         }
+
         return filename;
     }
 
@@ -279,7 +283,11 @@ public class AuthorSearchThread extends SingleSearchThread {
             return sectionHeader.contains("class=\"heading\"") || sectionHeader.contains("class=\"paragraph\"") || sectionHeader.contains("class=\"footnote\"");
         } else if (asc.author.equals(Author.BIBLE)) {
             return sectionHeader.contains("<tr");
-        } else return false;
+        } else if (asc.author.equals(Author.HYMNS)) {
+            return sectionHeader.contains("class=\"verse-number\"");
+        } else {
+            return false;
+        }
     }
 
     private boolean searchScope(ArrayList<String> resultText, ArrayList<String> stringsToSearch, AuthorSearchCache asc, boolean foundToken) {
@@ -339,6 +347,13 @@ public class AuthorSearchThread extends SingleSearchThread {
 
             }
 
+        } else if (asc.author.equals(Author.HYMNS)) {
+
+            resultText.add("\t<p>");
+            resultText.add("\t\t<a href=\"..\\..\\" + asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum) + "\"> "
+                    + getReadableReference() + "</a> ");
+            resultText.add("<blockquote>" + markedLine + "</blockquote>");
+            resultText.add("\t</p>");
         }
 
     }
@@ -348,6 +363,8 @@ public class AuthorSearchThread extends SingleSearchThread {
             return asc.author.getCode() + " volume " + asc.volNum + " page " + asc.pageNum;
         } else if (asc.author.equals(Author.BIBLE)) {
             return BibleBook.values()[asc.volNum - 1].getName() + " chapter " + asc.pageNum + ":" + asc.getBibleVerseNum();
+        } else if (asc.author.equals(Author.HYMNS)) {
+            return HymnBook.values()[asc.volNum - 1].getName() + " number " + asc.pageNum;
         }
 
         return "";
@@ -372,6 +389,14 @@ public class AuthorSearchThread extends SingleSearchThread {
 
             // skip synopsis
             for (int i = 0; i < 6; i++) br.readLine();
+
+            return br.readLine();
+
+        } else if (asc.author.equals(Author.HYMNS)) {
+
+            // skip author and metre
+            String temp = "";
+            for (int i = 0; i < 7; i++) temp = br.readLine();
 
             return br.readLine();
 
@@ -400,6 +425,14 @@ public class AuthorSearchThread extends SingleSearchThread {
 
             return br.readLine();
 
+        } else if (asc.author.equals(Author.HYMNS)) {
+
+            for (int i=0;i<6;i++) br.readLine();
+
+            debugLine = br.readLine();
+
+            return br.readLine();
+
         }
 
         return null;
@@ -424,6 +457,21 @@ public class AuthorSearchThread extends SingleSearchThread {
                 line = br.readLine();
             }
             return line;
+        } else if (asc.author.equals(Author.HYMNS)) {
+
+            // skip verse anchor tag
+            for (int i = 0; i < 3; i++) br.readLine();
+
+            String output = "";
+            String temp = br.readLine();
+
+            while (!temp.contains("</td>")) {
+                output += temp;
+                temp = br.readLine();
+            }
+
+            return output;
+
         }
 
         return null;
@@ -496,10 +544,61 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         if (asc.author.equals(Author.BIBLE)) {
             return findNextBiblePage(asc, br);
+        } else if (asc.author.equals(Author.HYMNS)) {
+            return findNextHymnPage(asc, br);
         } else {
             return findNextMinistryPage(asc, br);
         }
 
+    }
+
+    private int findNextHymnPage(AuthorSearchCache asc, BufferedReader br) throws IOException {
+
+        int cPageNum = 0;
+        boolean foundPage = false;
+
+        // clear the previous line
+        asc.prevLine = "";
+
+        // read until page number = page ref
+        // or if page number is page before next reference get the last line
+        while (!foundPage) {
+
+            if (asc.line != null) {
+
+                if (asc.line.contains("<td class=\"hymn-number\">")) {
+                    asc.line = br.readLine();
+
+                    try {
+
+                        // get the current page's number
+                        cPageNum = getPageNumber(asc.line, "=", ">");
+
+                        if (asc.pageNum == cPageNum) {
+                            return cPageNum;
+                        }
+
+                    } catch (NumberFormatException nfe) {
+                        searchLog.add(new LogRow(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum));
+                        return 0;
+                    }
+                }
+            } else {
+                searchLog.add(new LogRow(LogLevel.HIGH, "NULL line when reading " + getShortReadableReference()));
+                break;
+            }
+            asc.line = br.readLine();
+
+        } // found start of page
+
+        // shouldn't reach here
+        return 0;
+    }
+
+    private int getPageNumber(String line, String splitStart, String splitEnd) {
+        int start = line.indexOf(splitStart) + splitStart.length();
+        int end = line.indexOf(splitEnd, start);
+        return Integer.parseInt(line.substring(start, end));
     }
 
     private int findNextBiblePage(AuthorSearchCache asc, BufferedReader br) throws IOException {
@@ -926,7 +1025,8 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         // remove any html already in the line
         charPos = 0;
-        line = removeHtml(line);
+
+        if (!asc.author.equals(Author.HYMNS)) line = removeHtml(line);
 
         for (String word : words) {
 
@@ -960,7 +1060,7 @@ public class AuthorSearchThread extends SingleSearchThread {
     }
 
     private StringBuilder removeHtml(StringBuilder line) {
-        int charPos = 0;
+        int charPos = -1;
 
         while (++charPos < line.length()) {
             if (line.charAt(charPos) == '<') {
