@@ -92,7 +92,7 @@ public class Config {
     private void setDefaults() {
 
         mseVersion = "3.0.0";
-        resDir = ".." + File.separator + "MSE-Res-Lite" + File.separator + "res" + File.separator;
+        resDir = "res" + File.separator;
         resultsFileName = "SearchResults.htm";
         searchString = "";
         searchScope = SearchScope.CLAUSE;
@@ -157,6 +157,10 @@ public class Config {
 
     public String getResultsFileName() {
         return "target" + File.separator + "results" + File.separator + resultsFileName;
+    }
+
+    public String getResultsFilePath() {
+        return "target" + File.separator + "results";
     }
 
     public void setResultsFileName(String resultsFileName) {

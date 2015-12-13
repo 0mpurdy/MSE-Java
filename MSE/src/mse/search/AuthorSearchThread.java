@@ -128,7 +128,7 @@ public class AuthorSearchThread extends SingleSearchThread {
                         resultText.add(String.format("\t\t<p class=\"%s\">\n\t\t\t<a href=\"%s\">%s</a>",
                                 "results-hymnbook-name",
                                 "..\\..\\" + asc.author.getTargetPath(getVolumeName()),
-                                HymnBook.values()[asc.volNum-1].getName()));
+                                HymnBook.values()[asc.volNum - 1].getName()));
                     }
 
                     volumeSuccess = searchSingleVolume(resultText, asc);
@@ -382,6 +382,8 @@ public class AuthorSearchThread extends SingleSearchThread {
             return asc.author.getCode() + asc.volNum + ".htm";
         } else if (asc.author.equals(Author.BIBLE)) {
             return BibleBook.values()[asc.volNum - 1].getName() + ".htm";
+        } else if (asc.author.equals(Author.HYMNS)) {
+            return HymnBook.values()[asc.volNum - 1].getOutputFilename();
         } else {
             return "";
         }
@@ -434,11 +436,13 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         } else if (asc.author.equals(Author.HYMNS)) {
 
-            for (int i=0;i<6;i++) br.readLine();
-
             debugLine = br.readLine();
 
-            return br.readLine();
+            while (!debugLine.contains("class") && !debugLine.contains("</body>")) {
+                debugLine = br.readLine();
+            }
+
+            return new String(debugLine);
 
         }
 
@@ -878,7 +882,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             line = lineBuilder.toString();
         }
 
-        // split the line into tokens (words) by " " characters
+        // split the line into tokens (words) by non-word characters
         return tokenizeArray(line.split("[\\W]"), asc.getAuthorCode(), asc.volNum, asc.pageNum);
     }
 
@@ -1081,6 +1085,15 @@ public class AuthorSearchThread extends SingleSearchThread {
         return line;
     }
 
+    public String getShortReadableReference() {
+        if (asc.author.isMinistry()) {
+            return asc.author.getCode() + "vol " + asc.volNum + ":" + asc.pageNum;
+        } else if (asc.author.equals(Author.BIBLE)) {
+            return BibleBook.values()[asc.volNum - 1].getName() + " " + asc.pageNum;
+        }
+        return "Can't get short readable reference";
+    }
+
     @Override
     public ArrayList<LogRow> getLog() {
         return searchLog;
@@ -1094,14 +1107,5 @@ public class AuthorSearchThread extends SingleSearchThread {
     @Override
     int getNumberOfResults() {
         return asc.numAuthorResults;
-    }
-
-    public String getShortReadableReference() {
-        if (asc.author.isMinistry()) {
-            return asc.author.getCode() + "vol " + asc.volNum + ":" + asc.pageNum;
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum - 1].getName() + " " + asc.pageNum;
-        }
-        return "Can't get short readable reference";
     }
 }

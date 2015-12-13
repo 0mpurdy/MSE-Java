@@ -18,7 +18,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Indexes" />
+              <MenuItem mnemonicParsing="false" onAction="#handlesViewIndexes" text="Indexes" />
                   <MenuItem mnemonicParsing="false" text="Previous Search" />
                   <MenuItem mnemonicParsing="false" text="Options" />
                   <MenuItem mnemonicParsing="false" text="Exit" />
