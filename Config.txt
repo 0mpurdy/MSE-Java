@@ -1,19 +1,19 @@
 mseVersion:3.0.0
 resDir:..\MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
-searchString:
+searchString:Mephibosheth
 searchScope:Sentence contains words in order
  --- Selected Authors --- 
-JND:false
-CAC:false
+JND:true
+CAC:true
 Bible:true
-SMC:false
-Misc:false
-CHM:false
-JT:false
-Hymns:false
-FER:false
-WJH:false
-GRC:false
-JBS:false
-AJG:false
+SMC:true
+Misc:true
+CHM:true
+JT:true
+Hymns:true
+FER:true
+WJH:true
+GRC:true
+JBS:true
+AJG:true

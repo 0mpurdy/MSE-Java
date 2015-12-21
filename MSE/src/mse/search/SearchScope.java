@@ -10,11 +10,11 @@ package mse.search;
  */
 public enum SearchScope {
 
-    PHRASE("Phrase"),
+    CLAUSE("Exact Match"),
+    PHRASE("Sentence contains words in order"),
     SENTENCE("Sentence contains words"),
     PARAGRAPH("Paragraph contains words"),
-    PAGE("Page contains words"),
-    CLAUSE("Sentence contains words in order");
+    PAGE("Page contains words");
 
     String menuName;
 

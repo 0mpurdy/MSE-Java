@@ -270,33 +270,33 @@ public class FXMLSearchController implements Initializable {
     @FXML
     public void handlesViewIndexes(ActionEvent e) {
         // check if any authors are selected
-        if (cfg.isAnyAuthorSelected()) {
-
-            // get which authors to search
-            HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
-            ArrayList<Author> authorsToSearch = new ArrayList<>();
-            for (Author nextAuthor : Author.values()) {
-                if (!nextAuthor.isSearchable()) continue;
-                if (authors.get(nextAuthor.getCode())) {
-                    authorsToSearch.add(nextAuthor);
-                }
-            }
-
-            if (authorsToSearch.size() <= 1) {
-
-                ViewIndexThread viewIndexThread = new ViewIndexThread(cfg, logger, authorsToSearch, indexStore);
-                viewIndexThread.start();
-            } else {
-                progressLabel.setText("Only one author may be selected");
-                logger.log(LogLevel.INFO, "Only one author may be selected");
-                logger.closeLog();
-            }
-
-        } else {
-            progressLabel.setText("Only one author may be selected");
-            logger.log(LogLevel.INFO, "Only one author may be selected");
-            logger.closeLog();
-        }
+//        if (cfg.isAnyAuthorSelected()) {
+//
+//            // get which authors to search
+//            HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
+//            ArrayList<Author> authorsToSearch = new ArrayList<>();
+//            for (Author nextAuthor : Author.values()) {
+//                if (!nextAuthor.isSearchable()) continue;
+//                if (authors.get(nextAuthor.getCode())) {
+//                    authorsToSearch.add(nextAuthor);
+//                }
+//            }
+//
+//            if (authorsToSearch.size() <= 1) {
+//
+//                ViewIndexThread viewIndexThread = new ViewIndexThread(cfg, logger, authorsToSearch, indexStore);
+//                viewIndexThread.start();
+//            } else {
+//                progressLabel.setText("Only one author may be selected");
+//                logger.log(LogLevel.INFO, "Only one author may be selected");
+//                logger.closeLog();
+//            }
+//
+//        } else {
+//            progressLabel.setText("Only one author may be selected");
+//            logger.log(LogLevel.INFO, "Only one author may be selected");
+//            logger.closeLog();
+//        }
     }
 
     @FXML

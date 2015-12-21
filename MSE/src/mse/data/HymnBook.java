@@ -11,24 +11,22 @@ package mse.data;
  */
 public enum HymnBook {
 
-    h1973("1973 Hymn Book", "hymns1973.txt", "hymns1973.htm"),
-    h1962("1962 Hymn Book", "hymns1962.txt", "hymns1962.htm"),
-    h1951("1951 Hymn Book", "hymns1951.txt", "hymns1951.htm"),
-    h1932("1932 Hymn Book", "hymns1932.txt", "hymns1932.htm"),
-    h1903("1903 Hymn Book", "hymns1903.txt", "hymns1903.htm");
+    h1973("1973 Hymn Book", "hymns1973"),
+    h1962("1962 Hymn Book", "hymns1962"),
+    h1951("1951 Hymn Book", "hymns1951"),
+    h1932("1932 Hymn Book", "hymns1932"),
+    h1903("1903 Hymn Book", "hymns1903");
 
     private String name;
-    private String inputFilename;
-    private String outputFilename;
+    private String filename;
 
-    HymnBook(String name, String inputFilename, String outputFilename) {
+    HymnBook(String name, String filename) {
         this.name = name;
-        this.inputFilename = inputFilename;
-        this.outputFilename = outputFilename;
+        this.filename = filename;
     }
 
     public String getInputFilename() {
-        return inputFilename;
+        return filename + ".txt";
     }
 
     public String getName() {
@@ -40,6 +38,6 @@ public enum HymnBook {
     }
 
     public String getOutputFilename() {
-        return outputFilename;
+        return filename + ".htm";
     }
 }

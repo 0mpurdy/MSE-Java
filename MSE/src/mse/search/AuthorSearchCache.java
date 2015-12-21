@@ -1,10 +1,7 @@
 package mse.search;
 
 import mse.common.Config;
-import mse.common.LogLevel;
-import mse.data.Author;
-import mse.data.AuthorIndex;
-import mse.data.Search;
+import mse.data.*;
 
 import java.util.ArrayList;
 
@@ -29,9 +26,10 @@ public class AuthorSearchCache {
     private boolean writtenBibleSearchTableHeader;
     private boolean writtenBibleSearchTableFooter;
     private boolean searchingDarby;
+    private boolean foundDarby;
     public String previousDarbyLine;
 
-    private int bibleVerseNum;
+    private int verseNum;
 
     String[] searchWords;
     private String[] searchTokens;
@@ -70,8 +68,9 @@ public class AuthorSearchCache {
         this.writtenBibleSearchTableHeader = false;
         this.writtenBibleSearchTableFooter = false;
         this.searchingDarby = true;
+        this.foundDarby = false;
 
-        this.bibleVerseNum = 0;
+        this.verseNum = 0;
 
         tooFrequentTokens = "";
 
@@ -281,6 +280,17 @@ public class AuthorSearchCache {
         } // end multiple search tokens
     }
 
+    public String getShortReadableReference() {
+        if (author.isMinistry()) {
+            return author.getCode() + "vol " + volNum + ":" + pageNum;
+        } else if (author.equals(Author.BIBLE)) {
+            return BibleBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
+        } else if (author.equals(Author.HYMNS)) {
+            return HymnBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
+        }
+        return "Can't get short readable reference";
+    }
+
     public short[] refineSingleToken(String token) {
         ArrayList<Short> newListOfReferences = new ArrayList<>();
 
@@ -477,8 +487,16 @@ public class AuthorSearchCache {
         return searchScope;
     }
 
+    public void setFoundDarby(boolean foundToken) {
+        if (author == Author.BIBLE && searchingDarby) foundDarby = foundToken;
+    }
+
     public void incrementResults() {
-        numAuthorResults++;
+        if (author != Author.BIBLE) {
+            numAuthorResults++;
+        } else if (searchingDarby || !foundDarby) {
+            numAuthorResults++;
+        }
     }
 
     public boolean isWrittenBibleSearchTableHeader() {
@@ -503,6 +521,7 @@ public class AuthorSearchCache {
 
     public ArrayList<String> finishSearchingSingleBibleScope(String line, ArrayList<String> resultText, boolean foundToken) {
 
+        // if already written the header (found a result) and searching kjv
         if (writtenBibleSearchTableHeader && !searchingDarby) {
 
             if (!foundToken) {
@@ -513,6 +532,8 @@ public class AuthorSearchCache {
             resultText.add("\t</table>");
 
             writtenBibleSearchTableHeader = false;
+
+            // if searching jnd and not yet found a result
         } else if (searchingDarby && !writtenBibleSearchTableHeader) previousDarbyLine = line;
 
         searchingDarby = !searchingDarby;
@@ -520,12 +541,12 @@ public class AuthorSearchCache {
         return resultText;
     }
 
-    public int getBibleVerseNum() {
-        return bibleVerseNum;
+    public int getVerseNum() {
+        return verseNum;
     }
 
-    public void setBibleVerseNum(int bibleVerseNum) {
-        this.bibleVerseNum = bibleVerseNum;
+    public void setVerseNum(int verseNum) {
+        this.verseNum = verseNum;
     }
 
     private String removeHtml(String line) {
@@ -549,6 +570,6 @@ public class AuthorSearchCache {
 
     public void incrementVerseNum() {
 
-        if (searchingDarby) bibleVerseNum++;
+        if (searchingDarby) verseNum++;
     }
 }
