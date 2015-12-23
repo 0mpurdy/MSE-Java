@@ -1,19 +1,19 @@
 mseVersion:3.0.0
-resDir:..\MSE-Res-Lite\res\
+resDir:../MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
-searchString:Mephibosheth
-searchScope:Sentence contains words in order
+searchString:there am I
+searchScope:Exact Match
  --- Selected Authors --- 
-JND:true
-CAC:true
+JND:false
+CAC:false
 Bible:true
-SMC:true
-Misc:true
-CHM:true
-JT:true
-Hymns:true
-FER:true
-WJH:true
-GRC:true
-JBS:true
-AJG:true
+SMC:false
+Misc:false
+CHM:false
+JT:false
+Hymns:false
+FER:false
+WJH:false
+GRC:false
+JBS:false
+AJG:false

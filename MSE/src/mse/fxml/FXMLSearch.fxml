@@ -18,10 +18,8 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#handlesViewIndexes" text="Indexes" />
-                  <MenuItem mnemonicParsing="false" text="Previous Search" />
-                  <MenuItem mnemonicParsing="false" text="Options" />
-                  <MenuItem mnemonicParsing="false" text="Exit" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesPreviousSearches" text="Previous Searches" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesExit" text="Exit" />
             </items>
           </Menu>
           <Menu fx:id="booksMenu" mnemonicParsing="false" text="Books" />
@@ -35,16 +33,15 @@
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesRefreshLog" text="Refresh Log" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesRefreshConfig" text="Refresh Config" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesRefreshPreviousSearches" text="Refresh Previous Searches" />
                </items>
             </Menu>
             <Menu mnemonicParsing="false" text="Help">
               <items>
-                <MenuItem mnemonicParsing="false" text="Search Engine Help" />
-                  <MenuItem mnemonicParsing="false" text="Technical Support" />
+                <MenuItem mnemonicParsing="false" onAction="#handlesSearchEngineHelp" text="Search Engine Help" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesContactSupport" text="Contact Support" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="View Memory Usage" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="About Search Engine" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesAboutSearchEngine" text="About Search Engine" />
               </items>
             </Menu>
         </menus>

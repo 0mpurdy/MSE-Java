@@ -12,18 +12,16 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import mse.data.Search;
+import mse.helpers.HtmlHelper;
 import mse.search.*;
 import mse.common.*;
 
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.ResourceBundle;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.value.ChangeListener;
@@ -234,6 +232,11 @@ public class FXMLSearchController implements Initializable {
             if (cfg.isAnyAuthorSelected()) {
 
                 logger.log(LogLevel.INFO, "Searched: " + searchString);
+                try {
+                    addPreviousSearch(searchString);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
                 // get which authors to search
                 HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
@@ -267,6 +270,46 @@ public class FXMLSearchController implements Initializable {
         }
     }
 
+    private void addPreviousSearch(String searchString) throws IOException {
+
+        File previousSearchFile = new File(cfg.getPrevSearchesFile());
+        PrintWriter previousSearchWriter;
+        if (!previousSearchFile.exists()) {
+            previousSearchFile.getParentFile().mkdirs();
+            previousSearchFile.createNewFile();
+            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
+            HtmlHelper.writeHtmlHeader(previousSearchWriter, "Previous Searches", "../../mseStyles.css");
+            previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>\n\t\t\t<li>" + searchString);
+        } else {
+            BufferedReader br = new BufferedReader(new FileReader(previousSearchFile));
+            java.util.List<String> previousLines = Files.readAllLines(previousSearchFile.toPath());
+            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
+            previousLines.forEach(previousSearchWriter::println);
+            previousSearchWriter.println("\t\t\t<li>" + searchString);
+        }
+
+        previousSearchWriter.close();
+    }
+
+    @FXML
+    public void handlesPreviousSearches(ActionEvent e) {
+        File previousSearches = new File(cfg.getPrevSearchesFile());
+        try {
+            if (previousSearches.exists()) {
+                Desktop.getDesktop().open(previousSearches);
+            } else {
+                progressLabel.setText("No previous searches.");
+            }
+        } catch (IOException | IllegalArgumentException ioe) {
+            logger.log(LogLevel.HIGH, "Could not open results file.");
+        }
+    }
+
+    @FXML
+    public void handlesExit(ActionEvent e) {
+        System.exit(0);
+    }
+
     @FXML
     public void handlesViewIndexes(ActionEvent e) {
         // check if any authors are selected
@@ -297,6 +340,21 @@ public class FXMLSearchController implements Initializable {
 //            logger.log(LogLevel.INFO, "Only one author may be selected");
 //            logger.closeLog();
 //        }
+    }
+
+    @FXML
+    public void handlesSearchEngineHelp(ActionEvent e) {
+        System.exit(0);
+    }
+
+    @FXML
+    public void handlesContactSupport(ActionEvent e) {
+        System.exit(0);
+    }
+
+    @FXML
+    public void handlesAboutSearchEngine(ActionEvent e) {
+        System.exit(0);
     }
 
     @FXML
@@ -362,6 +420,23 @@ public class FXMLSearchController implements Initializable {
         defaultSearchScope.setSelected(true);
 
         cfg.setSetup(false);
+    }
+
+    @FXML
+    public void handlesRefreshPreviousSearches(ActionEvent e) {
+        try {
+            File previousSearchFile = new File(cfg.getPrevSearchesFile());
+            PrintWriter previousSearchWriter;
+            previousSearchFile.getParentFile().mkdirs();
+            previousSearchFile.createNewFile();
+            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
+            HtmlHelper.writeHtmlHeader(previousSearchWriter, "Previous Searches", "../../mseStyle.css");
+            previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>");
+
+            previousSearchWriter.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
     }
 
 //    removed to save having to use gson lib

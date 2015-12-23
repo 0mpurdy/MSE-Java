@@ -7,6 +7,7 @@ import mse.common.LogRow;
 import mse.data.Author;
 import mse.data.AuthorIndex;
 import mse.data.Search;
+import mse.helpers.HtmlHelper;
 
 import java.awt.*;
 import java.io.*;
@@ -98,7 +99,7 @@ public class SearchThread extends Thread {
 
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
-            pwResults.println(getHtmlHeader());
+            HtmlHelper.getResultsHeaderLines("Results", "../../mseStyle.css").forEach(pwResults::println);
 
             // join all the threads
             for (SingleSearchThread nextThread : singleSearchThreads) {
@@ -114,8 +115,8 @@ public class SearchThread extends Thread {
                 }
             }
 
-            pwResults.println("\n\t<p>\n\t\tNumber of total results: " + search.getTotalSearchResults() + "\n\t</p>");
-            pwResults.println(getHtmlFooter());
+            pwResults.println("\n\t<div class=\"spaced\">Number of total results: " + search.getTotalSearchResults() + "</div>");
+            pwResults.println(HtmlHelper.getHtmlFooter("</div>"));
 
         } catch (FileNotFoundException fnfe) {
 
@@ -135,21 +136,6 @@ public class SearchThread extends Thread {
 
         logger.closeLog();
 
-    }
-
-    private String getHtmlHeader() {
-        return "<!DOCTYPE html>" +
-                "\n\n<html>" +
-                "\n\n<head>" +
-                "\n\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../mseStyle.css\" />" +
-                "\n\t<title>Search Results</title>" +
-                "\n</head>" +
-                "\n<body>" +
-                "\t<p><img src=\"../../img/results.gif\"></p>";
-    }
-
-    private String getHtmlFooter() {
-        return "\n</body>\n\n</html>";
     }
 
 }

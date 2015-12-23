@@ -224,4 +224,7 @@ public class Config {
         save();
     }
 
+    public String getPrevSearchesFile() {
+        return getResDir() + File.separator + "target" + File.separator + "results" + File.separator + "PreviousSearches.html";
+    }
 }
