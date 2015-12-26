@@ -1,6 +1,6 @@
 mseVersion:3.0.0
 workingDir:
-resDir:res\
+resDir:..\MSE-Res-Lite\res\
 resultsFileName:search_results.htm
 searchString:
 searchType:Phrase

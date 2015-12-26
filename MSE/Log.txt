@@ -1,3 +1,0 @@
-[LOW] [2015-11-07 22:01:14] - Error reading config - setting defaults
-[HIGH] [2015-11-07 22:01:14] - Could not find maps file - F:\dev\Java\MSE-Java\MSE\res\Maps.txt
-[HIGH] [2015-11-07 22:01:25] - Could not find maps file - F:\dev\Java\MSE-Java\MSE\res\Maps.txt

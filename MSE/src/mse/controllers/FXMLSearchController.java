@@ -344,17 +344,42 @@ public class FXMLSearchController implements Initializable {
 
     @FXML
     public void handlesSearchEngineHelp(ActionEvent e) {
-        System.exit(0);
+        try {
+            File logFile = new File(cfg.getSearchEngineHelpPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
     }
 
     @FXML
     public void handlesContactSupport(ActionEvent e) {
-        System.exit(0);
+        try {
+            File logFile = new File(cfg.getSupportPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
+    }
+
+    @FXML
+    public void handlesViewLabourers(ActionEvent e) {
+        try {
+            File logFile = new File(cfg.getLabourersPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
     }
 
     @FXML
     public void handlesAboutSearchEngine(ActionEvent e) {
-        System.exit(0);
+        try {
+            File logFile = new File(cfg.getAboutPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
     }
 
     @FXML

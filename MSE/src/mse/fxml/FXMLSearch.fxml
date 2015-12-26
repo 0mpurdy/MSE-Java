@@ -41,6 +41,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#handlesSearchEngineHelp" text="Search Engine Help" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesContactSupport" text="Contact Support" />
                   <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#handlesViewLabourers" text="View Labourers" />
                   <MenuItem mnemonicParsing="false" onAction="#handlesAboutSearchEngine" text="About Search Engine" />
               </items>
             </Menu>

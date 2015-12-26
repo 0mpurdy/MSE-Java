@@ -1,10 +1,1 @@
-[INFO    ] [2015-12-23 01:12:21] - Searched: mephibosheth
-[HIGH    ] [2015-12-23 01:12:21] - Could not file find file: res\target\bible\index-Bible.idx
-[LOW     ] [2015-12-23 01:12:21] - 	Tokens in Bible not all found: MEPHIBOSHETH
-[INFO    ] [2015-12-23 01:13:31] - Searched: mephibosheth
-[LOW     ] [2015-12-23 01:13:32] - Did not find token 2Samuel 4:12
-[LOW     ] [2015-12-23 01:13:32] - Did not find token 2Samuel 9:13
-[LOW     ] [2015-12-23 01:13:32] - Did not find token 2Samuel 16:23
-[LOW     ] [2015-12-23 01:13:32] - Did not find token 2Samuel 19:43
-[LOW     ] [2015-12-23 01:13:32] - Did not find token 2Samuel 21:22
-[INFO    ] [2015-12-23 01:26:58] - Searched: there am I
+[HIGH    ] [2015-12-26 12:49:49] - Could not find maps file - F:\dev\Java\MSE-Java\res\Maps.txt

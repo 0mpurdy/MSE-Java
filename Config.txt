@@ -1,7 +1,7 @@
 mseVersion:3.0.0
-resDir:../MSE-Res-Lite\res\
+resDir:..\MSE-Res-Lite\res\
 resultsFileName:SearchResults.htm
-searchString:there am I
+searchString:
 searchScope:Exact Match
  --- Selected Authors --- 
 JND:false

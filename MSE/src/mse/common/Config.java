@@ -227,4 +227,20 @@ public class Config {
     public String getPrevSearchesFile() {
         return getResDir() + File.separator + "target" + File.separator + "results" + File.separator + "PreviousSearches.html";
     }
+
+    public String getSearchEngineHelpPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Help.html";
+    }
+
+    public String getSupportPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Contact.html";
+    }
+
+    public String getAboutPage() {
+        return getResDir() + File.separator + "other" + File.separator + "AboutMSE.html";
+    }
+
+    public String getLabourersPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Labourers.html";
+    }
 }
