@@ -35,7 +35,7 @@ public class Config {
 
         this.logger = logger;
 
-        this.configFilePath = "Config.txt";
+        this.configFilePath = "config.txt";
 
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
