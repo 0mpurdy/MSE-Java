@@ -67,7 +67,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         if (asc.getWildSearch()) {
             asc.setSearchTokens(asc.getSearchWords());
         } else {
-            asc.setSearchTokens(tokenizeArray(asc.getSearchWords(), asc.author.getCode(), 0, 0));
+            asc.setSearchTokens(tokenizeLine(asc.getSearchString(), asc));
         }
         log(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens());
 

@@ -45,6 +45,9 @@ public class FXMLSearchController implements Initializable {
     private RadioMenuItem defaultSearchScope;
     private IndexStore indexStore;
 
+    private TextField orSearch;
+    private TextField notSearch;
+
     @FXML
     Button refineButton;
     @FXML
@@ -63,6 +66,8 @@ public class FXMLSearchController implements Initializable {
     Menu logLevelMenu;
     @FXML
     Menu scopeMenu;
+    @FXML
+    GridPane searchBoxGrid;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
