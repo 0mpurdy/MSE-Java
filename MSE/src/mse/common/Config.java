@@ -12,7 +12,6 @@ import java.io.*;
 import java.util.HashMap;
 
 /**
- *
  * @author michael
  */
 public class Config {
@@ -20,12 +19,11 @@ public class Config {
     // the number of times a word has to appear before it is too frequent
     public final int TOO_FREQUENT = 10000;
 
-    private final String configFilePath = "Config.txt";
+    private final String configFilePath;
 
     private Logger logger;
 
     private String mseVersion;
-//    private String defaultBrowser;
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -37,19 +35,24 @@ public class Config {
 
         this.logger = logger;
 
+        this.configFilePath = "config.txt";
+
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
             logger.log(LogLevel.LOW, "No config file found - setting defaults");
             setDefaults();
+            save();
             return;
         }
 
-        try(BufferedReader br = new BufferedReader(new FileReader(configFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
 
             mseVersion = getNextOption(br, "mseVersion");
-            resDir = getNextOption(br, "mseVersion");
+            resDir = getNextOption(br, "resDir");
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
+            searchScope = SearchScope.fromString(getNextOption(br, "searchScope"));
+            if (searchScope == null) searchScope = SearchScope.CLAUSE;
 
             // skip selected authors line
             br.readLine();
@@ -65,7 +68,7 @@ public class Config {
             }
 
 
-        } catch (IOException | ArrayIndexOutOfBoundsException ex) {
+        } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException ex) {
             logger.log(LogLevel.LOW, "Error reading config - setting defaults");
             setDefaults();
         }
@@ -89,12 +92,10 @@ public class Config {
     private void setDefaults() {
 
         mseVersion = "3.0.0";
-        resDir = ".." + File.separator + "MSE-Res-Lite" + File.separator + "res" + File.separator;
-//        defaultBrowser = "/usr/bin/firefox";
-//        defaultBrowser = "C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe";
+        resDir = "res" + File.separator;
         resultsFileName = "SearchResults.htm";
         searchString = "";
-        searchScope = SearchScope.SENTENCE;
+        searchScope = SearchScope.CLAUSE;
 
         // set the selected books to be searched to only the bible
         selectedAuthors = new HashMap<>();
@@ -115,11 +116,11 @@ public class Config {
 
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
 
-                writeOption(bw,"mseVersion",mseVersion);
-                writeOption(bw,"resDir",resDir);
-                writeOption(bw,"resultsFileName",resultsFileName);
-                writeOption(bw,"searchString",searchString);
-                writeOption(bw,"setup",setup);
+                writeOption(bw, "mseVersion", mseVersion);
+                writeOption(bw, "resDir", resDir);
+                writeOption(bw, "resultsFileName", resultsFileName);
+                writeOption(bw, "searchString", searchString);
+                writeOption(bw, "searchScope", searchScope.getMenuName());
 
                 bw.write(" --- Selected Authors --- ");
                 bw.newLine();
@@ -127,14 +128,6 @@ public class Config {
                 for (String nextAuthorCode : selectedAuthors.keySet()) {
                     writeOption(bw, nextAuthorCode, selectedAuthors.get(nextAuthorCode).toString());
                 }
-
-//                changed to remove dependecy on gson
-//                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//                String json = gson.toJson(this);
-//                File f = new File("config.txt");
-//                PrintWriter pw = new PrintWriter(f);
-//                pw.write(json);
-//                pw.close();
 
                 logger.log(LogLevel.DEBUG, "Config saved: " + configFile.getCanonicalPath());
 
@@ -164,6 +157,10 @@ public class Config {
 
     public String getResultsFileName() {
         return "target" + File.separator + "results" + File.separator + resultsFileName;
+    }
+
+    public String getResultsFilePath() {
+        return "target" + File.separator + "results";
     }
 
     public void setResultsFileName(String resultsFileName) {
@@ -227,4 +224,23 @@ public class Config {
         save();
     }
 
+    public String getPrevSearchesFile() {
+        return getResDir() + File.separator + "target" + File.separator + "results" + File.separator + "PreviousSearches.html";
+    }
+
+    public String getSearchEngineHelpPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Help.html";
+    }
+
+    public String getSupportPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Contact.html";
+    }
+
+    public String getAboutPage() {
+        return getResDir() + File.separator + "other" + File.separator + "AboutMSE.html";
+    }
+
+    public String getLabourersPage() {
+        return getResDir() + File.separator + "other" + File.separator + "Labourers.html";
+    }
 }

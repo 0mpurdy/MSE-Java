@@ -1,4 +1,4 @@
-package mse.handlers;
+package mse.helpers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -30,7 +30,7 @@ public class OpenFileHandler implements EventHandler<ActionEvent> {
     public void handle(ActionEvent e) {
         try {
             Desktop.getDesktop().open(new File(path));
-            System.out.println("Opened: " + path);
+            logger.log(LogLevel.DEBUG, "Opened: " + path);
         } catch (IOException | IllegalArgumentException ex) {
             logger.openLog();
             logger.log(LogLevel.HIGH, "Could not open: " + path);

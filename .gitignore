@@ -51,3 +51,5 @@ Temporary Items
 out/
 res/
 .idea/workspace.xml
+Config.txt
+log.txt

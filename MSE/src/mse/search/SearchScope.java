@@ -6,12 +6,15 @@
 package mse.search;
 
 /**
- *
  * @author michael
  */
 public enum SearchScope {
-    
-    PHRASE("Phrase"), SENTENCE("Sentence contains words"), PARAGRAPH("Paragraph contains words"), PAGE("Page contains words");
+
+    CLAUSE("Exact Match"),
+    PHRASE("Sentence contains words in order"),
+    SENTENCE("Sentence contains words"),
+    PARAGRAPH("Paragraph contains words"),
+    PAGE("Page contains words");
 
     String menuName;
 
@@ -22,5 +25,16 @@ public enum SearchScope {
     public String getMenuName() {
         return menuName;
     }
-    
+
+    public static SearchScope fromString(String text) {
+        if (text != null) {
+            for (SearchScope nextSearchScope : SearchScope.values()) {
+                if (text.equalsIgnoreCase(nextSearchScope.menuName) || text.equalsIgnoreCase(nextSearchScope.toString())) {
+                    return nextSearchScope;
+                }
+            }
+        }
+        return null;
+    }
+
 }

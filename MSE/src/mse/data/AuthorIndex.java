@@ -27,6 +27,10 @@ public class AuthorIndex {
         this.logger = logger;
     }
 
+    public Author getAuthor() {
+        return author;
+    }
+
     public String getAuthorName() {
         return author.getName();
     }
