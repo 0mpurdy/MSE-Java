@@ -48,25 +48,10 @@ public class SearchThread extends Thread {
     @Override
     public void run() {
 
-//        if (authorsToSearch.contains(Author.BIBLE)) {
-//
-//            // search the bible
-//            AuthorSearchCache asc = new AuthorSearchCache(cfg, indexStore.getIndex(logger, Author.BIBLE),search);
-//
-//            BibleSearchThread bibleSearchThread = new BibleSearchThread(cfg, asc, progress);
-//            singleSearchThreads.add(bibleSearchThread);
-//
-//            bibleSearchThread.start();
-//
-//        }
-
         // for each author to be searched
         for (Author nextAuthor : authorsToSearch) {
 
             if (!nextAuthor.isSearchable()) continue;
-
-//            ArrayList<LogRow> searchLog = new ArrayList<>();
-//            searchLogs.add(searchLog);
 
             AuthorIndex nextAuthorIndex = indexStore.getIndex(logger, nextAuthor);
 
@@ -76,10 +61,6 @@ public class SearchThread extends Thread {
             singleSearchThreads.add(nextAuthorSearchThread);
 
             nextAuthorSearchThread.start();
-
-//            searchAuthor(resultText, nextAuthor, search, indexStore);
-//            resultText.add("Number of results for " + nextAuthor.getName() + ": " + search.getNumAuthorResults());
-//            search.clearAuthorValues();
 
         } // end searching each author
 
@@ -99,7 +80,7 @@ public class SearchThread extends Thread {
 
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
-            HtmlHelper.getResultsHeaderLines("Results", "../../mseStyle.css").forEach(pwResults::println);
+            pwResults.println(HtmlHelper.getResultsHeader("Results", "../../mseStyle.css"));
 
             // join all the threads
             for (SingleSearchThread nextThread : singleSearchThreads) {
@@ -123,8 +104,6 @@ public class SearchThread extends Thread {
             logger.log(LogLevel.HIGH, "Could not find results file.");
 
         }
-
-//        search.setProgress("Done", 1.0);
 
         progress.set(1000 * authorsToSearch.size() + 1);
 

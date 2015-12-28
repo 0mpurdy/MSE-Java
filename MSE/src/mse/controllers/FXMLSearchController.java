@@ -271,86 +271,6 @@ public class FXMLSearchController implements Initializable {
         }
     }
 
-    private void addPreviousSearch(String searchString) throws IOException {
-
-        File previousSearchFile = new File(cfg.getPrevSearchesFile());
-        PrintWriter previousSearchWriter;
-        if (!previousSearchFile.exists()) {
-            previousSearchFile.getParentFile().mkdirs();
-            previousSearchFile.createNewFile();
-            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
-            HtmlHelper.writeHtmlHeader(previousSearchWriter, "Previous Searches", "../../mseStyles.css");
-            previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>\n\t\t\t<li>" + searchString);
-        } else {
-            BufferedReader br = new BufferedReader(new FileReader(previousSearchFile));
-            java.util.List<String> previousLines = Files.readAllLines(previousSearchFile.toPath());
-            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
-            previousLines.forEach(previousSearchWriter::println);
-            previousSearchWriter.println("\t\t\t<li>" + searchString);
-        }
-
-        previousSearchWriter.close();
-    }
-
-    @FXML
-    public void handlesPreviousSearches(ActionEvent e) {
-        File previousSearches = new File(cfg.getPrevSearchesFile());
-        try {
-            if (previousSearches.exists()) {
-                Desktop.getDesktop().open(previousSearches);
-            } else {
-                progressLabel.setText("No previous searches.");
-            }
-        } catch (IOException | IllegalArgumentException ioe) {
-            logger.log(LogLevel.HIGH, "Could not open results file.");
-        }
-    }
-
-    @FXML
-    public void handlesExit(ActionEvent e) {
-        System.exit(0);
-    }
-
-    @FXML
-    public void handlesSearchEngineHelp(ActionEvent e) {
-        try {
-            File logFile = new File(cfg.getSearchEngineHelpPage());
-            Desktop.getDesktop().open(logFile);
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open log file.");
-        }
-    }
-
-    @FXML
-    public void handlesContactSupport(ActionEvent e) {
-        try {
-            File logFile = new File(cfg.getSupportPage());
-            Desktop.getDesktop().open(logFile);
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open log file.");
-        }
-    }
-
-    @FXML
-    public void handlesViewLabourers(ActionEvent e) {
-        try {
-            File logFile = new File(cfg.getLabourersPage());
-            Desktop.getDesktop().open(logFile);
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open log file.");
-        }
-    }
-
-    @FXML
-    public void handlesAboutSearchEngine(ActionEvent e) {
-        try {
-            File logFile = new File(cfg.getAboutPage());
-            Desktop.getDesktop().open(logFile);
-        } catch (IOException ioe) {
-            logger.log(LogLevel.LOW, "Could not open log file.");
-        }
-    }
-
     @FXML
     public void handlesRefine(ActionEvent e) {
 
@@ -392,6 +312,96 @@ public class FXMLSearchController implements Initializable {
             }
         }
     }
+
+    private void addPreviousSearch(String searchString) throws IOException {
+
+        File previousSearchFile = new File(cfg.getPrevSearchesFile());
+        PrintWriter previousSearchWriter;
+        if (!previousSearchFile.exists()) {
+            previousSearchFile.getParentFile().mkdirs();
+            previousSearchFile.createNewFile();
+            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
+            HtmlHelper.writeHtmlHeader(previousSearchWriter, "Previous Searches", "../../mseStyles.css");
+            previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>\n\t\t\t<li>" + searchString);
+        } else {
+            BufferedReader br = new BufferedReader(new FileReader(previousSearchFile));
+            java.util.List<String> previousLines = Files.readAllLines(previousSearchFile.toPath());
+            previousSearchWriter = new PrintWriter(cfg.getPrevSearchesFile());
+            previousLines.forEach(previousSearchWriter::println);
+            previousSearchWriter.println("\t\t\t<li>" + searchString);
+        }
+
+        previousSearchWriter.close();
+    }
+
+    // region fileMenu
+
+    @FXML
+    public void handlesPreviousSearches(ActionEvent e) {
+        File previousSearches = new File(cfg.getPrevSearchesFile());
+        try {
+            if (previousSearches.exists()) {
+                Desktop.getDesktop().open(previousSearches);
+            } else {
+                progressLabel.setText("No previous searches.");
+            }
+        } catch (IOException | IllegalArgumentException ioe) {
+            logger.log(LogLevel.HIGH, "Could not open results file.");
+        }
+    }
+
+    @FXML
+    public void handlesExit(ActionEvent e) {
+        System.exit(0);
+    }
+
+    // endregion
+
+    // region helpMenu
+
+    @FXML
+    public void handlesSearchEngineHelp(ActionEvent e) {
+        try {
+            File logFile = new File(cfg.getSearchEngineHelpPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
+    }
+
+    @FXML
+    public void handlesContactSupport(ActionEvent e) {
+        try {
+            File logFile = new File(cfg.getSupportPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
+    }
+
+    @FXML
+    public void handlesViewLabourers(ActionEvent e) {
+        try {
+            File logFile = new File(cfg.getLabourersPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
+    }
+
+    @FXML
+    public void handlesAboutSearchEngine(ActionEvent e) {
+        try {
+            File logFile = new File(cfg.getAboutPage());
+            Desktop.getDesktop().open(logFile);
+        } catch (IOException ioe) {
+            logger.log(LogLevel.LOW, "Could not open log file.");
+        }
+    }
+
+    // endregion
+
+    // region advancedMenu
 
     @FXML
     public void handlesViewLogFile(ActionEvent e) {
@@ -446,10 +456,22 @@ public class FXMLSearchController implements Initializable {
             previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>");
 
             previousSearchWriter.close();
+
+            File resultsFile = new File(cfg.getResDir() + cfg.getResultsFileName());
+            PrintWriter resultsWriter;
+            resultsFile.getParentFile().mkdirs();
+            resultsFile.createNewFile();
+            resultsWriter = new PrintWriter(cfg.getResDir() + cfg.getResultsFileName());
+            HtmlHelper.writeHtmlHeader(resultsWriter, "Results", "../../mseStyle.css");
+            resultsWriter.println("\n<body>\n</body>\n</html>");
+
+            resultsWriter.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
+
+    // endregion
 
 //    removed to save having to use gson lib
 //    private Config readConfig() {

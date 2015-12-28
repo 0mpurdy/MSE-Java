@@ -22,11 +22,8 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     private Config cfg;
     private ArrayList<LogRow> searchLog;
-
-    AuthorSearchCache asc;
-
+    private AuthorSearchCache asc;
     private ArrayList<String> authorResults;
-
     private AtomicInteger progress;
 
     public AuthorSearchThread(Config cfg, AuthorSearchCache asc, AtomicInteger progress) {
@@ -46,6 +43,8 @@ public class AuthorSearchThread extends SingleSearchThread {
         authorResults.add(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
 
     }
+
+    // region search
 
     private void searchAuthor(ArrayList<String> resultText, AuthorSearchCache asc) {
 
@@ -233,19 +232,6 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
     }
 
-    private boolean isNextSectionSearchable(String sectionHeader) {
-
-        if (asc.author.isMinistry()) {
-            return sectionHeader.contains("class=\"heading\"") || sectionHeader.contains("class=\"paragraph\"") || sectionHeader.contains("class=\"footnote\"");
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return sectionHeader.contains("<tr");
-        } else if (asc.author.equals(Author.HYMNS)) {
-            return sectionHeader.contains("class=\"verse-number\"");
-        } else {
-            return false;
-        }
-    }
-
     private boolean searchScope(ArrayList<String> resultText, ArrayList<String> stringsToSearch, AuthorSearchCache asc, boolean foundToken) {
 
         for (String scope : stringsToSearch) {
@@ -282,6 +268,21 @@ public class AuthorSearchThread extends SingleSearchThread {
         return foundToken;
     }
 
+    // endregion
+
+    private boolean isNextSectionSearchable(String sectionHeader) {
+
+        if (asc.author.isMinistry()) {
+            return sectionHeader.contains("class=\"heading\"") || sectionHeader.contains("class=\"paragraph\"") || sectionHeader.contains("class=\"footnote\"");
+        } else if (asc.author.equals(Author.BIBLE)) {
+            return sectionHeader.contains("<tr");
+        } else if (asc.author.equals(Author.HYMNS)) {
+            return sectionHeader.contains("class=\"verse-number\"");
+        } else {
+            return false;
+        }
+    }
+
     private void addResultText(ArrayList<String> resultText, String markedLine) {
 
         if (asc.author.isMinistry()) {
@@ -303,7 +304,7 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     }
 
-    String debugLine;
+    // region checkValidScope
 
     // check sentence search
     private boolean checkSentenceSearch(String scope, AuthorSearchCache asc) {
@@ -368,7 +369,11 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     }
 
+    // endregion
+
     int startOfLastSentencePos;
+
+    // region processSection
 
     private String getTrailingIncompleteSentence(String line) {
 
@@ -505,6 +510,8 @@ public class AuthorSearchThread extends SingleSearchThread {
         return token;
     }
 
+    // endregion
+
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {
         String inString = strIn;
         String outString = "";
@@ -609,7 +616,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         // remove any html already in the line
         charPos = 0;
 
-        if (!asc.author.equals(Author.HYMNS)) line = removeHtml(line);
+        if (!asc.author.equals(Author.HYMNS)) line = HtmlHelper.removeHtml(line);
 
         for (String word : words) {
 
@@ -640,29 +647,27 @@ public class AuthorSearchThread extends SingleSearchThread {
         return line.toString();
     }
 
-    private String removeHtml(String line) {
-        return removeHtml(new StringBuilder(line)).toString();
-    }
-
-    private StringBuilder removeHtml(StringBuilder line) {
-        int charPos = -1;
-
-        while (++charPos < line.length()) {
-            if (line.charAt(charPos) == '<') {
-                int tempCharIndex = charPos + 1;
-                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
-                tempCharIndex++;
-                line.replace(charPos, tempCharIndex, "");
-                charPos = 0;
-            }
-        }
-
-        return line;
-    }
+//    private StringBuilder removeHtml(StringBuilder line) {
+//        int charPos = -1;
+//
+//        while (++charPos < line.length()) {
+//            if (line.charAt(charPos) == '<') {
+//                int tempCharIndex = charPos + 1;
+//                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
+//                tempCharIndex++;
+//                line.replace(charPos, tempCharIndex, "");
+//                charPos = 0;
+//            }
+//        }
+//
+//        return line;
+//    }
 
     private void log(LogLevel logLevel, String message) {
         searchLog.add(new LogRow(logLevel, message));
     }
+
+    // region singleSearchThreadMethods
 
     @Override
     public ArrayList<LogRow> getLog() {
@@ -678,4 +683,6 @@ public class AuthorSearchThread extends SingleSearchThread {
     int getNumberOfResults() {
         return asc.numAuthorResults;
     }
+
+    // endregion
 }

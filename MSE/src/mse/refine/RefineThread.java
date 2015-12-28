@@ -4,6 +4,7 @@ import mse.common.Config;
 import mse.common.LogRow;
 import mse.helpers.HtmlReader;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +26,14 @@ public class RefineThread extends Thread {
 
         HtmlReader htmlReader = new HtmlReader(cfg.getResultsFilePath(), logRows);
 
+        try {
+            String firstAuthor = htmlReader.findAuthor();
+            System.out.println(firstAuthor);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        htmlReader.close();
 
     }
 }

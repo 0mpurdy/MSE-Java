@@ -16,37 +16,28 @@ public class HtmlHelper {
 
     public static void writeHtmlHeader(PrintWriter pw, String title, String mseStyleLocation) {
 
-        pw.println("<!DOCTYPE html>\n" +
+        pw.println(getHtmlHeader(title, mseStyleLocation));
+    }
+
+    public static String getHtmlHeader(String title, String mseStyleLocation) {
+        return "<!DOCTYPE html>\n" +
                 "\n" +
-                "<html>" +
+                "<html lang=\"en\">" +
                 "\n" +
                 "<head>\n" +
+                "\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>" +
+                "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
                 "\t<title>" + title + "</title>\n" +
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + bootstrapLocation + "\">\n" +
-                "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + mseStyleLocation + "\">\n" +
-                "</head>");
+                "\t<link rel=\"stylesheet\" type=\"text/css\" href=\"" + bootstrapLocation + "\">\n" +
+                "\t<link rel=\"stylesheet\" type=\"text/css\" href=\"" + mseStyleLocation + "\">\n" +
+                "</head>";
     }
 
-    public static ArrayList<String> getHtmlHeaderLines(String title, String mseStyleLocation) {
-        return new ArrayList<String>() {{
-            add("<!DOCTYPE html>");
-            add("");
-            add("<html>");
-            add("");
-            add("<head>");
-            add("\t<title>" + title + "</title>");
-            add("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + bootstrapLocation + "\">");
-            add("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + mseStyleLocation + "\">");
-            add("</head>");
-        }};
-    }
-
-    public static ArrayList<String> getResultsHeaderLines(String title, String mseStyleLocation) {
-        ArrayList header = new ArrayList();
-        header.addAll(getHtmlHeaderLines(title, mseStyleLocation));
-        header.add("<body>");
-        header.add("\t<div class=\"container centered\">");
-        header.add("\t\t<p><img src=\"../../img/results.gif\"></p>");
+    public static String getResultsHeader(String title, String mseStyleLocation) {
+        String header = getHtmlHeader(title, mseStyleLocation);
+        header += "\n<body>" +
+                "\n\t<div class=\"container centered\">" +
+                "\n\t\t<p><img src=\"../../img/results.gif\"></p>";
 
         return header;
     }
