@@ -11,6 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import mse.data.Search;
 import mse.helpers.HtmlHelper;
 import mse.search.*;
@@ -21,7 +23,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.value.ChangeListener;
@@ -45,9 +46,6 @@ public class FXMLSearchController implements Initializable {
     private RadioMenuItem defaultSearchScope;
     private IndexStore indexStore;
 
-    private TextField orSearch;
-    private TextField notSearch;
-
     @FXML
     Button refineButton;
     @FXML
@@ -66,8 +64,6 @@ public class FXMLSearchController implements Initializable {
     Menu logLevelMenu;
     @FXML
     Menu scopeMenu;
-    @FXML
-    GridPane searchBoxGrid;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -316,38 +312,6 @@ public class FXMLSearchController implements Initializable {
     }
 
     @FXML
-    public void handlesViewIndexes(ActionEvent e) {
-        // check if any authors are selected
-//        if (cfg.isAnyAuthorSelected()) {
-//
-//            // get which authors to search
-//            HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
-//            ArrayList<Author> authorsToSearch = new ArrayList<>();
-//            for (Author nextAuthor : Author.values()) {
-//                if (!nextAuthor.isSearchable()) continue;
-//                if (authors.get(nextAuthor.getCode())) {
-//                    authorsToSearch.add(nextAuthor);
-//                }
-//            }
-//
-//            if (authorsToSearch.size() <= 1) {
-//
-//                ViewIndexThread viewIndexThread = new ViewIndexThread(cfg, logger, authorsToSearch, indexStore);
-//                viewIndexThread.start();
-//            } else {
-//                progressLabel.setText("Only one author may be selected");
-//                logger.log(LogLevel.INFO, "Only one author may be selected");
-//                logger.closeLog();
-//            }
-//
-//        } else {
-//            progressLabel.setText("Only one author may be selected");
-//            logger.log(LogLevel.INFO, "Only one author may be selected");
-//            logger.closeLog();
-//        }
-    }
-
-    @FXML
     public void handlesSearchEngineHelp(ActionEvent e) {
         try {
             File logFile = new File(cfg.getSearchEngineHelpPage());
@@ -389,7 +353,25 @@ public class FXMLSearchController implements Initializable {
 
     @FXML
     public void handlesRefine(ActionEvent e) {
-        progressLabel.setText("This functionality hasn't been implemented yet");
+
+        logger.openLog();
+
+        int type = 1;
+        String refineText = searchBox.getText();
+        logger.log(LogLevel.INFO,"Refined by: " + refineText);
+
+        if (refineText.charAt(0) == '!') {
+            type = 0;
+            refineText = refineText.substring(1);
+            progressLabel.setText("Search doesn't include \"" + refineText + "\"");
+        } else {
+            progressLabel.setText("Search includes \"" + refineText + "\"");
+        }
+
+
+
+        logger.closeLog();
+
     }
 
     @FXML

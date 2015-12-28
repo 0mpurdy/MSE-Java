@@ -115,8 +115,8 @@ public class SearchThread extends Thread {
                 }
             }
 
-            pwResults.println("\n\t<div class=\"spaced\">Number of total results: " + search.getTotalSearchResults() + "</div>");
-            pwResults.println(HtmlHelper.getHtmlFooter("</div>"));
+            pwResults.println("\n\t\t<div class=\"spaced\">Number of total results: " + search.getTotalSearchResults() + "</div>");
+            pwResults.println(HtmlHelper.getHtmlFooter("\t</div>"));
 
         } catch (FileNotFoundException fnfe) {
 

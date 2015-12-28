@@ -1,8 +1,9 @@
-package mse.search;
+package mse.helpers;
 
 import mse.common.LogLevel;
 import mse.common.LogRow;
 import mse.data.Author;
+import mse.search.AuthorSearchCache;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Created by mj_pu_000 on 23/12/2015.
+ * Created by michaelpurdy on 23/12/2015.
  */
 public class HtmlReader {
 
@@ -27,7 +28,9 @@ public class HtmlReader {
         this.searchLog = searchLog;
     }
 
-    public int findNextPage(AuthorSearchCache asc) {
+    // region findAuthorPage
+
+    public int findNextAuthorPage(AuthorSearchCache asc) {
         // set the prevLine in asc to the last line of the previous page
         // return the page number of the next page
         // asc.Line is the page number and br is at the line of the current page number
@@ -222,11 +225,15 @@ public class HtmlReader {
         return 0;
     }
 
+    // endregion
+
     private int getPageNumber(String line, String splitStart, String splitEnd) {
         int start = line.indexOf(splitStart) + splitStart.length();
         int end = line.indexOf(splitEnd, start);
         return Integer.parseInt(line.substring(start, end));
     }
+
+    // region getLastLine
 
     private String getLastLineOfBiblePage(BufferedReader br) throws IOException {
         // returns the last darby line of the bible and moves
@@ -279,6 +286,10 @@ public class HtmlReader {
 
     }
 
+    // endregion
+
+    // region getAuthorSectionHeader
+
     public String getNextSectionHeader(AuthorSearchCache asc) {
         // returns the line that contains the class of the next section
 
@@ -317,7 +328,7 @@ public class HtmlReader {
 
     }
 
-    public String getNextSection(AuthorSearchCache asc) {
+    public String getNextAuthorSection(AuthorSearchCache asc) {
 
         try {
 
@@ -360,8 +371,7 @@ public class HtmlReader {
         return null;
     }
 
-
-    public String getFirstSectionHeader(AuthorSearchCache asc)  {
+    public String getFirstAuthorSectionHeader(AuthorSearchCache asc) {
         try {
             if (asc.author.isMinistry()) {
                 // skip a line
@@ -391,8 +401,26 @@ public class HtmlReader {
 
     }
 
+    // endregion
+
+    // region readResults
+
+    String authorIdentifier = "Results of search through";
+
+    public String findAuthor() throws IOException {
+        String currentLine = br.readLine();
+        while (!currentLine.contains(authorIdentifier)) {
+            currentLine = br.readLine();
+        }
+        currentLine = HtmlHelper.removeHtml(currentLine);
+        currentLine = currentLine.substring(currentLine.indexOf(authorIdentifier) + authorIdentifier.length());
+        return currentLine;
+    }
+
+    // endregion
+
     private void log(LogLevel logLevel, String message) {
-        searchLog.add(new LogRow(logLevel,message));
+        searchLog.add(new LogRow(logLevel, message));
     }
 
     public void close() {
@@ -413,4 +441,6 @@ public class HtmlReader {
         }
         return contentLine;
     }
+
+
 }

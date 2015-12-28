@@ -2,6 +2,7 @@ package mse.search;
 
 import mse.common.Config;
 import mse.data.*;
+import mse.helpers.HtmlHelper;
 
 import java.util.ArrayList;
 
@@ -23,10 +24,10 @@ public class AuthorSearchCache {
 
     private boolean wildSearch;
 
-    private boolean writtenBibleSearchTableHeader;
-    private boolean writtenBibleSearchTableFooter;
-    private boolean searchingDarby;
-    private boolean foundDarby;
+    public boolean writtenBibleSearchTableHeader;
+    public boolean writtenBibleSearchTableFooter;
+    public boolean searchingDarby;
+    public boolean foundDarby;
     public String previousDarbyLine;
 
     private int verseNum;
@@ -52,6 +53,7 @@ public class AuthorSearchCache {
     public String currentSectionHeader;
     public String prevLine;
     private SearchScope searchScope;
+    public boolean notFoundCurrentHymnBook;
 
     public AuthorSearchCache(Config cfg, AuthorIndex authorIndex, Search search) {
         this.cfg = cfg;
@@ -519,28 +521,6 @@ public class AuthorSearchCache {
         return searchingDarby;
     }
 
-    public ArrayList<String> finishSearchingSingleBibleScope(String line, ArrayList<String> resultText, boolean foundToken) {
-
-        // if already written the header (found a result) and searching kjv
-        if (writtenBibleSearchTableHeader && !searchingDarby) {
-
-            if (!foundToken) {
-                resultText.add("<td>" + removeHtml(line) + "</td>");
-            }
-
-            resultText.add("\t\t</tr>");
-            resultText.add("\t</table>");
-
-            writtenBibleSearchTableHeader = false;
-
-            // if searching jnd and not yet found a result
-        } else if (searchingDarby && !writtenBibleSearchTableHeader) previousDarbyLine = line;
-
-        searchingDarby = !searchingDarby;
-
-        return resultText;
-    }
-
     public int getVerseNum() {
         return verseNum;
     }
@@ -549,27 +529,32 @@ public class AuthorSearchCache {
         this.verseNum = verseNum;
     }
 
-    private String removeHtml(String line) {
-        return removeHtml(new StringBuilder(line)).toString();
-    }
-
-    private StringBuilder removeHtml(StringBuilder line) {
-        int charPos = 0;
-
-        while (++charPos < line.length()) {
-            if (line.charAt(charPos) == '<') {
-                int tempCharIndex = charPos + 1;
-                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
-                tempCharIndex++;
-                line.replace(charPos, tempCharIndex, "");
-            }
-        }
-
-        return line;
-    }
-
     public void incrementVerseNum() {
 
         if (searchingDarby) verseNum++;
+    }
+
+    public String getVolumeName() {
+        if (author.isMinistry()) {
+            return author.getCode() + volNum + ".htm";
+        } else if (author.equals(Author.BIBLE)) {
+            return BibleBook.values()[volNum - 1].getName() + ".htm";
+        } else if (author.equals(Author.HYMNS)) {
+            return HymnBook.values()[volNum - 1].getOutputFilename();
+        } else {
+            return "";
+        }
+    }
+
+    public String getReadableReference() {
+        if (author.isMinistry()) {
+            return author.getCode() + " volume " + volNum + " page " + pageNum;
+        } else if (author.equals(Author.BIBLE)) {
+            return BibleBook.values()[volNum - 1].getName() + " chapter " + pageNum + ":" + getVerseNum();
+        } else if (author.equals(Author.HYMNS)) {
+            return Integer.toString(pageNum);
+        }
+
+        return "";
     }
 }

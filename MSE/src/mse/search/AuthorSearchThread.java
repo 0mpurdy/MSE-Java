@@ -5,17 +5,15 @@
  */
 package mse.search;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // mse
 import mse.common.*;
 import mse.data.Author;
-import mse.data.BibleBook;
-import mse.data.HymnBook;
 import mse.helpers.FileHelper;
 import mse.helpers.HtmlHelper;
+import mse.helpers.HtmlReader;
 
 /**
  * @author michael
@@ -102,13 +100,7 @@ public class AuthorSearchThread extends SingleSearchThread {
                 // for each reference
                 while (asc.volNum != 0 && volumeSuccess) {
 
-                    if (asc.author.equals(Author.HYMNS)) {
-                        resultText.add(String.format("\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
-                                "results-hymnbook-name",
-                                "..\\..\\" + asc.author.getTargetPath(getVolumeName()),
-                                HymnBook.values()[asc.volNum - 1].getName()));
-                    }
-
+                    asc.notFoundCurrentHymnBook = true;
                     volumeSuccess = searchSingleVolume(resultText, asc);
 
                 } // end one frequent token and all tokens found
@@ -158,7 +150,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             asc.prevLine = "";
 
             // skip to next page and get the last line of the previous page
-            cPageNum = htmlReader.findNextPage(asc);
+            cPageNum = htmlReader.findNextAuthorPage(asc);
 
             // if the page number is 0 log the error and break out
             if (cPageNum == 0) {
@@ -167,7 +159,7 @@ public class AuthorSearchThread extends SingleSearchThread {
                 return false;
             }
 
-            asc.currentSectionHeader = htmlReader.getFirstSectionHeader(asc);
+            asc.currentSectionHeader = htmlReader.getFirstAuthorSectionHeader(asc);
             if (asc.currentSectionHeader == null) {
                 searchLog.add(new LogRow(LogLevel.HIGH, "NULL line " + asc.getShortReadableReference()));
             } else {
@@ -197,7 +189,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         // while still on the same page (class != page-number)
         while (isNextSectionSearchable(asc.currentSectionHeader)) {
 
-            asc.line = htmlReader.getNextSection(asc);
+            asc.line = htmlReader.getNextAuthorSection(asc);
 
             ArrayList<String> stringsToSearch = new ArrayList<>();
 
@@ -216,7 +208,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             asc.setFoundDarby(foundToken);
 
             if (asc.author.equals(Author.BIBLE)) {
-                resultText = asc.finishSearchingSingleBibleScope(removeHtml(asc.line), resultText, foundToken);
+                resultText = HtmlHelper.finishSearchingSingleBibleScope(HtmlHelper.removeHtml(asc.line), resultText, asc, foundToken);
                 if (asc.getSearchScope() == SearchScope.CLAUSE) {
                     foundToken = false;
                 }
@@ -276,8 +268,10 @@ public class AuthorSearchThread extends SingleSearchThread {
 
                 String markedLine = markLine(new StringBuilder(scope), asc.getSearchWords(), "mse-mark");
 
-//                // close any opened blockquote tags
-//                if (markedLine.contains("<blockquote>")) markedLine += "</blockquote>";
+                if (asc.author.equals(Author.HYMNS) && asc.notFoundCurrentHymnBook) {
+                    asc.notFoundCurrentHymnBook = false;
+                    HtmlHelper.writeHymnbookName(resultText, asc);
+                }
 
                 addResultText(resultText, markedLine);
 
@@ -293,46 +287,21 @@ public class AuthorSearchThread extends SingleSearchThread {
         if (asc.author.isMinistry()) {
 
             resultText.addAll(HtmlHelper.getMinistryResultBlock(
-                    asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum),
-                    getReadableReference(),
+                    asc.author.getTargetPath(asc.getVolumeName() + "#" + asc.pageNum),
+                    asc.getReadableReference(),
                     markedLine));
 
         } else if (asc.author.equals(Author.BIBLE)) {
 
-            HtmlHelper.writeBibleResultBlock(resultText, asc, getVolumeName(), getReadableReference(), markedLine);
+            HtmlHelper.writeBibleResultBlock(resultText, asc, markedLine);
 
         } else if (asc.author.equals(Author.HYMNS)) {
 
-            resultText.addAll(HtmlHelper.getHymnsResultBlock(asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum), getReadableReference(), markedLine));
+            resultText.addAll(HtmlHelper.getHymnsResultBlock(asc.author.getTargetPath(asc.getVolumeName() + "#" + asc.pageNum), asc.getReadableReference(), markedLine));
 
         }
 
     }
-
-    private String getReadableReference() {
-        if (asc.author.isMinistry()) {
-            return asc.author.getCode() + " volume " + asc.volNum + " page " + asc.pageNum;
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum - 1].getName() + " chapter " + asc.pageNum + ":" + asc.getVerseNum();
-        } else if (asc.author.equals(Author.HYMNS)) {
-            return Integer.toString(asc.pageNum);
-        }
-
-        return "";
-    }
-
-    private String getVolumeName() {
-        if (asc.author.isMinistry()) {
-            return asc.author.getCode() + asc.volNum + ".htm";
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum - 1].getName() + ".htm";
-        } else if (asc.author.equals(Author.HYMNS)) {
-            return HymnBook.values()[asc.volNum - 1].getOutputFilename();
-        } else {
-            return "";
-        }
-    }
-
 
     String debugLine;
 
