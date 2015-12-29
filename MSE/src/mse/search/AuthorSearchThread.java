@@ -193,7 +193,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             ArrayList<String> stringsToSearch = new ArrayList<>();
 
             // get the searchLine based on the search scope
-            if ((asc.getSearchScope() == SearchScope.SENTENCE) || asc.getSearchScope() == SearchScope.CLAUSE) {
+            if ((asc.getSearchType() == SearchType.SENTENCE) || asc.getSearchType() == SearchType.MATCH || asc.getSearchType() == SearchType.PHRASE) {
                 stringsToSearch = convertLineIntoSentences(asc.line, getTrailingIncompleteSentence(asc.prevLine));
             } else {
                 stringsToSearch.add(asc.line);
@@ -208,7 +208,7 @@ public class AuthorSearchThread extends SingleSearchThread {
 
             if (asc.author.equals(Author.BIBLE)) {
                 resultText = HtmlHelper.finishSearchingSingleBibleScope(HtmlHelper.removeHtml(asc.line), resultText, asc, foundToken);
-                if (asc.getSearchScope() == SearchScope.CLAUSE) {
+                if (asc.getSearchType() == SearchType.MATCH) {
                     foundToken = false;
                 }
             }
@@ -224,7 +224,8 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
 
         if (!foundToken) {
-            if (asc.getInfrequentTokens().size() > 1) {
+            // if exact match only debug level as many references will not have exact matches
+            if (asc.getSearchType() == SearchType.MATCH) {
                 searchLog.add(new LogRow(LogLevel.DEBUG, "Did not find token " + asc.getShortReadableReference()));
             } else {
                 searchLog.add(new LogRow(LogLevel.LOW, "Did not find token " + asc.getShortReadableReference()));
@@ -238,12 +239,23 @@ public class AuthorSearchThread extends SingleSearchThread {
 
             boolean validScope = false;
 
-            switch (asc.getSearchScope()) {
-                case SENTENCE:
-                    validScope = checkSentenceSearch(scope, asc);
-                    break;
-                case CLAUSE:
-                    validScope = clauseSearch(tokenizeLine(scope, asc), asc.getSearchTokens());
+            if (asc.getWildSearch()) {
+                validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+            } else {
+
+                switch (asc.getSearchType()) {
+                    case MATCH:
+                        validScope = clauseSearch(tokenizeLine(scope, asc), asc.getSearchTokens());
+                        break;
+                    case PHRASE:
+                        validScope = scopeWordsInOrder(tokenizeLine(scope, asc), asc.getSearchTokens());
+                        break;
+                    case SENTENCE:
+                        validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+                        break;
+                    case PARAGRAPH:
+                        validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+                }
             }
 
 
@@ -266,6 +278,24 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
 
         return foundToken;
+    }
+
+    private boolean scopeWordsInOrder(String[] lineTokens, String[] searchTokens) {
+        int indexNextLineToken = 0;
+        int indexNextSearchToken = 0;
+
+        while (indexNextLineToken < lineTokens.length) {
+            if (lineTokens[indexNextLineToken].toUpperCase().equals(searchTokens[indexNextSearchToken])) {
+                indexNextSearchToken++;
+
+                // if no more tokens to find
+                if (indexNextSearchToken == searchTokens.length) return true;
+            }
+            indexNextLineToken++;
+        }
+
+        // if gone through all the line and not found all the tokens in the order
+        return false;
     }
 
     // endregion
@@ -306,11 +336,6 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     // region checkValidScope
 
-    // check sentence search
-    private boolean checkSentenceSearch(String scope, AuthorSearchCache asc) {
-        return wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
-    }
-
     boolean foundCurrentSearchToken;
 
     private boolean wordSearch(String[] currentLineTokens, String[] searchTokens, boolean wildSearch) {
@@ -327,8 +352,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
 
         // if it reaches this point as a wild search then no tokens were found
-        if (wildSearch) return false;
-        return true;
+        return !wildSearch;
     }
 
     private boolean clauseSearch(String[] currentLineTokens, String[] searchTokens) {

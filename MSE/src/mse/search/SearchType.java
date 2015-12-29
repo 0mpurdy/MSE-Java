@@ -8,17 +8,17 @@ package mse.search;
 /**
  * @author michael
  */
-public enum SearchScope {
+public enum SearchType {
 
-    CLAUSE("Exact Match"),
+    MATCH("Exact Match"),
     PHRASE("Sentence contains words in order"),
     SENTENCE("Sentence contains words"),
-    PARAGRAPH("Paragraph contains words"),
-    PAGE("Page contains words");
+    PARAGRAPH("Paragraph contains words");
+//    PAGE("Page contains words");
 
     String menuName;
 
-    SearchScope(String menuName) {
+    SearchType(String menuName) {
         this.menuName = menuName;
     }
 
@@ -26,11 +26,11 @@ public enum SearchScope {
         return menuName;
     }
 
-    public static SearchScope fromString(String text) {
+    public static SearchType fromString(String text) {
         if (text != null) {
-            for (SearchScope nextSearchScope : SearchScope.values()) {
-                if (text.equalsIgnoreCase(nextSearchScope.menuName) || text.equalsIgnoreCase(nextSearchScope.toString())) {
-                    return nextSearchScope;
+            for (SearchType nextSearchType : SearchType.values()) {
+                if (text.equalsIgnoreCase(nextSearchType.menuName) || text.equalsIgnoreCase(nextSearchType.toString())) {
+                    return nextSearchType;
                 }
             }
         }

@@ -1,10 +1,7 @@
 package mse.data;
 
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import mse.common.*;
-import mse.search.SearchScope;
+import mse.search.SearchType;
 
 import java.util.ArrayList;
 
@@ -19,7 +16,7 @@ public class Search {
 
     private boolean wildSearch;
 
-    private SearchScope searchScope;
+    private SearchType searchType;
 
     private int numTotalResults;
 
@@ -27,7 +24,7 @@ public class Search {
         this.cfg = cfg;
         this.logger = logger;
         this.searchString = searchString;
-        this.searchScope = cfg.getSearchScope();
+        this.searchType = cfg.getSearchType();
         this.numTotalResults = 0;
         setWildSearch();
     }
@@ -67,8 +64,8 @@ public class Search {
         this.searchString = searchString;
     }
 
-    public SearchScope getSearchScope() {
-        return searchScope;
+    public SearchType getSearchType() {
+        return searchType;
     }
 
     public int getTotalSearchResults() {

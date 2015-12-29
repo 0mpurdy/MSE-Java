@@ -6,7 +6,7 @@
 package mse.common;
 
 import mse.data.Author;
-import mse.search.SearchScope;
+import mse.search.SearchType;
 
 import java.io.*;
 import java.util.HashMap;
@@ -27,7 +27,7 @@ public class Config {
     private String resDir;
     private String resultsFileName;
     private String searchString;
-    private SearchScope searchScope;
+    private SearchType searchType;
     private HashMap<String, Boolean> selectedAuthors;
     private boolean setup;
 
@@ -51,8 +51,8 @@ public class Config {
             resDir = getNextOption(br, "resDir");
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
-            searchScope = SearchScope.fromString(getNextOption(br, "searchScope"));
-            if (searchScope == null) searchScope = SearchScope.CLAUSE;
+            searchType = SearchType.fromString(getNextOption(br, "searchType"));
+            if (searchType == null) searchType = SearchType.MATCH;
 
             // skip selected authors line
             br.readLine();
@@ -95,7 +95,7 @@ public class Config {
         resDir = "res" + File.separator;
         resultsFileName = "SearchResults.htm";
         searchString = "";
-        searchScope = SearchScope.CLAUSE;
+        searchType = SearchType.MATCH;
 
         // set the selected books to be searched to only the bible
         selectedAuthors = new HashMap<>();
@@ -120,7 +120,7 @@ public class Config {
                 writeOption(bw, "resDir", resDir);
                 writeOption(bw, "resultsFileName", resultsFileName);
                 writeOption(bw, "searchString", searchString);
-                writeOption(bw, "searchScope", searchScope.getMenuName());
+                writeOption(bw, "searchType", searchType.getMenuName());
 
                 bw.write(" --- Selected Authors --- ");
                 bw.newLine();
@@ -175,12 +175,12 @@ public class Config {
         this.searchString = searchString;
     }
 
-    public SearchScope getSearchScope() {
-        return searchScope;
+    public SearchType getSearchType() {
+        return searchType;
     }
 
-    public void setSearchScope(SearchScope searchScope) {
-        this.searchScope = searchScope;
+    public void setSearchType(SearchType searchType) {
+        this.searchType = searchType;
     }
 
     public HashMap<String, Boolean> getSelectedAuthors() {

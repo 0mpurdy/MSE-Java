@@ -8,30 +8,51 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * Created by Michael on 02/12/2015.
+ * Created by Michael Purdy on 02/12/2015.
+ *
+ * Helps with creation of HTML files
  */
 public class HtmlHelper {
 
     private static String bootstrapLocation = "../../bootstrap/css/bootstrap.css";
 
-    public static void writeHtmlHeader(PrintWriter pw, String title, String mseStyleLocation) {
+    // region genericStart
 
+    public static void writeHtmlHeader(PrintWriter pw, String title, String mseStyleLocation) {
         pw.println(getHtmlHeader(title, mseStyleLocation));
     }
 
     public static String getHtmlHeader(String title, String mseStyleLocation) {
         return "<!DOCTYPE html>\n" +
-                "\n" +
-                "<html lang=\"en\">" +
-                "\n" +
+                "<html lang=\"en\">\n\n" +
                 "<head>\n" +
-                "\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>" +
-                "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>" +
+                "\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n" +
+                "\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n" +
                 "\t<title>" + title + "</title>\n" +
                 "\t<link rel=\"stylesheet\" type=\"text/css\" href=\"" + bootstrapLocation + "\">\n" +
                 "\t<link rel=\"stylesheet\" type=\"text/css\" href=\"" + mseStyleLocation + "\">\n" +
                 "</head>";
     }
+
+    public static void writeStart(PrintWriter pw) {
+        pw.println(getStart());
+    }
+
+    public static void writeStartAndContainer(PrintWriter pw) {
+        pw.println(getStart() + "\n" + getStartContainer());
+    }
+
+    public static String getStart() {
+        return "\n<body>";
+    }
+
+    public static String getStartContainer() {
+        return "\t<div class=\"container\">";
+    }
+
+    // endregion
+
+    // region resultsPage
 
     public static String getResultsHeader(String title, String mseStyleLocation) {
         String header = getHtmlHeader(title, mseStyleLocation);
@@ -58,6 +79,13 @@ public class HtmlHelper {
             add("\t\t<p>Searched: " + searchWords + "</p>");
             add("\t\t<div class=\"container" + extraClass + "\">");
         }};
+    }
+
+    public static void writeHymnbookName(ArrayList<String> resultText, AuthorSearchCache asc) {
+        resultText.add(String.format("\t\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
+                "results-hymnbook-name",
+                "..\\..\\" + asc.author.getTargetPath(asc.getVolumeName()),
+                HymnBook.values()[asc.volNum - 1].getName()));
     }
 
     public static String closeAuthorResultsBlock() {
@@ -133,9 +161,13 @@ public class HtmlHelper {
         return "\t\t<div class=\"spaced\">Number of results for " + name + ": " + numResults + "</div>";
     }
 
+    // endregion
+
     public static String getHtmlFooter(String end) {
         return end + "\n</body>\n\n</html>";
     }
+
+    // region htmlManipulation
 
     public static String removeHtml(String line) {
         return removeHtml(new StringBuilder(line)).toString();
@@ -144,22 +176,19 @@ public class HtmlHelper {
     public static StringBuilder removeHtml(StringBuilder line) {
         int charPos = 0;
 
-        while (++charPos < line.length()) {
+        while (charPos < line.length()) {
             if (line.charAt(charPos) == '<') {
                 int tempCharIndex = charPos + 1;
                 while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
                 tempCharIndex++;
                 line.replace(charPos, tempCharIndex, "");
+            } else {
+                charPos++;
             }
         }
 
         return line;
     }
 
-    public static void writeHymnbookName(ArrayList<String> resultText, AuthorSearchCache asc) {
-        resultText.add(String.format("\t\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
-                "results-hymnbook-name",
-                "..\\..\\" + asc.author.getTargetPath(asc.getVolumeName()),
-                HymnBook.values()[asc.volNum - 1].getName()));
-    }
+    // endregion
 }

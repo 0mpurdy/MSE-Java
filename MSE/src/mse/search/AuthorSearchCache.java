@@ -2,7 +2,6 @@ package mse.search;
 
 import mse.common.Config;
 import mse.data.*;
-import mse.helpers.HtmlHelper;
 
 import java.util.ArrayList;
 
@@ -52,7 +51,7 @@ public class AuthorSearchCache {
     public String line;
     public String currentSectionHeader;
     public String prevLine;
-    private SearchScope searchScope;
+    private SearchType searchType;
     public boolean notFoundCurrentHymnBook;
 
     public AuthorSearchCache(Config cfg, AuthorIndex authorIndex, Search search) {
@@ -65,7 +64,7 @@ public class AuthorSearchCache {
         this.searchString = search.getSearchString();
         this.wildSearch = search.getWildSearch();
 
-        this.searchScope = search.getSearchScope();
+        this.searchType = search.getSearchType();
 
         this.writtenBibleSearchTableHeader = false;
         this.writtenBibleSearchTableFooter = false;
@@ -118,13 +117,29 @@ public class AuthorSearchCache {
         if (searchString.contains("*")) {
             if (wildSearch) {
 
+                // 0 = at start
+                // 1 = at end
+                // 2 = contains
+                int type;
+
+                // check type of wildcard search
+                if (searchString.charAt(0) == '*') {
+                    if (searchString.charAt(searchString.length() - 1) == '*') {
+                        type = 2;
+                    } else {
+                        type = 1;
+                    }
+                } else {
+                    type = 0;
+                }
+
                 // remove the stars from the search string
-                String bareSearchString = searchString.replace("*", "");
-                bareSearchString = bareSearchString.toUpperCase();
+                String wildToken = searchString.replace("*", "");
+                wildToken = wildToken.toUpperCase();
 
                 for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
 
-                    if (nextWord.contains(bareSearchString)) {
+                    if (wildWordCheck(type, wildToken, nextWord)) {
 
                         // add the word to the list of words to be searched (with
                         // a comma if it isn't the first word
@@ -143,6 +158,12 @@ public class AuthorSearchCache {
             // if it's not a wildcard search
             searchWords = searchString.split(" ");
         }
+    }
+
+    private boolean wildWordCheck(int type, String wildToken, String word) {
+        return ((type == 0 && word.startsWith(wildToken)) ||
+        type == 1 && word.endsWith(wildToken) ||
+        type == 2 && word.contains(wildToken));
     }
 
     public String[] getSearchTokens() {
@@ -485,8 +506,8 @@ public class AuthorSearchCache {
         return a == b || (a + 1) == b || a == (b + 1);
     }
 
-    public SearchScope getSearchScope() {
-        return searchScope;
+    public SearchType getSearchType() {
+        return searchType;
     }
 
     public void setFoundDarby(boolean foundToken) {

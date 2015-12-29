@@ -11,8 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import mse.data.Search;
 import mse.helpers.HtmlHelper;
 import mse.search.*;
@@ -171,14 +169,14 @@ public class FXMLSearchController implements Initializable {
 
             // add search scopes to menu
             ToggleGroup scopeToggleGroup = new ToggleGroup();
-            for (SearchScope scope : SearchScope.values()) {
+            for (SearchType scope : SearchType.values()) {
                 RadioMenuItem nextScopeRadioMenuItem = new RadioMenuItem(scope.getMenuName());
-                if (scope == cfg.getSearchScope()) nextScopeRadioMenuItem.setSelected(true);
-                if (scope == SearchScope.CLAUSE) defaultSearchScope = nextScopeRadioMenuItem;
+                if (scope == cfg.getSearchType()) nextScopeRadioMenuItem.setSelected(true);
+                if (scope == SearchType.MATCH) defaultSearchScope = nextScopeRadioMenuItem;
                 nextScopeRadioMenuItem.setToggleGroup(scopeToggleGroup);
                 nextScopeRadioMenuItem.setOnAction(event -> {
                     int scopeIndex = scopeMenu.getItems().indexOf(event.getSource());
-                    cfg.setSearchScope(SearchScope.values()[scopeIndex]);
+                    cfg.setSearchType(SearchType.values()[scopeIndex]);
                 });
                 scopeMenu.getItems().add(nextScopeRadioMenuItem);
             }
