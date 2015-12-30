@@ -71,17 +71,17 @@ public class HtmlReader {
                         // get the current page's number
                         cPageNum = getPageNumber(asc.line, "=", ">");
 
-                        if (asc.pageNum == cPageNum) {
+                        if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
 
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + cPageNum);
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.getShortReadableReference());
+                log(LogLevel.HIGH, "NULL line when reading " + asc.reference.getShortReadableReference());
                 break;
             }
             asc.line = br.readLine();
@@ -117,7 +117,7 @@ public class HtmlReader {
                         cPageNum = Integer.parseInt(cPageNumStr);
 
                         // if it is the previous page
-                        if (asc.pageNum == cPageNum + 1) {
+                        if (asc.reference.pageNum == cPageNum + 1) {
                             asc.prevLine = getLastLineOfBiblePage(br);
 
                             // skip close and open of table and open of row
@@ -133,23 +133,23 @@ public class HtmlReader {
                             cPageNumStr = asc.line.substring(startIndex, endIndex);
                             cPageNum = Integer.parseInt(cPageNumStr);
 
-                            if (asc.pageNum == cPageNum) {
+                            if (asc.reference.pageNum == cPageNum) {
                                 return cPageNum;
                             } else {
                                 // error next page not after previous page
-                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
+                                log(LogLevel.LOW, "Couldn't find search page: " + asc.reference.getShortReadableReference());
                                 return 0;
                             }
-                        } else if (asc.pageNum == cPageNum) {
+                        } else if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.reference.getShortReadableReference());
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.getShortReadableReference());
+                log(LogLevel.HIGH, "NULL line when reading " + asc.reference.getShortReadableReference());
                 break;
             }
             asc.line = br.readLine();
@@ -183,7 +183,7 @@ public class HtmlReader {
                         cPageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
 
                         // if it is the previous page
-                        if (asc.pageNum == cPageNum + 1) {
+                        if (asc.reference.pageNum == cPageNum + 1) {
                             asc.prevLine = getLastLineOfPage(br);
 
                             // set found page get page number
@@ -198,23 +198,23 @@ public class HtmlReader {
 
                             cPageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
 
-                            if (asc.pageNum == cPageNum) {
+                            if (asc.reference.pageNum == cPageNum) {
                                 return cPageNum;
                             } else {
                                 // error next page not after previous page
-                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
+                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + asc.reference.pageNum);
                                 return 0;
                             }
-                        } else if (asc.pageNum == cPageNum) {
+                        } else if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + cPageNum);
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.author.getCode() + " vol " + asc.volNum + " page " + asc.pageNum);
+                log(LogLevel.HIGH, "NULL line when reading " + asc.author.getCode() + " vol " + asc.reference.volNum + " page " + asc.reference.pageNum);
                 break;
             }
             asc.line = br.readLine();
@@ -501,7 +501,7 @@ public class HtmlReader {
         boolean firstCloseDiv = true;
 
         String currentline = br.readLine();
-        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container\">")) {
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container padded\">")) {
             currentline = br.readLine();
         }
         if (checkEndAuthorResults(currentline)) return null;

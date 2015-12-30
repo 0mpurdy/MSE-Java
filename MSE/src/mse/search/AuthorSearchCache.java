@@ -16,6 +16,8 @@ public class AuthorSearchCache {
     public AuthorIndex authorIndex;
     public Author author;
 
+    public Reference reference;
+
     public short[] referencesToSearch;
     public int refIndex;
 
@@ -29,8 +31,6 @@ public class AuthorSearchCache {
     public boolean foundDarby;
     public String previousDarbyLine;
 
-    private int verseNum;
-
     String[] searchWords;
     private String[] searchTokens;
 
@@ -42,9 +42,6 @@ public class AuthorSearchCache {
     private int numInfrequentTokens;
 
     public int numAuthorResults;
-
-    public int volNum;
-    public int pageNum;
 
     public short nextRef;
 
@@ -71,7 +68,7 @@ public class AuthorSearchCache {
         this.searchingDarby = true;
         this.foundDarby = false;
 
-        this.verseNum = 0;
+        this.reference = new Reference(author, 0,0,0);
 
         tooFrequentTokens = "";
 
@@ -80,19 +77,19 @@ public class AuthorSearchCache {
 
     public void getNextPage() {
         if (refIndex >= referencesToSearch.length) {
-            volNum = 0;
-            pageNum = 0;
+            reference.volNum = 0;
+            reference.pageNum = 0;
             return;
         }
 
         nextRef = referencesToSearch[refIndex++];
 
         if (nextRef < 0) {
-            volNum = -nextRef;
+            reference.volNum = -nextRef;
             nextRef = referencesToSearch[refIndex++];
-            pageNum = nextRef;
+            reference.pageNum = nextRef;
         } else {
-            pageNum = nextRef;
+            reference.pageNum = nextRef;
         }
     }
 
@@ -301,17 +298,6 @@ public class AuthorSearchCache {
             }
 
         } // end multiple search tokens
-    }
-
-    public String getShortReadableReference() {
-        if (author.isMinistry()) {
-            return author.getCode() + "vol " + volNum + ":" + pageNum;
-        } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
-        } else if (author.equals(Author.HYMNS)) {
-            return HymnBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
-        }
-        return "Can't get short readable reference";
     }
 
     public short[] refineSingleToken(String token) {
@@ -542,40 +528,8 @@ public class AuthorSearchCache {
         return searchingDarby;
     }
 
-    public int getVerseNum() {
-        return verseNum;
-    }
-
-    public void setVerseNum(int verseNum) {
-        this.verseNum = verseNum;
-    }
-
     public void incrementVerseNum() {
 
-        if (searchingDarby) verseNum++;
-    }
-
-    public String getVolumeName() {
-        if (author.isMinistry()) {
-            return author.getCode() + volNum + ".htm";
-        } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + ".htm";
-        } else if (author.equals(Author.HYMNS)) {
-            return HymnBook.values()[volNum - 1].getOutputFilename();
-        } else {
-            return "";
-        }
-    }
-
-    public String getReadableReference() {
-        if (author.isMinistry()) {
-            return author.getCode() + " volume " + volNum + " page " + pageNum;
-        } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + " chapter " + pageNum + ":" + getVerseNum();
-        } else if (author.equals(Author.HYMNS)) {
-            return Integer.toString(pageNum);
-        }
-
-        return "";
+        if (searchingDarby) reference.verseNum++;
     }
 }

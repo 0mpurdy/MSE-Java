@@ -4,6 +4,7 @@ import mse.common.Config;
 import mse.common.ILogger;
 import mse.common.LogRow;
 import mse.data.Author;
+import mse.data.Result;
 import mse.helpers.HtmlHelper;
 import mse.helpers.HtmlReader;
 
@@ -39,20 +40,10 @@ public class RefineThread extends Thread {
             Author author;
             while ((author = htmlReader.findNextAuthor()) != null) {
 
-                String result;
-                while ((result = htmlReader.getNextResult(author)) != null) {
-
-                    switch (author) {
-                        case BIBLE:
-                            String[] bibleResults = HtmlHelper.extractBibleResult(result);
-                            System.out.println("\nBible Result:\n" + bibleResults[0] + "\n" + bibleResults[1]);
-                            break;
-                        case HYMNS:
-                            System.out.println("\nHymns Result:\n" + HtmlHelper.extractHymnsResult(result));
-                            break;
-                        default:
-                            System.out.println("\n" + author.getCode() + "Result:\n" + HtmlHelper.extractMinistryResult(result));
-                    }
+                String resultBlock;
+                while ((resultBlock = htmlReader.getNextResult(author)) != null) {
+                    Result result = new Result(author, resultBlock, new String[]{"EMMANUEL"});
+                    result.print();
                 }
 
             }

@@ -2,6 +2,7 @@ package mse.helpers;
 
 import mse.data.Author;
 import mse.data.HymnBook;
+import mse.data.Reference;
 import mse.search.AuthorSearchCache;
 
 import java.io.PrintWriter;
@@ -84,28 +85,18 @@ public class HtmlHelper {
     public static void writeHymnbookName(ArrayList<String> resultText, AuthorSearchCache asc) {
         resultText.add(String.format("\t\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
                 "results-hymnbook-name",
-                "..\\..\\" + asc.author.getTargetPath(asc.getVolumeName()),
-                HymnBook.values()[asc.volNum - 1].getName()));
+                "..\\..\\" + asc.author.getTargetPath(asc.reference.getFileName()),
+                HymnBook.values()[asc.reference.volNum - 1].getName()));
     }
 
     public static String closeAuthorResultsBlock() {
         return "\t\t</div>";
     }
 
-    public static ArrayList<String> getMinistryResultBlock(String path, String readableReference, String markedLine) {
-        return new ArrayList<String>() {{
-            add("\t\t\t<div class=\"container\">");
-            add("\t\t\t\t<a class=\"btn\" href=\"..\\..\\" + path + "\"> "
-                    + readableReference + "</a> ");
-            add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
-            add("\t\t\t</div>");
-        }};
-    }
-
     public static void writeBibleResultBlock(ArrayList<String> resultText, AuthorSearchCache asc, String markedLine) {
         if (!asc.isWrittenBibleSearchTableHeader()) {
-            resultText.add("\t\t\t<p><a class=\"btn\" href=\"..\\..\\" + asc.author.getTargetPath(asc.getVolumeName() + "#" + asc.pageNum + ":" + asc.getVerseNum()) + "\"> "
-                    + asc.getReadableReference() + "</a></p>");
+            resultText.add("\t\t\t<p><a class=\"btn\" href=\"..\\..\\" + asc.author.getTargetPath(asc.reference.getFileName() + "#" + asc.reference.pageNum + ":" + asc.reference.verseNum) + "\"> "
+                    + asc.reference.getReadableReference() + "</a></p>");
             resultText.add("\t\t\t<table class=\"bible-searchResult\">");
             resultText.add("\t\t\t\t<tr>");
             asc.setWrittenBibleSearchTableHeader(true);
@@ -147,14 +138,43 @@ public class HtmlHelper {
         return resultText;
     }
 
-    public static ArrayList<String> getHymnsResultBlock(String path, String readableReference, String markedLine) {
-        return new ArrayList<String>() {{
-            add("\t\t\t<div class=\"container padded\">");
-            add("\t\t\t\t<a class=\"btn btn-primary\" href=\"..\\..\\" + path + "\" role=\"button\"> "
-                    + readableReference + "</a>");
-            add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
-            add("\t\t\t</div>");
-        }};
+    public static String markLine(Author author, StringBuilder line, String[] words, String emphasis) {
+        // highlight all the search words in the line with an html <mark/> tag
+
+        // remove any html already in the line
+        int charPos = 0;
+
+        if (!author.equals(Author.HYMNS)) line = HtmlHelper.removeHtml(line);
+
+        for (String word : words) {
+
+            charPos = 0;
+
+            // while there are still more words matching the current word in the line
+            // and the char position hasn't exceeded the line
+            int startOfWord;
+            int endOfWord;
+            while (charPos < line.length() && ((startOfWord = line.toString().toLowerCase().indexOf(word.toLowerCase(), charPos)) != -1)) {
+
+                endOfWord = startOfWord + word.length();
+                charPos = endOfWord;
+
+                // if the word has a letter before it or after it then skip it
+                if (startOfWord >= 0 && Character.isLetter(line.charAt(startOfWord - 1))) continue;
+                if (endOfWord < line.length() && Character.isLetter(line.charAt(endOfWord))) continue;
+
+                // otherwise mark the word
+                String currentCapitalisation = line.substring(startOfWord, endOfWord);
+                String openDiv = "<span class=\"" + emphasis + "\">";
+                String closeDiv = "</span>";
+                line.replace(startOfWord, endOfWord, openDiv + currentCapitalisation + closeDiv);
+
+                // set the char position to after the word
+                charPos = endOfWord + openDiv.length() + closeDiv.length();
+            }
+        }
+
+        return line.toString();
     }
 
     public static String getSingleAuthorResults(String name, int numResults) {
@@ -166,38 +186,6 @@ public class HtmlHelper {
     public static String getHtmlFooter(String end) {
         return end + "\n</body>\n\n</html>";
     }
-
-    // region refine
-
-    public static String[] extractBibleResult(String result) {
-        String[] lines = result.split("\\n");
-        int i = 0;
-        while ((i < lines.length) && !lines[i].contains("mse-half")) i++;
-        String jndLine = removeTabs(removeHtml(lines[i]));
-        String kjvLine = removeTabs(removeHtml(lines[i + 1]));
-        return new String[]{jndLine, kjvLine};
-    }
-
-    public static String extractHymnsResult(String result) {
-        String[] lines = result.split("\\n");
-
-        // result is on line 3 (index 2)
-
-        String extractedResult = lines[2].replace("<br>", "\n");
-        extractedResult = removeTabs(removeHtml(extractedResult));
-        return extractedResult;
-    }
-
-    public static String extractMinistryResult(String result) {
-        String[] lines = result.split("\\n");
-
-        // result is on line 3 (index 2)
-
-        String extractedResult = removeTabs(removeHtml(lines[2]));
-        return extractedResult;
-    }
-
-    // endregion
 
     // region htmlManipulation
 
@@ -238,6 +226,16 @@ public class HtmlHelper {
         }
 
         return line;
+    }
+
+    public static String extractSubstring(String line, String pre, String sub) {
+        return line.substring(line.indexOf(pre) + pre.length(), line.lastIndexOf(sub));
+    }
+
+    public static String extractFirstLink(String line) {
+        String linkStart = "href=\"";
+        String link = line.substring(line.indexOf(linkStart) + linkStart.length());
+        return link.substring(0, link.indexOf("\""));
     }
 
     // endregion
