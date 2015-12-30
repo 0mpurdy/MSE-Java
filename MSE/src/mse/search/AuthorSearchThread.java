@@ -56,18 +56,13 @@ public class AuthorSearchThread extends SingleSearchThread {
         asc.setSearchWords();
 
         // add the author header
-        HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()).forEach(resultText::add);
         log(LogLevel.TRACE, "\tSearch strings: " + asc.printableSearchWords());
 
         /* Search all the words to make sure that all the search tokens are in the author's
          * index. log any words that are too frequent, find the least frequent token and
          * record the number of infrequent words
          */
-        if (asc.getWildSearch()) {
-            asc.setSearchTokens(asc.getSearchWords());
-        } else {
-            asc.setSearchTokens(tokenizeLine(asc.getSearchString(), asc));
-        }
+        asc.setSearchTokens(searchLog);
         log(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens());
 
         int errorNum = asc.setLeastFrequentToken();
@@ -242,21 +237,22 @@ public class AuthorSearchThread extends SingleSearchThread {
             boolean validScope = false;
 
             if (asc.getWildSearch()) {
-                validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+                validScope = wordSearch(HtmlHelper.tokenizeLine(scope, asc, searchLog), asc.getSearchTokens(), asc.getWildSearch());
             } else {
 
+                String[] tokenizedLine = HtmlHelper.tokenizeLine(scope, asc, searchLog);
                 switch (asc.getSearchType()) {
                     case MATCH:
-                        validScope = clauseSearch(tokenizeLine(scope, asc), asc.getSearchTokens());
+                        validScope = clauseSearch(tokenizedLine, asc.getSearchTokens());
                         break;
                     case PHRASE:
-                        validScope = scopeWordsInOrder(tokenizeLine(scope, asc), asc.getSearchTokens());
+                        validScope = scopeWordsInOrder(tokenizedLine, asc.getSearchTokens());
                         break;
                     case SENTENCE:
-                        validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+                        validScope = wordSearch(tokenizedLine, asc.getSearchTokens(), asc.getWildSearch());
                         break;
                     case PARAGRAPH:
-                        validScope = wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
+                        validScope = wordSearch(tokenizedLine, asc.getSearchTokens(), asc.getWildSearch());
                 }
             }
 
@@ -359,9 +355,11 @@ public class AuthorSearchThread extends SingleSearchThread {
         // position of the next token to find in the search tokens array
         int j = 0;
 
+        //
         for (int i = 0; i < currentLineTokens.length; i++) {
 
-            if (currentLineTokens[i].equals("")) continue;
+            try {
+                if (currentLineTokens[i].equals("")) continue;
 
             currentWordIsSearchToken = false;
             if (currentLineTokens[i].equalsIgnoreCase(searchTokens[j])) {
@@ -378,6 +376,9 @@ public class AuthorSearchThread extends SingleSearchThread {
                 if (!currentWordIsSearchToken) j = 0;
             }
 
+            } catch (NullPointerException npe) {
+                System.out.println("debug");
+            }
         }
 
         return false;
@@ -386,7 +387,7 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     // endregion
 
-    int startOfLastSentencePos;
+    private int startOfLastSentencePos;
 
     // region processSection
 
@@ -446,83 +447,6 @@ public class AuthorSearchThread extends SingleSearchThread {
         if (sentences.size() > 0) sentences.set(0, trailingIncompleteSentence + " " + sentences.get(0));
 
         return sentences;
-    }
-
-    StringBuilder lineBuilder = new StringBuilder();
-    int startHtml;
-    int endHtml;
-
-    private String[] tokenizeLine(String line, AuthorSearchCache asc) {
-
-        // if the line contains html - remove the html tag
-        while (line.contains("<")) {
-
-            // set the lineBuilder to the string passed in
-            lineBuilder.setLength(0);
-            lineBuilder.append(line);
-            startHtml = 0;
-            while ((startHtml < lineBuilder.length()) && (lineBuilder.charAt(startHtml) != '<')) {
-                startHtml++;
-            }
-            endHtml = startHtml + 1;
-            while ((endHtml < lineBuilder.length()) && (lineBuilder.charAt(endHtml) != '>')) {
-                endHtml++;
-            }
-            if ((startHtml < lineBuilder.length()) && (endHtml <= lineBuilder.length()))
-                lineBuilder.replace(startHtml, endHtml + 1, "");
-
-            line = lineBuilder.toString();
-        }
-
-        // split the line into tokens (words) by non-word characters
-        return tokenizeArray(line.split("[\\W]"), asc.getAuthorCode(), asc.reference.volNum, asc.reference.pageNum);
-    }
-
-    String[] newTokensArray;
-    ArrayList<String> newTokens = new ArrayList<>();
-
-    private String[] tokenizeArray(String[] tokens, String authorCode, int volNum, int pageNum) {
-
-        newTokens.clear();
-
-        // make each token into a word that can be searched
-        for (String token : tokens) {
-            token = token.toUpperCase();
-            if (!isAlpha(token)) {
-                token = processString(token);
-            }
-            if (!isAlpha(token)) {
-                searchLog.add(new LogRow(LogLevel.HIGH, "Error processing token " + authorCode + " " + volNum + ":" + pageNum + ": " + token));
-                token = "";
-            }
-            newTokens.add(token);
-        } // end for each token
-
-        newTokensArray = new String[newTokens.size()];
-        newTokensArray = newTokens.toArray(newTokensArray);
-
-        return newTokensArray;
-    }
-
-    private boolean isAlpha(String token) {
-        char[] chars = token.toCharArray();
-
-        for (char c : chars) {
-            if (!Character.isLetter(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String processString(String token) {
-        for (char c : token.toCharArray()) {
-            if (!Character.isLetter(c)) {
-                token = token.replace(Character.toString(c), "");
-            }
-        }
-
-        return token;
     }
 
     // endregion
@@ -620,27 +544,6 @@ public class AuthorSearchThread extends SingleSearchThread {
         return outString;
     }
 
-    int charPos = 0;
-    int startOfWord = 0;
-    int endOfWord = 0;
-    String currentCapitalisation;
-
-//    private StringBuilder removeHtml(StringBuilder line) {
-//        int charPos = -1;
-//
-//        while (++charPos < line.length()) {
-//            if (line.charAt(charPos) == '<') {
-//                int tempCharIndex = charPos + 1;
-//                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
-//                tempCharIndex++;
-//                line.replace(charPos, tempCharIndex, "");
-//                charPos = 0;
-//            }
-//        }
-//
-//        return line;
-//    }
-
     private void log(LogLevel logLevel, String message) {
         searchLog.add(new LogRow(logLevel, message));
     }
@@ -658,8 +561,12 @@ public class AuthorSearchThread extends SingleSearchThread {
     }
 
     @Override
-    int getNumberOfResults() {
+    public int getNumberOfResults() {
         return asc.numAuthorResults;
+    }
+
+    public AuthorSearchCache getAsc() {
+        return asc;
     }
 
     // endregion

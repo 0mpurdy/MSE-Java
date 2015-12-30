@@ -1,5 +1,7 @@
 package mse.helpers;
 
+import mse.common.LogLevel;
+import mse.common.LogRow;
 import mse.data.Author;
 import mse.data.HymnBook;
 import mse.data.Reference;
@@ -64,7 +66,7 @@ public class HtmlHelper {
         return header;
     }
 
-    public static ArrayList<String> getAuthorResultsHeader(Author author, String searchWords) {
+    public static String getAuthorResultsHeader(Author author, String searchWords) {
         // print the title of the author search results and search words
 
         String temp;
@@ -75,11 +77,9 @@ public class HtmlHelper {
         }
         final String extraClass = temp;
 
-        return new ArrayList<String>() {{
-            add("\t\t<hr>\n\t\t<h1>Results of search through " + author.getName() + "</h1>");
-            add("\t\t<p>Searched: " + searchWords + "</p>");
-            add("\t\t<div class=\"container" + extraClass + "\">");
-        }};
+        return "\t\t<hr>\n\t\t<h1>Results of search through " + author.getName() + "</h1>\n" +
+                "\t\t<p>Searched: " + searchWords + "</p>\n" +
+                "\t\t<div class=\"container" + extraClass + "\">";
     }
 
     public static void writeHymnbookName(ArrayList<String> resultText, AuthorSearchCache asc) {
@@ -236,6 +236,62 @@ public class HtmlHelper {
         String linkStart = "href=\"";
         String link = line.substring(line.indexOf(linkStart) + linkStart.length());
         return link.substring(0, link.indexOf("\""));
+    }
+
+    // endregion
+
+    // region tokenHelp
+
+    public static String[] tokenizeLine(String line, AuthorSearchCache asc, ArrayList<LogRow> searchLog) {
+        line = removeHtml(line);
+
+        // split the line into tokens (words) by non-word characters
+        return tokenizeArray(line.split("[\\W]"), asc, searchLog);
+    }
+
+    public static String[] tokenizeArray(String[] tokens, AuthorSearchCache asc, ArrayList<LogRow> searchLog) {
+
+        ArrayList<String> newTokens = new ArrayList<>();
+
+        // make each token into a word that can be searched
+        for (String token : tokens) {
+            token = token.toUpperCase();
+            if (!isAlpha(token)) {
+                token = processString(token);
+            }
+            if (!isAlpha(token)) {
+                searchLog.add(new LogRow(LogLevel.HIGH, "Error processing token " + asc.reference.getShortReadableReference()));
+                token = "";
+            }
+            newTokens.add(token);
+        } // end for each token
+
+        String[] newTokensArray = new String[newTokens.size()];
+        newTokensArray = newTokens.toArray(newTokensArray);
+
+        return newTokensArray;
+    }
+
+
+    public static boolean isAlpha(String token) {
+        char[] chars = token.toCharArray();
+
+        for (char c : chars) {
+            if (!Character.isLetter(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String processString(String token) {
+        for (char c : token.toCharArray()) {
+            if (!Character.isLetter(c)) {
+                token = token.replace(Character.toString(c), "");
+            }
+        }
+
+        return token;
     }
 
     // endregion

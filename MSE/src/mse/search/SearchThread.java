@@ -87,6 +87,11 @@ public class SearchThread extends Thread {
                 try {
                     nextThread.join();
 
+                    // print out the document
+                    AuthorSearchCache asc = ((AuthorSearchThread) nextThread).getAsc();
+                    pwResults.println(HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()));
+
+
                     nextThread.getResults().forEach(pwResults::println);
                     nextThread.getLog().forEach(logger::log);
                     search.addAuthorSearchResults(nextThread.getNumberOfResults());

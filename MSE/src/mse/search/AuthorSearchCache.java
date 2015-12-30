@@ -1,8 +1,11 @@
 package mse.search;
 
 import mse.common.Config;
+import mse.common.LogRow;
 import mse.data.*;
+import mse.helpers.HtmlHelper;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -167,8 +170,12 @@ public class AuthorSearchCache {
         return searchTokens;
     }
 
-    public void setSearchTokens(String[] searchTokens) {
-        this.searchTokens = searchTokens;
+    public void setSearchTokens(ArrayList<LogRow> searchLog) {
+        if (getWildSearch()) {
+            this.searchTokens = getSearchWords();
+        } else {
+            this.searchTokens = HtmlHelper.tokenizeLine(getSearchString(), this, searchLog);
+        }
     }
 
     public String printableSearchWords() {
