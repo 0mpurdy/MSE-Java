@@ -407,14 +407,15 @@ public class HtmlReader {
 
     String authorIdentifier = "Results of search through";
 
-    public String findAuthor() throws IOException {
+    public Author findNextAuthor() throws IOException {
         String currentLine = br.readLine();
-        while (!currentLine.contains(authorIdentifier)) {
+        while ((currentLine != null) && !currentLine.contains(authorIdentifier)) {
             currentLine = br.readLine();
         }
+        if (currentLine == null) return null;
         currentLine = HtmlHelper.removeHtml(currentLine);
-        currentLine = currentLine.substring(currentLine.indexOf(authorIdentifier) + authorIdentifier.length());
-        return currentLine;
+        currentLine = currentLine.substring(currentLine.indexOf(authorIdentifier) + authorIdentifier.length() + 1);
+        return Author.getFromString(currentLine);
     }
 
     // endregion
@@ -442,5 +443,93 @@ public class HtmlReader {
         return contentLine;
     }
 
+    // region refine
 
+    public String getNextResult(Author author) throws IOException {
+        switch (author) {
+            case BIBLE:
+                return getNextBibleResult();
+            case HYMNS:
+                return getNextHymnsResult();
+            default:
+                return getNextMinistryResult();
+        }
+    }
+
+    private String getNextBibleResult() throws IOException {
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("btn")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("</table>")) {
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    private String getNextHymnsResult() throws IOException {
+
+        // this is to check that the first of the closing div tags is ignored
+        boolean firstCloseDiv = true;
+
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container padded\">")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && (!currentline.contains("</div>") || firstCloseDiv)) {
+            if (currentline.contains("</div>")) firstCloseDiv = false;
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    private String getNextMinistryResult() throws IOException {
+
+        // this is to check that the first of the closing div tags is ignored
+        boolean firstCloseDiv = true;
+
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container\">")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && (!currentline.contains("</div>") || firstCloseDiv)) {
+            if (currentline.contains("</div>")) firstCloseDiv = false;
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    // endregion
+
+    private String getAuthorResultStartString(Author author) {
+        switch (author) {
+            case BIBLE:
+            case HYMNS:
+                return "btn";
+            default:
+                return "container";
+        }
+    }
+
+    private boolean checkEndAuthorResults(String line) {
+        return (line == null) || line.contains("Number of results for");
+    }
 }

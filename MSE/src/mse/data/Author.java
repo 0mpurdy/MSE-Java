@@ -76,4 +76,22 @@ public enum Author {
     public int getIndex() {
         return index;
     }
+
+    public static Author getFromString(String authorString) {
+
+        authorString = authorString.toLowerCase();
+
+        // go through each author and check if the name or the code matches
+        for (Author nextAuthor : values()) {
+            if (authorString.equals(nextAuthor.getCode().toLowerCase()) ||
+                    authorString.equals(nextAuthor.getName().toLowerCase()))
+                return nextAuthor;
+        }
+
+        // potentially include switch statement for other string matches here
+
+        // if no authors matched return null
+        return null;
+
+    }
 }

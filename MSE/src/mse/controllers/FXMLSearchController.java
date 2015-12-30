@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import mse.data.Search;
 import mse.helpers.HtmlHelper;
+import mse.refine.RefineThread;
 import mse.search.*;
 import mse.common.*;
 
@@ -286,9 +287,8 @@ public class FXMLSearchController implements Initializable {
             progressLabel.setText("Search includes \"" + refineText + "\"");
         }
 
-
-
-        logger.closeLog();
+        RefineThread refineThread = new RefineThread(cfg, logger);
+        refineThread.start();
 
     }
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Michael Purdy on 02/12/2015.
- *
+ * <p>
  * Helps with creation of HTML files
  */
 public class HtmlHelper {
@@ -94,12 +94,12 @@ public class HtmlHelper {
 
     public static ArrayList<String> getMinistryResultBlock(String path, String readableReference, String markedLine) {
         return new ArrayList<String>() {{
-                add("\t\t\t<div class=\"container\">");
-                add("\t\t\t\t<a class=\"btn\" href=\"..\\..\\" + path + "\"> "
-                        + readableReference + "</a> ");
-                add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
-                add("\t\t\t</div>");
-            }};
+            add("\t\t\t<div class=\"container\">");
+            add("\t\t\t\t<a class=\"btn\" href=\"..\\..\\" + path + "\"> "
+                    + readableReference + "</a> ");
+            add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
+            add("\t\t\t</div>");
+        }};
     }
 
     public static void writeBibleResultBlock(ArrayList<String> resultText, AuthorSearchCache asc, String markedLine) {
@@ -149,12 +149,12 @@ public class HtmlHelper {
 
     public static ArrayList<String> getHymnsResultBlock(String path, String readableReference, String markedLine) {
         return new ArrayList<String>() {{
-                add("\t\t\t<div class=\"container padded\">");
-                add("\t\t\t\t<a class=\"btn btn-primary\" href=\"..\\..\\" + path + "\" role=\"button\"> "
-                        + readableReference + "</a>");
-                add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
-                add("\t\t\t</div>");
-            }};
+            add("\t\t\t<div class=\"container padded\">");
+            add("\t\t\t\t<a class=\"btn btn-primary\" href=\"..\\..\\" + path + "\" role=\"button\"> "
+                    + readableReference + "</a>");
+            add("\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>");
+            add("\t\t\t</div>");
+        }};
     }
 
     public static String getSingleAuthorResults(String name, int numResults) {
@@ -166,6 +166,38 @@ public class HtmlHelper {
     public static String getHtmlFooter(String end) {
         return end + "\n</body>\n\n</html>";
     }
+
+    // region refine
+
+    public static String[] extractBibleResult(String result) {
+        String[] lines = result.split("\\n");
+        int i = 0;
+        while ((i < lines.length) && !lines[i].contains("mse-half")) i++;
+        String jndLine = removeTabs(removeHtml(lines[i]));
+        String kjvLine = removeTabs(removeHtml(lines[i + 1]));
+        return new String[]{jndLine, kjvLine};
+    }
+
+    public static String extractHymnsResult(String result) {
+        String[] lines = result.split("\\n");
+
+        // result is on line 3 (index 2)
+
+        String extractedResult = lines[2].replace("<br>", "\n");
+        extractedResult = removeTabs(removeHtml(extractedResult));
+        return extractedResult;
+    }
+
+    public static String extractMinistryResult(String result) {
+        String[] lines = result.split("\\n");
+
+        // result is on line 3 (index 2)
+
+        String extractedResult = removeTabs(removeHtml(lines[2]));
+        return extractedResult;
+    }
+
+    // endregion
 
     // region htmlManipulation
 
@@ -182,6 +214,24 @@ public class HtmlHelper {
                 while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
                 tempCharIndex++;
                 line.replace(charPos, tempCharIndex, "");
+            } else {
+                charPos++;
+            }
+        }
+
+        return line;
+    }
+
+    public static String removeTabs(String line) {
+        return removeTabs(new StringBuilder(line)).toString();
+    }
+
+    public static StringBuilder removeTabs(StringBuilder line) {
+        int charPos = 0;
+
+        while (charPos < line.length()) {
+            if (line.charAt(charPos) == '\t') {
+                line.replace(charPos, charPos + 1, "");
             } else {
                 charPos++;
             }
