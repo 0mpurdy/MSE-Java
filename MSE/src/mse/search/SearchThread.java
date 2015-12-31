@@ -85,14 +85,25 @@ public class SearchThread extends Thread {
                 try {
                     nextThread.join();
 
-                    // print out the document
                     AuthorSearchCache asc = ((AuthorSearchThread) nextThread).getAsc();
+
+                    // write the author header
                     pwResults.println(HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()));
 
+                    // write all the results / errors
                     for (IResult result : nextThread.getResults()) {
                         pwResults.println(result.getBlock());
                     }
+
+                    HtmlHelper.closeAuthorContainer();
+
+                    // write the number of results for the author
+                    pwResults.println(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
+
+                    // write the log
                     nextThread.getLog().forEach(logger::log);
+
+                    // add the number of search results to the total
                     search.addAuthorSearchResults(nextThread.getNumberOfResults());
 
                 } catch (InterruptedException e) {

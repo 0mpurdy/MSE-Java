@@ -41,9 +41,6 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         searchAuthor(authorResults, asc);
 
-        // write number of results for author
-        authorResults.add(new TempResult2(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults)));
-
     }
 
     // region search
@@ -79,7 +76,7 @@ public class AuthorSearchThread extends SingleSearchThread {
                 while (asc.reference.volNum != 0 && volumeSuccess) {
 
                     asc.notFoundCurrentHymnBook = true;
-                    volumeSuccess = searchSingleVolume(results, asc);
+                    volumeSuccess = searchVolume(results, asc);
 
                 } // end one frequent token and all tokens found
 
@@ -101,11 +98,9 @@ public class AuthorSearchThread extends SingleSearchThread {
             error += "\t</p>";
             results.add(new ErrorResult(error));
         }
-
-        results.add(new TempResult2(HtmlHelper.closeAuthorResultsBlock()));
     }
 
-    private boolean searchSingleVolume(ArrayList<IResult> results, AuthorSearchCache asc) {
+    private boolean searchVolume(ArrayList<IResult> results, AuthorSearchCache asc) {
         // for each volume
 
         searchLog.add(new LogRow(LogLevel.TRACE, "\tVol: " + asc.reference.volNum));
@@ -142,7 +137,7 @@ public class AuthorSearchThread extends SingleSearchThread {
             if (asc.currentSectionHeader == null) {
                 searchLog.add(new LogRow(LogLevel.HIGH, "NULL line " + asc.reference.getShortReadableReference()));
             } else {
-                searchSinglePage(results, asc, htmlReader);
+                searchPage(results, asc, htmlReader);
             }
             asc.line = asc.currentSectionHeader;
 
@@ -159,7 +154,7 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     }
 
-    private void searchSinglePage(ArrayList<IResult> results, AuthorSearchCache asc, HtmlReader htmlReader) {
+    private void searchPage(ArrayList<IResult> results, AuthorSearchCache asc, HtmlReader htmlReader) {
 
         boolean foundToken = false;
 
@@ -263,12 +258,14 @@ public class AuthorSearchThread extends SingleSearchThread {
 
                     String markedLine = HtmlHelper.markLine(asc.author, new StringBuilder(scope), asc.getSearchWords(), "mse-mark");
 
+                    Result result;
                     if (asc.author.equals(Author.HYMNS) && asc.notFoundCurrentHymnBook) {
                         asc.notFoundCurrentHymnBook = false;
-                        HtmlHelper.writeHymnbookName(results, asc);
+                        result = new Result(asc.author, asc.reference.copy(), markedLine, asc.searchWords,
+                                HtmlHelper.getFormattedHymnbookLink(asc));
+                    } else {
+                        result = new Result(asc.author, asc.reference.copy(), markedLine, asc.searchWords);
                     }
-
-                    Result result = new Result(asc.author, asc.reference.copy(), markedLine, asc.searchWords);
                     results.add(result);
 
                     asc.incrementResults();

@@ -16,6 +16,9 @@ public class Result implements IResult {
 
     String text;
 
+    private boolean newHymnBook;
+    private String hymnBookLink;
+
     // region constructors
 
     public Result(Author author, Reference reference, String text, String[] searchWords) {
@@ -23,6 +26,16 @@ public class Result implements IResult {
         this.reference = reference;
         this.searchWords = searchWords;
         this.text = text;
+        this.newHymnBook = false;
+    }
+
+    public Result(Author author, Reference reference, String text, String[] searchWords, String hymnBookLink) {
+        this.author = author;
+        this.reference = reference;
+        this.searchWords = searchWords;
+        this.text = text;
+        this.newHymnBook = true;
+        this.hymnBookLink = hymnBookLink;
     }
 
     // region blockConstructors
@@ -128,11 +141,13 @@ public class Result implements IResult {
     }
 
     public String getHymnsBlock() {
-        return "\t\t\t<div class=\"container padded\">\n" +
+        String block =  "\t\t\t<div class=\"container padded\">\n" +
                 "\t\t\t\t<a class=\"btn btn-primary\" href=\"" + reference.getPath() + "\" role=\"button\">" +
                 reference.getReadableReference() + "</a>\n" +
                 "\t\t\t\t<div class=\"spaced\">" + getMarkedLine(text) + "</div>\n" +
                 "\t\t\t</div>";
+        if (newHymnBook) block = hymnBookLink + "\n" + block;
+        return block;
     }
 
     public String getMinistryBlock() {
