@@ -2,9 +2,7 @@ package mse.helpers;
 
 import mse.common.LogLevel;
 import mse.common.LogRow;
-import mse.data.Author;
-import mse.data.HymnBook;
-import mse.data.Reference;
+import mse.data.*;
 import mse.search.AuthorSearchCache;
 
 import java.io.PrintWriter;
@@ -82,60 +80,15 @@ public class HtmlHelper {
                 "\t\t<div class=\"container" + extraClass + "\">";
     }
 
-    public static void writeHymnbookName(ArrayList<String> resultText, AuthorSearchCache asc) {
-        resultText.add(String.format("\t\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
+    public static void writeHymnbookName(ArrayList<IResult> results, AuthorSearchCache asc) {
+        results.add(new TempResult2(String.format("\t\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
                 "results-hymnbook-name",
                 "..\\..\\" + asc.author.getTargetPath(asc.reference.getFileName()),
-                HymnBook.values()[asc.reference.volNum - 1].getName()));
+                HymnBook.values()[asc.reference.volNum - 1].getName())));
     }
 
     public static String closeAuthorResultsBlock() {
         return "\t\t</div>";
-    }
-
-    public static void writeBibleResultBlock(ArrayList<String> resultText, AuthorSearchCache asc, String markedLine) {
-        if (!asc.isWrittenBibleSearchTableHeader()) {
-            resultText.add("\t\t\t<p><a class=\"btn\" href=\"..\\..\\" + asc.author.getTargetPath(asc.reference.getFileName() + "#" + asc.reference.pageNum + ":" + asc.reference.verseNum) + "\"> "
-                    + asc.reference.getReadableReference() + "</a></p>");
-            resultText.add("\t\t\t<table class=\"bible-searchResult\">");
-            resultText.add("\t\t\t\t<tr>");
-            asc.setWrittenBibleSearchTableHeader(true);
-            if (!asc.isSearchingDarby()) {
-                resultText.add("\t\t\t\t\t<td class=\"mse-half\">" + asc.previousDarbyLine + "</td>");
-            }
-        }
-
-        if (asc.isSearchingDarby()) {
-
-            resultText.add("\t\t\t\t\t<td class=\"mse-half\">" + markedLine + "</td>");
-
-        } else {
-
-            resultText.add("\t\t\t\t\t<td class=\"mse-half\">" + markedLine + "</td>");
-
-        }
-    }
-
-    public static ArrayList<String> finishSearchingSingleBibleScope(String line, ArrayList<String> resultText, AuthorSearchCache asc, boolean foundToken) {
-
-        // if already written the header (found a result) and searching kjv
-        if (asc.writtenBibleSearchTableHeader && !asc.searchingDarby) {
-
-            if (!foundToken) {
-                writeBibleResultBlock(resultText, asc, removeHtml(line));
-            }
-
-            resultText.add("\t\t\t\t</tr>");
-            resultText.add("\t\t\t</table>");
-
-            asc.writtenBibleSearchTableHeader = false;
-
-            // if searching jnd and not yet found a result
-        } else if (asc.searchingDarby && !asc.writtenBibleSearchTableHeader) asc.previousDarbyLine = line;
-
-        asc.searchingDarby = !asc.searchingDarby;
-
-        return resultText;
     }
 
     public static String markLine(Author author, StringBuilder line, String[] words, String emphasis) {

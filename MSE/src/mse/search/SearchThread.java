@@ -4,9 +4,7 @@ import mse.common.Config;
 import mse.common.ILogger;
 import mse.common.LogLevel;
 import mse.common.LogRow;
-import mse.data.Author;
-import mse.data.AuthorIndex;
-import mse.data.Search;
+import mse.data.*;
 import mse.helpers.HtmlHelper;
 
 import java.awt.*;
@@ -91,8 +89,9 @@ public class SearchThread extends Thread {
                     AuthorSearchCache asc = ((AuthorSearchThread) nextThread).getAsc();
                     pwResults.println(HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()));
 
-
-                    nextThread.getResults().forEach(pwResults::println);
+                    for (IResult result : nextThread.getResults()) {
+                        pwResults.println(result.getBlock());
+                    }
                     nextThread.getLog().forEach(logger::log);
                     search.addAuthorSearchResults(nextThread.getNumberOfResults());
 

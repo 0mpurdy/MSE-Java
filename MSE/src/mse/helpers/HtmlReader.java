@@ -302,7 +302,7 @@ public class HtmlReader {
             } else if (asc.author.equals(Author.BIBLE)) {
 
                 // if still in same section do not change section header
-                if (!asc.isSearchingDarby()) return asc.currentSectionHeader;
+                if (!asc.brl.isSearchingDarby()) return asc.currentSectionHeader;
 
                 // skip a line
                 br.readLine();
@@ -336,17 +336,16 @@ public class HtmlReader {
                 return br.readLine();
             } else if (asc.author.equals(Author.BIBLE)) {
                 String line = "";
-                if (asc.isSearchingDarby()) {
 
-                    // skip verse number
-                    br.readLine();
+                // skip verse number
+                br.readLine();
 
-                    // read jnd
-                    line = br.readLine();
+                // read jnd
+                line = br.readLine();
 
-                } else {
-                    line = br.readLine();
-                }
+                // add kjv
+                line += " <!-> " + br.readLine();
+
                 return line;
             } else if (asc.author.equals(Author.HYMNS)) {
 

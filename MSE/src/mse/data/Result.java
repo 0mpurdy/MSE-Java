@@ -2,10 +2,12 @@ package mse.data;
 
 import mse.helpers.HtmlHelper;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by michaelpurdy on 30/12/2015.
  */
-public class Result {
+public class Result implements IResult {
 
     Author author;
     Reference reference;
@@ -14,8 +16,6 @@ public class Result {
 
     String text;
 
-    String resultBlock;
-
     // region constructors
 
     public Result(Author author, Reference reference, String text, String[] searchWords) {
@@ -23,11 +23,6 @@ public class Result {
         this.reference = reference;
         this.searchWords = searchWords;
         this.text = text;
-
-        switch (author) {
-            case HYMNS:
-                this.resultBlock = getHymnsResultBlock();
-        }
     }
 
     // region blockConstructors
@@ -117,33 +112,53 @@ public class Result {
     }
 
     public void printBlock() {
-        System.out.println(resultBlock);
+        System.out.println(getBlock());
     }
 
-    public String getResultBlock() {
+    @Override
+    public String getBlock() {
         switch (author) {
+            case BIBLE:
+                return getBibleBlock();
             case HYMNS:
-                return getHymnsResultBlock();
+                return getHymnsBlock();
             default:
-                return getMinistryResultBlock();
+                return getMinistryBlock();
         }
     }
 
-    public String getHymnsResultBlock() {
-        String markedLine = HtmlHelper.markLine(author, new StringBuilder(text), searchWords, "mse-mark");
+    public String getHymnsBlock() {
         return "\t\t\t<div class=\"container padded\">\n" +
                 "\t\t\t\t<a class=\"btn btn-primary\" href=\"" + reference.getPath() + "\" role=\"button\">" +
                 reference.getReadableReference() + "</a>\n" +
-                "\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>\n" +
+                "\t\t\t\t<div class=\"spaced\">" + getMarkedLine(text) + "</div>\n" +
                 "\t\t\t</div>";
     }
 
-    public String getMinistryResultBlock() {
+    public String getMinistryBlock() {
         String markedLine = HtmlHelper.markLine(author, new StringBuilder(text), searchWords, "mse-mark");
         return "\t\t\t<div class=\"container\">\n" +
                 "\t\t\t\t<a class=\"btn\" href=\"" + reference.getPath() + "\">" +
                 reference.getReadableReference() + "</a>\n" +
                 "\t\t\t\t<div class=\"spaced\">" + markedLine + "</div>\n" +
                 "\t\t\t</div>";
+    }
+
+    public String getBibleBlock() {
+
+        String[] lines = text.split(Pattern.quote(" <!-> "));
+
+        return "\t\t\t<p><a class=\"btn\" href=\"" + reference.getPath() + "\"> "
+                + reference.getReadableReference() + "</a></p>\n" +
+                "\t\t\t<table class=\"bible-searchResult\">\n" +
+                "\t\t\t\t<tr>\n" +
+                "\t\t\t\t\t<td class=\"mse-half\">" + getMarkedLine(lines[0]) + "</td>\n" +
+                "\t\t\t\t\t<td class=\"mse-half\">" + getMarkedLine(lines[1]) + "</td>\n" +
+                "\t\t\t\t</tr>\n" +
+                "\t\t\t</table>";
+    }
+
+    private String getMarkedLine(String line) {
+        return HtmlHelper.markLine(author, new StringBuilder(line), searchWords, "mse-mark");
     }
 }

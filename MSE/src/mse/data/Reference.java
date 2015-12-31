@@ -12,18 +12,15 @@ public class Reference {
     // public allows faster access
     public int volNum, pageNum, verseNum;
 
-    public Reference(Author author, Reference reference) {
-        this.author = author;
-        this.volNum = reference.volNum;
-        this.pageNum = reference.pageNum;
-        this.verseNum = reference.verseNum;
-    }
-
     public Reference(Author author, int volNum, int pageNum, int verseNum) {
         this.author = author;
         this.volNum = volNum;
         this.pageNum = pageNum;
         this.verseNum = verseNum;
+    }
+
+    public Reference copy() {
+        return new Reference(author, volNum, pageNum, verseNum);
     }
 
     public String getReadableReference() {
