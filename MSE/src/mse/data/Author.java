@@ -49,6 +49,10 @@ public enum Author {
         return "target" + File.separator + folder + File.separator + filename;
     }
 
+    public String getRelativeHtmlTargetPath(String filename) {
+        return "../../target/" + folder + "/" + filename;
+    }
+
     public String getVolumePath(int volumeNumber) {
         return getTargetPath(folder + volumeNumber + ".htm");
     }

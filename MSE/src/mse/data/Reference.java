@@ -60,9 +60,9 @@ public class Reference {
     public String getPath() {
         switch (author) {
             case BIBLE:
-                return "../../" + author.getTargetPath(getFileName() + "#" + pageNum + ":" + verseNum);
+                return author.getRelativeHtmlTargetPath(getFileName() + "#" + pageNum + ":" + verseNum);
             default:
-                return "../../" + author.getTargetPath(getFileName()) + "#" + pageNum;
+                return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum;
         }
     }
 }
