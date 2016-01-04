@@ -133,7 +133,7 @@ public class AuthorSearchCache {
         if (getWildSearch()) {
             this.searchTokens = getSearchWords();
         } else {
-            this.searchTokens = HtmlHelper.tokenizeLine(getSearchString(), this, searchLog);
+            this.searchTokens = HtmlHelper.tokenizeLine(getSearchString());
         }
     }
 
@@ -510,30 +510,13 @@ public class AuthorSearchCache {
 
     // endregion
 
-    // region publicPrintGetters
-
     public String printableSearchWords() {
-        return printableArray(searchWords);
+        return HtmlHelper.printableArray(searchWords);
     }
 
     public String printableSearchTokens() {
-        return printableArray(searchTokens);
+        return HtmlHelper.printableArray(searchTokens);
     }
-
-    public String printableArray(String[] array) {
-        StringBuilder printableArray = new StringBuilder();
-
-        for (String word : array) {
-            printableArray.append(word).append(", ");
-        }
-
-        if (printableArray.length() < 2) return "";
-
-        // remove last comma
-        return printableArray.toString().substring(0, printableArray.length() - 2);
-    }
-
-    // endregion
 
 
 }

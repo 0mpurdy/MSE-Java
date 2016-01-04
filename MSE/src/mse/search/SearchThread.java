@@ -66,7 +66,7 @@ public class SearchThread extends Thread {
         // write the results
 
         // try to open and write to the results file
-        File resultsFile = new File(cfg.getResDir() + cfg.getResultsFileName());
+        File resultsFile = new File(cfg.getResDir() + cfg.getResultsFile());
         if (!resultsFile.exists()) {
             resultsFile.getParentFile().mkdirs();
             try {
@@ -78,7 +78,7 @@ public class SearchThread extends Thread {
 
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
-            pwResults.println(HtmlHelper.getResultsHeader("Results", "../../mseStyle.css"));
+            pwResults.println(HtmlHelper.getResultsHeader("../../mseStyle.css"));
 
             // join all the threads
             for (SingleSearchThread nextThread : singleSearchThreads) {
@@ -95,7 +95,7 @@ public class SearchThread extends Thread {
                         pwResults.println(result.getBlock());
                     }
 
-                    HtmlHelper.closeAuthorContainer();
+                    HtmlHelper.closeAuthorContainer(pwResults);
 
                     // write the number of results for the author
                     pwResults.println(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
@@ -123,7 +123,7 @@ public class SearchThread extends Thread {
         progress.set(1000 * authorsToSearch.size() + 1);
 
         try {
-            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
+            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFile()));
         } catch (IOException | IllegalArgumentException ioe) {
             logger.log(LogLevel.HIGH, "Could not open results file.");
         }

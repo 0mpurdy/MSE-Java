@@ -86,16 +86,16 @@ public class AuthorSearchThread extends SingleSearchThread {
             }
 
         } else {
-            String error = "\t<p>\n";
+            String error = "\t\t\t<p class=\"centered\">";
             if (errorNum % 4 > 1) {
-                error += "\t\tNot all words were found in index.<br>\n";
+                error += "Not all words were found in index.";
                 searchLog.add(new LogRow(LogLevel.LOW, "\tTokens in " + asc.author.getCode() + " not all found: " + asc.printableSearchTokens()));
             }
             if (errorNum >= 4) {
-                error += "\t\tSome words appeared too frequently: " + asc.getTooFrequentTokens() + "\n";
+                error += "Some words appeared too frequently: " + asc.getTooFrequentTokens();
                 searchLog.add(new LogRow(LogLevel.LOW, "\tToo frequent tokens in " + asc.author.getCode() + ": " + asc.getTooFrequentTokens()));
             }
-            error += "\t</p>";
+            error += "</p>";
             results.add(new ErrorResult(error));
         }
     }
@@ -226,26 +226,13 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         for (String scope : scopes) {
 
-            boolean validScope = false;
+            boolean validScope;
 
             if (asc.getWildSearch()) {
-                validScope = wordSearch(HtmlHelper.tokenizeLine(scope, asc, searchLog), asc.getSearchTokens(), asc.getWildSearch());
+                validScope = SearchType.wildSearch(HtmlHelper.tokenizeLine(scope), asc.getSearchTokens());
             } else {
-
-                String[] tokenizedLine = HtmlHelper.tokenizeLine(scope, asc, searchLog);
-                switch (asc.getSearchType()) {
-                    case MATCH:
-                        validScope = clauseSearch(tokenizedLine, asc.getSearchTokens());
-                        break;
-                    case PHRASE:
-                        validScope = scopeWordsInOrder(tokenizedLine, asc.getSearchTokens());
-                        break;
-                    case SENTENCE:
-                        validScope = wordSearch(tokenizedLine, asc.getSearchTokens(), asc.getWildSearch());
-                        break;
-                    case PARAGRAPH:
-                        validScope = wordSearch(tokenizedLine, asc.getSearchTokens(), asc.getWildSearch());
-                }
+                String[] tokenizedLine = HtmlHelper.tokenizeLine(scope);
+                validScope = asc.getSearchType().search(tokenizedLine, asc.getSearchTokens());
             }
 
 
@@ -275,24 +262,6 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         return validSection;
 
-    }
-
-    private boolean scopeWordsInOrder(String[] lineTokens, String[] searchTokens) {
-        int indexNextLineToken = 0;
-        int indexNextSearchToken = 0;
-
-        while (indexNextLineToken < lineTokens.length) {
-            if (lineTokens[indexNextLineToken].toUpperCase().equals(searchTokens[indexNextSearchToken])) {
-                indexNextSearchToken++;
-
-                // if no more tokens to find
-                if (indexNextSearchToken == searchTokens.length) return true;
-            }
-            indexNextLineToken++;
-        }
-
-        // if gone through all the line and not found all the tokens in the order
-        return false;
     }
 
     private ArrayList<String> getSearchScopes(String section, String previousLine) {
@@ -325,58 +294,7 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     boolean foundCurrentSearchToken;
 
-    private boolean wordSearch(String[] currentLineTokens, String[] searchTokens, boolean wildSearch) {
 
-        for (String nextSearchToken : searchTokens) {
-            foundCurrentSearchToken = false;
-            for (String nextLineToken : currentLineTokens) {
-                if (nextSearchToken.equals(nextLineToken)) {
-                    foundCurrentSearchToken = true;
-                    if (wildSearch) return true;
-                }
-            }
-            if (!foundCurrentSearchToken && !asc.getWildSearch()) return false;
-        }
-
-        // if it reaches this point as a wild search then no tokens were found
-        return !wildSearch;
-    }
-
-    private boolean clauseSearch(String[] currentLineTokens, String[] searchTokens) {
-
-        // read through the clause finding each word in order
-        // return false if reached the end without finding every word
-
-        // true if the next word should be next word in the search tokens
-        boolean currentWordIsSearchToken;
-
-        // position of the next token to find in the search tokens array
-        int j = 0;
-
-        //
-        for (int i = 0; i < currentLineTokens.length; i++) {
-
-            if (currentLineTokens[i].equals("")) continue;
-
-            currentWordIsSearchToken = false;
-            if (currentLineTokens[i].equalsIgnoreCase(searchTokens[j])) {
-                j++;
-                currentWordIsSearchToken = true;
-            }
-
-            if (j > 0) {
-
-                // if all words found in order return true
-                if (j == searchTokens.length) return true;
-
-                // if current word wasn't a search token reset j
-                if (!currentWordIsSearchToken) j = 0;
-            }
-        }
-
-        return false;
-
-    }
 
     // endregion
 

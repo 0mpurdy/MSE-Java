@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
  * Created by michaelpurdy on 23/12/2015.
@@ -417,6 +418,18 @@ public class HtmlReader {
         return Author.getFromString(currentLine);
     }
 
+    public String[] getSearchTokens() throws IOException {
+
+        String tokensIdentifier = "<p>Searched: ";
+
+        String currentLine = br.readLine();
+        while ((currentLine != null) && !currentLine.contains(tokensIdentifier)) {
+            currentLine = br.readLine();
+        }
+        currentLine = currentLine.substring(currentLine.indexOf(tokensIdentifier) + tokensIdentifier.length(), currentLine.indexOf("</p>"));
+        return currentLine.split(Pattern.quote(", "));
+    }
+
     // endregion
 
     private void log(LogLevel logLevel, String message) {
@@ -500,7 +513,7 @@ public class HtmlReader {
         boolean firstCloseDiv = true;
 
         String currentline = br.readLine();
-        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container padded\">")) {
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container\">")) {
             currentline = br.readLine();
         }
         if (checkEndAuthorResults(currentline)) return null;

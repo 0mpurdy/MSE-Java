@@ -275,19 +275,26 @@ public class FXMLSearchController implements Initializable {
 
         logger.openLog();
 
-        int type = 1;
+
         String refineText = searchBox.getText();
         logger.log(LogLevel.INFO,"Refined by: " + refineText);
 
-        if (refineText.charAt(0) == '!') {
-            type = 0;
+        boolean contains = !(refineText.charAt(0) == '!');
+
+        if (!contains) {
             refineText = refineText.substring(1);
             progressLabel.setText("Search doesn't include \"" + refineText + "\"");
         } else {
             progressLabel.setText("Search includes \"" + refineText + "\"");
         }
 
-        RefineThread refineThread = new RefineThread(cfg, logger);
+        String[] refineTokens = null;
+
+        if (!refineText.equals("")) {
+            refineTokens = HtmlHelper.tokenizeLine(refineText);
+        }
+
+        RefineThread refineThread = new RefineThread(cfg, logger, contains, refineTokens);
         refineThread.start();
 
     }
@@ -455,11 +462,11 @@ public class FXMLSearchController implements Initializable {
 
             previousSearchWriter.close();
 
-            File resultsFile = new File(cfg.getResDir() + cfg.getResultsFileName());
+            File resultsFile = new File(cfg.getResDir() + cfg.getResultsFile());
             PrintWriter resultsWriter;
             resultsFile.getParentFile().mkdirs();
             resultsFile.createNewFile();
-            resultsWriter = new PrintWriter(cfg.getResDir() + cfg.getResultsFileName());
+            resultsWriter = new PrintWriter(cfg.getResDir() + cfg.getResultsFile());
             HtmlHelper.writeHtmlHeader(resultsWriter, "Results", "../../mseStyle.css");
             resultsWriter.println("\n<body>\n</body>\n</html>");
 

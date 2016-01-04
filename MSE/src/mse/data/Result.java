@@ -1,6 +1,7 @@
 package mse.data;
 
 import mse.helpers.HtmlHelper;
+import mse.search.SearchType;
 
 import java.util.regex.Pattern;
 
@@ -38,6 +39,8 @@ public class Result implements IResult {
         this.hymnBookLink = hymnBookLink;
     }
 
+    // endregion
+
     // region blockConstructors
 
     public Result(Author author, String resultBlock, String[] searchWords) {
@@ -66,7 +69,7 @@ public class Result implements IResult {
         int i = 0;
         while ((i < lines.length) && !lines[i].contains("mse-half")) i++;
         text = HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[i]));
-        text += "\n" + HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[i + 1]));
+        text += " <!-> " + HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[i + 1]));
 
         String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".htm"));
         String chapter = link.substring(link.lastIndexOf("#") + 1, link.lastIndexOf(":"));
@@ -119,6 +122,24 @@ public class Result implements IResult {
 
     // endregion
 
+    // region refine
+
+    public boolean refine (boolean contains, String[] refineWords) {
+
+        String[] lineTokens = HtmlHelper.tokenizeLine(text);
+
+        if (contains) {
+            return SearchType.SENTENCE.search(lineTokens, refineWords);
+        } else {
+            return !SearchType.SENTENCE.search(lineTokens, refineWords);
+        }
+
+    }
+
+    // endregion
+
+    // region output
+
     public void print() {
         System.out.println(author.getCode() + ": " + reference.getReadableReference());
         System.out.println(text);
@@ -141,10 +162,11 @@ public class Result implements IResult {
     }
 
     public String getHymnsBlock() {
+        String brokenText = text.replace("\n", "<br>");
         String block =  "\t\t\t<div class=\"container padded\">\n" +
                 "\t\t\t\t<a class=\"btn btn-primary\" href=\"" + reference.getPath() + "\" role=\"button\">" +
                 reference.getReadableReference() + "</a>\n" +
-                "\t\t\t\t<div class=\"spaced\">" + getMarkedLine(text) + "</div>\n" +
+                "\t\t\t\t<div class=\"spaced\">" + getMarkedLine(brokenText) + "</div>\n" +
                 "\t\t\t</div>";
         if (newHymnBook) block = hymnBookLink + "\n" + block;
         return block;
@@ -176,4 +198,6 @@ public class Result implements IResult {
     private String getMarkedLine(String line) {
         return HtmlHelper.markLine(author, new StringBuilder(line), searchWords, "mse-mark");
     }
+
+    // endregion
 }

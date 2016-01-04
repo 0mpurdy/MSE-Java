@@ -55,8 +55,8 @@ public class HtmlHelper {
 
     // region resultsPage
 
-    public static String getResultsHeader(String title, String mseStyleLocation) {
-        String header = getHtmlHeader(title, mseStyleLocation);
+    public static String getResultsHeader(String mseStyleLocation) {
+        String header = getHtmlHeader("Results", mseStyleLocation);
         header += "\n<body>" +
                 "\n\t<div class=\"container centered\">" +
                 "\n\t\t<p><img src=\"../../img/results.gif\"></p>";
@@ -87,8 +87,8 @@ public class HtmlHelper {
                 HymnBook.values()[asc.reference.volNum - 1].getName());
     }
 
-    public static String closeAuthorContainer() {
-        return "\t\t</div>";
+    public static void closeAuthorContainer(PrintWriter pw) {
+        pw.println("\t\t</div>");
     }
 
     public static String markLine(Author author, StringBuilder line, String[] words, String emphasis) {
@@ -113,7 +113,7 @@ public class HtmlHelper {
                 charPos = endOfWord;
 
                 // if the word has a letter before it or after it then skip it
-                if (startOfWord >= 0 && Character.isLetter(line.charAt(startOfWord - 1))) continue;
+                if (startOfWord > 0 && Character.isLetter(line.charAt(startOfWord - 1))) continue;
                 if (endOfWord < line.length() && Character.isLetter(line.charAt(endOfWord))) continue;
 
                 // otherwise mark the word
@@ -195,14 +195,14 @@ public class HtmlHelper {
 
     // region tokenHelp
 
-    public static String[] tokenizeLine(String line, AuthorSearchCache asc, ArrayList<LogRow> searchLog) {
+    public static String[] tokenizeLine(String line) {
         line = removeHtml(line);
 
         // split the line into tokens (words) by non-word characters
-        return tokenizeArray(line.split("[\\W]"), asc, searchLog);
+        return tokenizeArray(line.split("[\\W]"));
     }
 
-    public static String[] tokenizeArray(String[] tokens, AuthorSearchCache asc, ArrayList<LogRow> searchLog) {
+    public static String[] tokenizeArray(String[] tokens) {
 
         ArrayList<String> newTokens = new ArrayList<>();
 
@@ -211,10 +211,6 @@ public class HtmlHelper {
             token = token.toUpperCase();
             if (!isAlpha(token)) {
                 token = processString(token);
-            }
-            if (!isAlpha(token)) {
-                searchLog.add(new LogRow(LogLevel.HIGH, "Error processing token " + asc.reference.getShortReadableReference()));
-                token = "";
             }
             newTokens.add(token);
         } // end for each token
@@ -245,6 +241,23 @@ public class HtmlHelper {
         }
 
         return token;
+    }
+
+    // endregion
+
+    // region printableArrays
+
+    public static String printableArray(String[] array) {
+        StringBuilder printableArray = new StringBuilder();
+
+        for (String word : array) {
+            printableArray.append(word).append(", ");
+        }
+
+        if (printableArray.length() < 2) return "";
+
+        // remove last comma
+        return printableArray.toString().substring(0, printableArray.length() - 2);
     }
 
     // endregion

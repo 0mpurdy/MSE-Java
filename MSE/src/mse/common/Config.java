@@ -155,11 +155,11 @@ public class Config {
         return resDir;
     }
 
-    public String getResultsFileName() {
+    public String getResultsFile() {
         return "target" + File.separator + "results" + File.separator + resultsFileName;
     }
 
-    public String getResultsFilePath() {
+    public String getResultsFolder() {
         return "target" + File.separator + "results";
     }
 
