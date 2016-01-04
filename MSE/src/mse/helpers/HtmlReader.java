@@ -1,17 +1,19 @@
-package mse.search;
+package mse.helpers;
 
 import mse.common.LogLevel;
 import mse.common.LogRow;
 import mse.data.Author;
+import mse.search.AuthorSearchCache;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 /**
- * Created by mj_pu_000 on 23/12/2015.
+ * Created by michaelpurdy on 23/12/2015.
  */
 public class HtmlReader {
 
@@ -27,7 +29,9 @@ public class HtmlReader {
         this.searchLog = searchLog;
     }
 
-    public int findNextPage(AuthorSearchCache asc) {
+    // region findAuthorPage
+
+    public int findNextAuthorPage(AuthorSearchCache asc) {
         // set the prevLine in asc to the last line of the previous page
         // return the page number of the next page
         // asc.Line is the page number and br is at the line of the current page number
@@ -68,17 +72,17 @@ public class HtmlReader {
                         // get the current page's number
                         cPageNum = getPageNumber(asc.line, "=", ">");
 
-                        if (asc.pageNum == cPageNum) {
+                        if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
 
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + cPageNum);
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.getShortReadableReference());
+                log(LogLevel.HIGH, "NULL line when reading " + asc.reference.getShortReadableReference());
                 break;
             }
             asc.line = br.readLine();
@@ -114,7 +118,7 @@ public class HtmlReader {
                         cPageNum = Integer.parseInt(cPageNumStr);
 
                         // if it is the previous page
-                        if (asc.pageNum == cPageNum + 1) {
+                        if (asc.reference.pageNum == cPageNum + 1) {
                             asc.prevLine = getLastLineOfBiblePage(br);
 
                             // skip close and open of table and open of row
@@ -130,23 +134,23 @@ public class HtmlReader {
                             cPageNumStr = asc.line.substring(startIndex, endIndex);
                             cPageNum = Integer.parseInt(cPageNumStr);
 
-                            if (asc.pageNum == cPageNum) {
+                            if (asc.reference.pageNum == cPageNum) {
                                 return cPageNum;
                             } else {
                                 // error next page not after previous page
-                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
+                                log(LogLevel.LOW, "Couldn't find search page: " + asc.reference.getShortReadableReference());
                                 return 0;
                             }
-                        } else if (asc.pageNum == cPageNum) {
+                        } else if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.reference.getShortReadableReference());
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.getShortReadableReference());
+                log(LogLevel.HIGH, "NULL line when reading " + asc.reference.getShortReadableReference());
                 break;
             }
             asc.line = br.readLine();
@@ -180,7 +184,7 @@ public class HtmlReader {
                         cPageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
 
                         // if it is the previous page
-                        if (asc.pageNum == cPageNum + 1) {
+                        if (asc.reference.pageNum == cPageNum + 1) {
                             asc.prevLine = getLastLineOfPage(br);
 
                             // set found page get page number
@@ -195,23 +199,23 @@ public class HtmlReader {
 
                             cPageNum = Integer.parseInt(asc.line.substring(asc.line.indexOf("=") + 1, asc.line.indexOf('>')));
 
-                            if (asc.pageNum == cPageNum) {
+                            if (asc.reference.pageNum == cPageNum) {
                                 return cPageNum;
                             } else {
                                 // error next page not after previous page
-                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.volNum + ":" + asc.pageNum);
+                                log(LogLevel.LOW, "Couldn't find search page: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + asc.reference.pageNum);
                                 return 0;
                             }
-                        } else if (asc.pageNum == cPageNum) {
+                        } else if (asc.reference.pageNum == cPageNum) {
                             return cPageNum;
                         }
                     } catch (NumberFormatException nfe) {
-                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.volNum + ":" + cPageNum);
+                        log(LogLevel.HIGH, "Error formatting page number in search: " + asc.author.getCode() + " " + asc.reference.volNum + ":" + cPageNum);
                         return 0;
                     }
                 }
             } else {
-                log(LogLevel.HIGH, "NULL line when reading " + asc.author.getCode() + " vol " + asc.volNum + " page " + asc.pageNum);
+                log(LogLevel.HIGH, "NULL line when reading " + asc.author.getCode() + " vol " + asc.reference.volNum + " page " + asc.reference.pageNum);
                 break;
             }
             asc.line = br.readLine();
@@ -222,11 +226,15 @@ public class HtmlReader {
         return 0;
     }
 
+    // endregion
+
     private int getPageNumber(String line, String splitStart, String splitEnd) {
         int start = line.indexOf(splitStart) + splitStart.length();
         int end = line.indexOf(splitEnd, start);
         return Integer.parseInt(line.substring(start, end));
     }
+
+    // region getLastLine
 
     private String getLastLineOfBiblePage(BufferedReader br) throws IOException {
         // returns the last darby line of the bible and moves
@@ -279,6 +287,10 @@ public class HtmlReader {
 
     }
 
+    // endregion
+
+    // region getAuthorSectionHeader
+
     public String getNextSectionHeader(AuthorSearchCache asc) {
         // returns the line that contains the class of the next section
 
@@ -291,7 +303,7 @@ public class HtmlReader {
             } else if (asc.author.equals(Author.BIBLE)) {
 
                 // if still in same section do not change section header
-                if (!asc.isSearchingDarby()) return asc.currentSectionHeader;
+                if (!asc.brl.isSearchingDarby()) return asc.currentSectionHeader;
 
                 // skip a line
                 br.readLine();
@@ -317,7 +329,7 @@ public class HtmlReader {
 
     }
 
-    public String getNextSection(AuthorSearchCache asc) {
+    public String getNextAuthorSection(AuthorSearchCache asc) {
 
         try {
 
@@ -325,17 +337,16 @@ public class HtmlReader {
                 return br.readLine();
             } else if (asc.author.equals(Author.BIBLE)) {
                 String line = "";
-                if (asc.isSearchingDarby()) {
 
-                    // skip verse number
-                    br.readLine();
+                // skip verse number
+                br.readLine();
 
-                    // read jnd
-                    line = br.readLine();
+                // read jnd
+                line = br.readLine();
 
-                } else {
-                    line = br.readLine();
-                }
+                // add kjv
+                line += " <!-> " + br.readLine();
+
                 return line;
             } else if (asc.author.equals(Author.HYMNS)) {
 
@@ -360,8 +371,7 @@ public class HtmlReader {
         return null;
     }
 
-
-    public String getFirstSectionHeader(AuthorSearchCache asc)  {
+    public String getFirstAuthorSectionHeader(AuthorSearchCache asc) {
         try {
             if (asc.author.isMinistry()) {
                 // skip a line
@@ -391,8 +401,39 @@ public class HtmlReader {
 
     }
 
+    // endregion
+
+    // region readResults
+
+    String authorIdentifier = "Results of search through";
+
+    public Author findNextAuthor() throws IOException {
+        String currentLine = br.readLine();
+        while ((currentLine != null) && !currentLine.contains(authorIdentifier)) {
+            currentLine = br.readLine();
+        }
+        if (currentLine == null) return null;
+        currentLine = HtmlHelper.removeHtml(currentLine);
+        currentLine = currentLine.substring(currentLine.indexOf(authorIdentifier) + authorIdentifier.length() + 1);
+        return Author.getFromString(currentLine);
+    }
+
+    public String[] getSearchTokens() throws IOException {
+
+        String tokensIdentifier = "<p>Searched: ";
+
+        String currentLine = br.readLine();
+        while ((currentLine != null) && !currentLine.contains(tokensIdentifier)) {
+            currentLine = br.readLine();
+        }
+        currentLine = currentLine.substring(currentLine.indexOf(tokensIdentifier) + tokensIdentifier.length(), currentLine.indexOf("</p>"));
+        return currentLine.split(Pattern.quote(", "));
+    }
+
+    // endregion
+
     private void log(LogLevel logLevel, String message) {
-        searchLog.add(new LogRow(logLevel,message));
+        searchLog.add(new LogRow(logLevel, message));
     }
 
     public void close() {
@@ -412,5 +453,95 @@ public class HtmlReader {
             e.printStackTrace();
         }
         return contentLine;
+    }
+
+    // region refine
+
+    public String getNextResult(Author author) throws IOException {
+        switch (author) {
+            case BIBLE:
+                return getNextBibleResult();
+            case HYMNS:
+                return getNextHymnsResult();
+            default:
+                return getNextMinistryResult();
+        }
+    }
+
+    private String getNextBibleResult() throws IOException {
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("btn")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("</table>")) {
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    private String getNextHymnsResult() throws IOException {
+
+        // this is to check that the first of the closing div tags is ignored
+        boolean firstCloseDiv = true;
+
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container padded\">")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && (!currentline.contains("</div>") || firstCloseDiv)) {
+            if (currentline.contains("</div>")) firstCloseDiv = false;
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    private String getNextMinistryResult() throws IOException {
+
+        // this is to check that the first of the closing div tags is ignored
+        boolean firstCloseDiv = true;
+
+        String currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && !currentline.contains("<div class=\"container\">")) {
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        String result = currentline;
+        currentline = br.readLine();
+        while (!checkEndAuthorResults(currentline) && (!currentline.contains("</div>") || firstCloseDiv)) {
+            if (currentline.contains("</div>")) firstCloseDiv = false;
+            result += "\n" + currentline;
+            currentline = br.readLine();
+        }
+        if (checkEndAuthorResults(currentline)) return null;
+        result += "\n" + currentline;
+        return result;
+    }
+
+    // endregion
+
+    private String getAuthorResultStartString(Author author) {
+        switch (author) {
+            case BIBLE:
+            case HYMNS:
+                return "btn";
+            default:
+                return "container";
+        }
+    }
+
+    private boolean checkEndAuthorResults(String line) {
+        return (line == null) || line.contains("Number of results for");
     }
 }

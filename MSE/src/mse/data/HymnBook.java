@@ -40,4 +40,16 @@ public enum HymnBook {
     public String getOutputFilename() {
         return filename + ".htm";
     }
+
+    public static int getIndexFromString(String bookName) {
+        for (HymnBook nextBook :values()) {
+            if (nextBook.filename.equalsIgnoreCase(bookName)) {
+                return nextBook.ordinal();
+            }
+        }
+        for (HymnBook nextBook : values()) {
+            if (nextBook.getName().equalsIgnoreCase(bookName)) return nextBook.ordinal();
+        }
+        return -1;
+    }
 }

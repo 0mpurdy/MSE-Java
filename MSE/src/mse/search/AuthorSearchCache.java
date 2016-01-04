@@ -1,8 +1,11 @@
 package mse.search;
 
 import mse.common.Config;
+import mse.common.LogRow;
 import mse.data.*;
+import mse.helpers.HtmlHelper;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -16,20 +19,15 @@ public class AuthorSearchCache {
     public AuthorIndex authorIndex;
     public Author author;
 
+    public Reference reference;
+    public BibleResultsLogic brl;
+
     public short[] referencesToSearch;
     public int refIndex;
 
     private String searchString;
 
     private boolean wildSearch;
-
-    private boolean writtenBibleSearchTableHeader;
-    private boolean writtenBibleSearchTableFooter;
-    private boolean searchingDarby;
-    private boolean foundDarby;
-    public String previousDarbyLine;
-
-    private int verseNum;
 
     String[] searchWords;
     private String[] searchTokens;
@@ -43,15 +41,13 @@ public class AuthorSearchCache {
 
     public int numAuthorResults;
 
-    public int volNum;
-    public int pageNum;
-
     public short nextRef;
 
     public String line;
     public String currentSectionHeader;
     public String prevLine;
-    private SearchScope searchScope;
+    private SearchType searchType;
+    public boolean notFoundCurrentHymnBook;
 
     public AuthorSearchCache(Config cfg, AuthorIndex authorIndex, Search search) {
         this.cfg = cfg;
@@ -63,51 +59,25 @@ public class AuthorSearchCache {
         this.searchString = search.getSearchString();
         this.wildSearch = search.getWildSearch();
 
-        this.searchScope = search.getSearchScope();
+        this.searchType = search.getSearchType();
 
-        this.writtenBibleSearchTableHeader = false;
-        this.writtenBibleSearchTableFooter = false;
-        this.searchingDarby = true;
-        this.foundDarby = false;
-
-        this.verseNum = 0;
+        this.brl = new BibleResultsLogic();
+        this.reference = new Reference(author, 0,0,0);
 
         tooFrequentTokens = "";
 
         infrequentTokens = new ArrayList<>();
     }
 
-    public void getNextPage() {
-        if (refIndex >= referencesToSearch.length) {
-            volNum = 0;
-            pageNum = 0;
-            return;
-        }
+    // region setup
 
-        nextRef = referencesToSearch[refIndex++];
-
-        if (nextRef < 0) {
-            volNum = -nextRef;
-            nextRef = referencesToSearch[refIndex++];
-            pageNum = nextRef;
-        } else {
-            pageNum = nextRef;
-        }
+    public int setup(ArrayList<LogRow> searchLog) {
+        setSearchWords();
+        setSearchTokens(searchLog);
+        return setLeastFrequentToken();
     }
 
-    public String getAuthorCode() {
-        return author.getCode();
-    }
-
-    public String getLeastFrequentToken() {
-        return leastFrequentToken;
-    }
-
-    public String[] getSearchWords() {
-        return searchWords;
-    }
-
-    public void setSearchWords() {
+    private void setSearchWords() {
         // this sets the array of search words
 
         StringBuilder searchWordsBuilder = new StringBuilder();
@@ -116,13 +86,29 @@ public class AuthorSearchCache {
         if (searchString.contains("*")) {
             if (wildSearch) {
 
+                // 0 = at start
+                // 1 = at end
+                // 2 = contains
+                int type;
+
+                // check type of wildcard search
+                if (searchString.charAt(0) == '*') {
+                    if (searchString.charAt(searchString.length() - 1) == '*') {
+                        type = 2;
+                    } else {
+                        type = 1;
+                    }
+                } else {
+                    type = 0;
+                }
+
                 // remove the stars from the search string
-                String bareSearchString = searchString.replace("*", "");
-                bareSearchString = bareSearchString.toUpperCase();
+                String wildToken = searchString.replace("*", "");
+                wildToken = wildToken.toUpperCase();
 
                 for (String nextWord : authorIndex.getTokenCountMap().keySet()) {
 
-                    if (nextWord.contains(bareSearchString)) {
+                    if (wildWordCheck(type, wildToken, nextWord)) {
 
                         // add the word to the list of words to be searched (with
                         // a comma if it isn't the first word
@@ -143,40 +129,15 @@ public class AuthorSearchCache {
         }
     }
 
-    public String[] getSearchTokens() {
-        return searchTokens;
-    }
-
-    public void setSearchTokens(String[] searchTokens) {
-        this.searchTokens = searchTokens;
-    }
-
-    public String printableSearchWords() {
-        return printableArray(searchWords);
-    }
-
-    public String printableSearchTokens() {
-        return printableArray(searchTokens);
-    }
-
-    public String printableArray(String[] array) {
-        StringBuilder printableArray = new StringBuilder();
-
-        for (String word : array) {
-            printableArray.append(word).append(", ");
+    private void setSearchTokens(ArrayList<LogRow> searchLog) {
+        if (getWildSearch()) {
+            this.searchTokens = getSearchWords();
+        } else {
+            this.searchTokens = HtmlHelper.tokenizeLine(getSearchString());
         }
-
-        if (printableArray.length() < 2) return "";
-
-        // remove last comma
-        return printableArray.toString().substring(0, printableArray.length() - 2);
     }
 
-    public String getTooFrequentTokens() {
-        return tooFrequentTokens;
-    }
-
-    public int setLeastFrequentToken() {
+    private int setLeastFrequentToken() {
         // sets the least frequent token and returns the number of infrequent tokens found
 
         boolean foundToken = false;
@@ -241,31 +202,70 @@ public class AuthorSearchCache {
         return errorNum;
     }
 
-    public ArrayList<String> getInfrequentTokens() {
-        return infrequentTokens;
+    // endregion
+
+    // region increments
+
+    public void getNextPage() {
+        if (refIndex >= referencesToSearch.length) {
+            reference.volNum = 0;
+            reference.pageNum = 0;
+            return;
+        }
+
+        nextRef = referencesToSearch[refIndex++];
+
+        if (nextRef < 0) {
+            reference.volNum = -nextRef;
+            nextRef = referencesToSearch[refIndex++];
+            reference.pageNum = nextRef;
+        } else {
+            reference.pageNum = nextRef;
+        }
     }
 
-    public int getNumInfrequentTokens() {
-        return numInfrequentTokens;
+    public void incrementResults() {
+        if (author != Author.BIBLE) {
+            numAuthorResults++;
+        } else if (brl.searchingDarby || !brl.foundDarby) {
+            numAuthorResults++;
+        }
     }
 
-    public String getSearchString() {
-        return searchString;
+    // endregion
+
+    // region checks
+
+    private boolean wildWordCheck(int type, String wildToken, String word) {
+        return ((type == 0 && word.startsWith(wildToken)) ||
+                type == 1 && word.endsWith(wildToken) ||
+                type == 2 && word.contains(wildToken));
     }
 
-    public String getAuthorName() {
-        return author.getName();
+    private boolean checkAdjacent(short a, short b) {
+        return a == b || (a + 1) == b || a == (b + 1);
     }
 
-    public boolean getWildSearch() {
-        return wildSearch;
+    // endregion
+
+    // region refine
+
+    public void setupReferences() {
+        setReferencesToSearch();
+        refineReferences();
+        refIndex = 0;
     }
 
-    public void setReferencesToSearch() {
+    private void setReferencesToSearch() {
+        // add all the references for the least frequent token to the referencesToSearch array
         referencesToSearch = authorIndex.getReferences(getLeastFrequentToken());
     }
 
-    public void refineReferences() {
+    private void refineReferences() {
+        // if there is more than one infrequent word
+        // refine the number of references (combine if wild,
+        // if not wild only use references where each word is found within 1 page
+
         if (numInfrequentTokens > 1) {
 
             // refine the references to search
@@ -280,18 +280,7 @@ public class AuthorSearchCache {
         } // end multiple search tokens
     }
 
-    public String getShortReadableReference() {
-        if (author.isMinistry()) {
-            return author.getCode() + "vol " + volNum + ":" + pageNum;
-        } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
-        } else if (author.equals(Author.HYMNS)) {
-            return HymnBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
-        }
-        return "Can't get short readable reference";
-    }
-
-    public short[] refineSingleToken(String token) {
+    private short[] refineSingleToken(String token) {
         ArrayList<Short> newListOfReferences = new ArrayList<>();
 
         // current volume, page number and reference for "Current Ref To Search" and "Current Extra Reference"
@@ -479,97 +468,55 @@ public class AuthorSearchCache {
         return newReferencesArray;
     }
 
-    private boolean checkAdjacent(short a, short b) {
-        return a == b || (a + 1) == b || a == (b + 1);
+    // endregion
+
+    // region publicGetters
+
+    public String getAuthorCode() {
+        return author.getCode();
     }
 
-    public SearchScope getSearchScope() {
-        return searchScope;
+    public String getSearchString() {
+        return searchString;
     }
 
-    public void setFoundDarby(boolean foundToken) {
-        if (author == Author.BIBLE && searchingDarby) foundDarby = foundToken;
+    public String getAuthorName() {
+        return author.getName();
     }
 
-    public void incrementResults() {
-        if (author != Author.BIBLE) {
-            numAuthorResults++;
-        } else if (searchingDarby || !foundDarby) {
-            numAuthorResults++;
-        }
+    public boolean getWildSearch() {
+        return wildSearch;
     }
 
-    public boolean isWrittenBibleSearchTableHeader() {
-        return writtenBibleSearchTableHeader;
+    public String getTooFrequentTokens() {
+        return tooFrequentTokens;
     }
 
-    public boolean isWrittenBibleSearchTableFooter() {
-        return writtenBibleSearchTableFooter;
+    public SearchType getSearchType() {
+        return searchType;
     }
 
-    public void setWrittenBibleSearchTableHeader(boolean writtenBibleSearchTableHeader) {
-        this.writtenBibleSearchTableHeader = writtenBibleSearchTableHeader;
+    public String getLeastFrequentToken() {
+        return leastFrequentToken;
     }
 
-    public void setWrittenBibleSearchTableFooter(boolean writtenBibleSearchTableFooter) {
-        this.writtenBibleSearchTableFooter = writtenBibleSearchTableFooter;
+    public String[] getSearchWords() {
+        return searchWords;
     }
 
-    public boolean isSearchingDarby() {
-        return searchingDarby;
+    public String[] getSearchTokens() {
+        return searchTokens;
     }
 
-    public ArrayList<String> finishSearchingSingleBibleScope(String line, ArrayList<String> resultText, boolean foundToken) {
+    // endregion
 
-        // if already written the header (found a result) and searching kjv
-        if (writtenBibleSearchTableHeader && !searchingDarby) {
-
-            if (!foundToken) {
-                resultText.add("<td>" + removeHtml(line) + "</td>");
-            }
-
-            resultText.add("\t\t</tr>");
-            resultText.add("\t</table>");
-
-            writtenBibleSearchTableHeader = false;
-
-            // if searching jnd and not yet found a result
-        } else if (searchingDarby && !writtenBibleSearchTableHeader) previousDarbyLine = line;
-
-        searchingDarby = !searchingDarby;
-
-        return resultText;
+    public String printableSearchWords() {
+        return HtmlHelper.printableArray(searchWords);
     }
 
-    public int getVerseNum() {
-        return verseNum;
+    public String printableSearchTokens() {
+        return HtmlHelper.printableArray(searchTokens);
     }
 
-    public void setVerseNum(int verseNum) {
-        this.verseNum = verseNum;
-    }
 
-    private String removeHtml(String line) {
-        return removeHtml(new StringBuilder(line)).toString();
-    }
-
-    private StringBuilder removeHtml(StringBuilder line) {
-        int charPos = 0;
-
-        while (++charPos < line.length()) {
-            if (line.charAt(charPos) == '<') {
-                int tempCharIndex = charPos + 1;
-                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
-                tempCharIndex++;
-                line.replace(charPos, tempCharIndex, "");
-            }
-        }
-
-        return line;
-    }
-
-    public void incrementVerseNum() {
-
-        if (searchingDarby) verseNum++;
-    }
 }

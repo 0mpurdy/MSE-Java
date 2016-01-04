@@ -13,6 +13,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import mse.data.Search;
 import mse.helpers.HtmlHelper;
+import mse.refine.RefineThread;
 import mse.search.*;
 import mse.common.*;
 
@@ -21,7 +22,6 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javafx.beans.value.ChangeListener;
@@ -170,14 +170,14 @@ public class FXMLSearchController implements Initializable {
 
             // add search scopes to menu
             ToggleGroup scopeToggleGroup = new ToggleGroup();
-            for (SearchScope scope : SearchScope.values()) {
+            for (SearchType scope : SearchType.values()) {
                 RadioMenuItem nextScopeRadioMenuItem = new RadioMenuItem(scope.getMenuName());
-                if (scope == cfg.getSearchScope()) nextScopeRadioMenuItem.setSelected(true);
-                if (scope == SearchScope.CLAUSE) defaultSearchScope = nextScopeRadioMenuItem;
+                if (scope == cfg.getSearchType()) nextScopeRadioMenuItem.setSelected(true);
+                if (scope == SearchType.MATCH) defaultSearchScope = nextScopeRadioMenuItem;
                 nextScopeRadioMenuItem.setToggleGroup(scopeToggleGroup);
                 nextScopeRadioMenuItem.setOnAction(event -> {
                     int scopeIndex = scopeMenu.getItems().indexOf(event.getSource());
-                    cfg.setSearchScope(SearchScope.values()[scopeIndex]);
+                    cfg.setSearchType(SearchType.values()[scopeIndex]);
                 });
                 scopeMenu.getItems().add(nextScopeRadioMenuItem);
             }
@@ -270,6 +270,54 @@ public class FXMLSearchController implements Initializable {
         }
     }
 
+    @FXML
+    public void handlesRefine(ActionEvent e) {
+
+        logger.openLog();
+
+
+        String refineText = searchBox.getText();
+        logger.log(LogLevel.INFO,"Refined by: " + refineText);
+
+        boolean contains = !(refineText.charAt(0) == '!');
+
+        if (!contains) {
+            refineText = refineText.substring(1);
+            progressLabel.setText("Search doesn't include \"" + refineText + "\"");
+        } else {
+            progressLabel.setText("Search includes \"" + refineText + "\"");
+        }
+
+        String[] refineTokens = null;
+
+        if (!refineText.equals("")) {
+            refineTokens = HtmlHelper.tokenizeLine(refineText);
+        }
+
+        RefineThread refineThread = new RefineThread(cfg, logger, contains, refineTokens);
+        refineThread.start();
+
+    }
+
+    @FXML
+    public void handlesSelectAll(ActionEvent e) {
+
+        boolean allSelected = true;
+
+        for (CheckBox nextCheckBox : checkboxes) {
+            if (!nextCheckBox.isSelected()) {
+                allSelected = false;
+                nextCheckBox.setSelected(true);
+            }
+        }
+
+        if (allSelected) {
+            for (CheckBox nextCheckBox : checkboxes) {
+                nextCheckBox.setSelected(false);
+            }
+        }
+    }
+
     private void addPreviousSearch(String searchString) throws IOException {
 
         File previousSearchFile = new File(cfg.getPrevSearchesFile());
@@ -291,6 +339,8 @@ public class FXMLSearchController implements Initializable {
         previousSearchWriter.close();
     }
 
+    // region fileMenu
+
     @FXML
     public void handlesPreviousSearches(ActionEvent e) {
         File previousSearches = new File(cfg.getPrevSearchesFile());
@@ -310,37 +360,9 @@ public class FXMLSearchController implements Initializable {
         System.exit(0);
     }
 
-    @FXML
-    public void handlesViewIndexes(ActionEvent e) {
-        // check if any authors are selected
-//        if (cfg.isAnyAuthorSelected()) {
-//
-//            // get which authors to search
-//            HashMap<String, Boolean> authors = cfg.getSelectedAuthors();
-//            ArrayList<Author> authorsToSearch = new ArrayList<>();
-//            for (Author nextAuthor : Author.values()) {
-//                if (!nextAuthor.isSearchable()) continue;
-//                if (authors.get(nextAuthor.getCode())) {
-//                    authorsToSearch.add(nextAuthor);
-//                }
-//            }
-//
-//            if (authorsToSearch.size() <= 1) {
-//
-//                ViewIndexThread viewIndexThread = new ViewIndexThread(cfg, logger, authorsToSearch, indexStore);
-//                viewIndexThread.start();
-//            } else {
-//                progressLabel.setText("Only one author may be selected");
-//                logger.log(LogLevel.INFO, "Only one author may be selected");
-//                logger.closeLog();
-//            }
-//
-//        } else {
-//            progressLabel.setText("Only one author may be selected");
-//            logger.log(LogLevel.INFO, "Only one author may be selected");
-//            logger.closeLog();
-//        }
-    }
+    // endregion
+
+    // region helpMenu
 
     @FXML
     public void handlesSearchEngineHelp(ActionEvent e) {
@@ -382,29 +404,9 @@ public class FXMLSearchController implements Initializable {
         }
     }
 
-    @FXML
-    public void handlesRefine(ActionEvent e) {
-        progressLabel.setText("This functionality hasn't been implemented yet");
-    }
+    // endregion
 
-    @FXML
-    public void handlesSelectAll(ActionEvent e) {
-
-        boolean allSelected = true;
-
-        for (CheckBox nextCheckBox : checkboxes) {
-            if (!nextCheckBox.isSelected()) {
-                allSelected = false;
-                nextCheckBox.setSelected(true);
-            }
-        }
-
-        if (allSelected) {
-            for (CheckBox nextCheckBox : checkboxes) {
-                nextCheckBox.setSelected(false);
-            }
-        }
-    }
+    // region advancedMenu
 
     @FXML
     public void handlesViewLogFile(ActionEvent e) {
@@ -459,10 +461,22 @@ public class FXMLSearchController implements Initializable {
             previousSearchWriter.println("\n<body>\n\t<p>\n\t\t<ul>");
 
             previousSearchWriter.close();
+
+            File resultsFile = new File(cfg.getResDir() + cfg.getResultsFile());
+            PrintWriter resultsWriter;
+            resultsFile.getParentFile().mkdirs();
+            resultsFile.createNewFile();
+            resultsWriter = new PrintWriter(cfg.getResDir() + cfg.getResultsFile());
+            HtmlHelper.writeHtmlHeader(resultsWriter, "Results", "../../mseStyle.css");
+            resultsWriter.println("\n<body>\n</body>\n</html>");
+
+            resultsWriter.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
     }
+
+    // endregion
 
 //    removed to save having to use gson lib
 //    private Config readConfig() {

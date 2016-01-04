@@ -85,4 +85,10 @@ public enum BibleBook {
         return numChapters;
     }
 
+    public static int getIndexFromString(String bookName) {
+        for (BibleBook nextBook : values()) {
+            if (nextBook.getName().equalsIgnoreCase(bookName)) return nextBook.ordinal();
+        }
+        return -1;
+    }
 }

@@ -1,6 +1,7 @@
 package mse.search;
 
 import mse.common.LogRow;
+import mse.data.IResult;
 
 import java.util.ArrayList;
 
@@ -11,7 +12,7 @@ public abstract class SingleSearchThread extends Thread {
 
     abstract ArrayList<LogRow> getLog();
 
-    abstract ArrayList<String> getResults();
+    abstract ArrayList<IResult> getResults();
 
     abstract int getNumberOfResults();
 

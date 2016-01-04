@@ -4,9 +4,7 @@ import mse.common.Config;
 import mse.common.ILogger;
 import mse.common.LogLevel;
 import mse.common.LogRow;
-import mse.data.Author;
-import mse.data.AuthorIndex;
-import mse.data.Search;
+import mse.data.*;
 import mse.helpers.HtmlHelper;
 
 import java.awt.*;
@@ -48,25 +46,10 @@ public class SearchThread extends Thread {
     @Override
     public void run() {
 
-//        if (authorsToSearch.contains(Author.BIBLE)) {
-//
-//            // search the bible
-//            AuthorSearchCache asc = new AuthorSearchCache(cfg, indexStore.getIndex(logger, Author.BIBLE),search);
-//
-//            BibleSearchThread bibleSearchThread = new BibleSearchThread(cfg, asc, progress);
-//            singleSearchThreads.add(bibleSearchThread);
-//
-//            bibleSearchThread.start();
-//
-//        }
-
         // for each author to be searched
         for (Author nextAuthor : authorsToSearch) {
 
             if (!nextAuthor.isSearchable()) continue;
-
-//            ArrayList<LogRow> searchLog = new ArrayList<>();
-//            searchLogs.add(searchLog);
 
             AuthorIndex nextAuthorIndex = indexStore.getIndex(logger, nextAuthor);
 
@@ -77,17 +60,13 @@ public class SearchThread extends Thread {
 
             nextAuthorSearchThread.start();
 
-//            searchAuthor(resultText, nextAuthor, search, indexStore);
-//            resultText.add("Number of results for " + nextAuthor.getName() + ": " + search.getNumAuthorResults());
-//            search.clearAuthorValues();
-
         } // end searching each author
 
 
         // write the results
 
         // try to open and write to the results file
-        File resultsFile = new File(cfg.getResDir() + cfg.getResultsFileName());
+        File resultsFile = new File(cfg.getResDir() + cfg.getResultsFile());
         if (!resultsFile.exists()) {
             resultsFile.getParentFile().mkdirs();
             try {
@@ -99,15 +78,32 @@ public class SearchThread extends Thread {
 
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
-            HtmlHelper.getResultsHeaderLines("Results", "../../mseStyle.css").forEach(pwResults::println);
+            pwResults.println(HtmlHelper.getResultsHeader("../../mseStyle.css"));
 
             // join all the threads
             for (SingleSearchThread nextThread : singleSearchThreads) {
                 try {
                     nextThread.join();
 
-                    nextThread.getResults().forEach(pwResults::println);
+                    AuthorSearchCache asc = ((AuthorSearchThread) nextThread).getAsc();
+
+                    // write the author header
+                    pwResults.println(HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()));
+
+                    // write all the results / errors
+                    for (IResult result : nextThread.getResults()) {
+                        pwResults.println(result.getBlock());
+                    }
+
+                    HtmlHelper.closeAuthorContainer(pwResults);
+
+                    // write the number of results for the author
+                    pwResults.println(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
+
+                    // write the log
                     nextThread.getLog().forEach(logger::log);
+
+                    // add the number of search results to the total
                     search.addAuthorSearchResults(nextThread.getNumberOfResults());
 
                 } catch (InterruptedException e) {
@@ -115,8 +111,8 @@ public class SearchThread extends Thread {
                 }
             }
 
-            pwResults.println("\n\t<div class=\"spaced\">Number of total results: " + search.getTotalSearchResults() + "</div>");
-            pwResults.println(HtmlHelper.getHtmlFooter("</div>"));
+            pwResults.println("\n\t\t<div class=\"spaced\">Number of total results: " + search.getTotalSearchResults() + "</div>");
+            pwResults.println(HtmlHelper.getHtmlFooter("\t</div>"));
 
         } catch (FileNotFoundException fnfe) {
 
@@ -124,12 +120,10 @@ public class SearchThread extends Thread {
 
         }
 
-//        search.setProgress("Done", 1.0);
-
         progress.set(1000 * authorsToSearch.size() + 1);
 
         try {
-            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFileName()));
+            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFile()));
         } catch (IOException | IllegalArgumentException ioe) {
             logger.log(LogLevel.HIGH, "Could not open results file.");
         }

@@ -5,17 +5,16 @@
  */
 package mse.search;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 // mse
 import mse.common.*;
-import mse.data.Author;
-import mse.data.BibleBook;
-import mse.data.HymnBook;
+import mse.data.*;
 import mse.helpers.FileHelper;
 import mse.helpers.HtmlHelper;
+import mse.helpers.HtmlReader;
 
 /**
  * @author michael
@@ -24,11 +23,8 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     private Config cfg;
     private ArrayList<LogRow> searchLog;
-
-    AuthorSearchCache asc;
-
-    private ArrayList<String> authorResults;
-
+    private AuthorSearchCache asc;
+    private ArrayList<IResult> authorResults;
     private AtomicInteger progress;
 
     public AuthorSearchThread(Config cfg, AuthorSearchCache asc, AtomicInteger progress) {
@@ -45,54 +41,31 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         searchAuthor(authorResults, asc);
 
-        authorResults.add(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
-
     }
 
-    private void searchAuthor(ArrayList<String> resultText, AuthorSearchCache asc) {
+    // region search
+
+    private void searchAuthor(ArrayList<IResult> results, AuthorSearchCache asc) {
+        /*
+        search all the words to make sure that all the search tokens are in the author's
+        index. log any words that are too frequent, find the least frequent token and
+        record the number of infrequent words
+        */
 
         log(LogLevel.DEBUG, "\tSearching: " + asc.author.getName() + " for \"" + asc.getSearchString() + "\"");
 
-        // get the search words
-        asc.setSearchWords();
-
-        // add the author header
-        HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()).forEach(resultText::add);
+        // setup searchWords, searchTokens and leastFrequentTokens
+        int errorNum = asc.setup(searchLog);
         log(LogLevel.TRACE, "\tSearch strings: " + asc.printableSearchWords());
-
-        /* Search all the words to make sure that all the search tokens are in the author's
-         * index. log any words that are too frequent, find the least frequent token and
-         * record the number of infrequent words
-         */
-        if (asc.getWildSearch()) {
-            asc.setSearchTokens(asc.getSearchWords());
-        } else {
-            asc.setSearchTokens(tokenizeArray(asc.getSearchWords(), asc.author.getCode(), 0, 0));
-        }
         log(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens());
-
-        int errorNum = asc.setLeastFrequentToken();
 
         if ((asc.getLeastFrequentToken() != null) && (errorNum % 4 < 2)) {
             // at least one searchable token and all tokens in author index
 
-            // add all the references for the least frequent token to the referencesToSearch array
-            asc.setReferencesToSearch();
-
-            // if there is more than one infrequent word
-            // refine the number of references (combine if wild,
-            // if not wild only use references where each word is found within 1 page
-            asc.refineReferences();
-
-            // TODO what is option.fullScan
-
-            // if there are still any references to search
+            asc.setupReferences();
 
             // should be at least two references (volume and page to start)
             if (asc.referencesToSearch.length > 1) {
-
-                // process each page that contains a match
-                asc.refIndex = 0;
 
                 // first two references should be volume and page
                 asc.getNextPage();
@@ -100,16 +73,10 @@ public class AuthorSearchThread extends SingleSearchThread {
                 boolean volumeSuccess = true;
 
                 // for each reference
-                while (asc.volNum != 0 && volumeSuccess) {
+                while (asc.reference.volNum != 0 && volumeSuccess) {
 
-                    if (asc.author.equals(Author.HYMNS)) {
-                        resultText.add(String.format("\t\t<p class=\"%s\"><a href=\"%s\">%s</a></p>",
-                                "results-hymnbook-name",
-                                "..\\..\\" + asc.author.getTargetPath(getVolumeName()),
-                                HymnBook.values()[asc.volNum - 1].getName()));
-                    }
-
-                    volumeSuccess = searchSingleVolume(resultText, asc);
+                    asc.notFoundCurrentHymnBook = true;
+                    volumeSuccess = searchVolume(results, asc);
 
                 } // end one frequent token and all tokens found
 
@@ -119,31 +86,30 @@ public class AuthorSearchThread extends SingleSearchThread {
             }
 
         } else {
-            resultText.add("\t<p>");
+            String error = "\t\t\t<p class=\"centered\">";
             if (errorNum % 4 > 1) {
-                resultText.add("\t\tNot all words were found in index.<br>");
+                error += "Not all words were found in index.";
                 searchLog.add(new LogRow(LogLevel.LOW, "\tTokens in " + asc.author.getCode() + " not all found: " + asc.printableSearchTokens()));
             }
             if (errorNum >= 4) {
-                resultText.add("\t\tSome words appeared too frequently: " + asc.getTooFrequentTokens());
+                error += "Some words appeared too frequently: " + asc.getTooFrequentTokens();
                 searchLog.add(new LogRow(LogLevel.LOW, "\tToo frequent tokens in " + asc.author.getCode() + ": " + asc.getTooFrequentTokens()));
             }
-            resultText.add("\t</p>");
+            error += "</p>";
+            results.add(new ErrorResult(error));
         }
-
-        resultText.add(HtmlHelper.closeAuthorResultsBlock());
     }
 
-    private boolean searchSingleVolume(ArrayList<String> resultText, AuthorSearchCache asc) {
+    private boolean searchVolume(ArrayList<IResult> results, AuthorSearchCache asc) {
         // for each volume
 
-        searchLog.add(new LogRow(LogLevel.TRACE, "\tVol: " + asc.volNum));
+        searchLog.add(new LogRow(LogLevel.TRACE, "\tVol: " + asc.reference.volNum));
 
         int cPageNum = 0;
-        final int cVolNum = asc.volNum;
+        final int cVolNum = asc.reference.volNum;
 
         // get file name
-        String filename = FileHelper.getHtmlFileName(cfg, asc.author, asc.volNum);
+        String filename = FileHelper.getHtmlFileName(cfg, asc.author, asc.reference.volNum);
 
         HtmlReader htmlReader = new HtmlReader(filename, searchLog);
         // start with the first line
@@ -151,27 +117,27 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         progress.addAndGet(1000 / asc.author.getNumVols());
 
-        while (asc.volNum == cVolNum) {
+        while (asc.reference.volNum == cVolNum) {
             // while still in the same volume
             // loop through references
 
             asc.prevLine = "";
 
             // skip to next page and get the last line of the previous page
-            cPageNum = htmlReader.findNextPage(asc);
+            cPageNum = htmlReader.findNextAuthorPage(asc);
 
             // if the page number is 0 log the error and break out
             if (cPageNum == 0) {
-                log(LogLevel.HIGH, "Could not find reference " + asc.getShortReadableReference());
+                log(LogLevel.HIGH, "Could not find reference " + asc.reference.getShortReadableReference());
                 htmlReader.close();
                 return false;
             }
 
-            asc.currentSectionHeader = htmlReader.getFirstSectionHeader(asc);
+            asc.currentSectionHeader = htmlReader.getFirstAuthorSectionHeader(asc);
             if (asc.currentSectionHeader == null) {
-                searchLog.add(new LogRow(LogLevel.HIGH, "NULL line " + asc.getShortReadableReference()));
+                searchLog.add(new LogRow(LogLevel.HIGH, "NULL line " + asc.reference.getShortReadableReference()));
             } else {
-                searchSinglePage(resultText, asc, htmlReader);
+                searchPage(results, asc, htmlReader);
             }
             asc.line = asc.currentSectionHeader;
 
@@ -188,39 +154,29 @@ public class AuthorSearchThread extends SingleSearchThread {
 
     }
 
-    private void searchSinglePage(ArrayList<String> resultText, AuthorSearchCache asc, HtmlReader htmlReader) {
+    private void searchPage(ArrayList<IResult> results, AuthorSearchCache asc, HtmlReader htmlReader) {
 
         boolean foundToken = false;
 
-        asc.setVerseNum(0);
+        asc.reference.verseNum = 0;
 
         // while still on the same page (class != page-number)
         while (isNextSectionSearchable(asc.currentSectionHeader)) {
 
-            asc.line = htmlReader.getNextSection(asc);
+            asc.line = htmlReader.getNextAuthorSection(asc);
 
-            ArrayList<String> stringsToSearch = new ArrayList<>();
+            String section = asc.line;
 
-            // get the searchLine based on the search scope
-            if ((asc.getSearchScope() == SearchScope.SENTENCE) || asc.getSearchScope() == SearchScope.CLAUSE) {
-                stringsToSearch = convertLineIntoSentences(asc.line, getTrailingIncompleteSentence(asc.prevLine));
+            asc.reference.verseNum += asc.brl.verseNumIncrement();
+
+            // search the section
+            if (asc.author == Author.BIBLE) {
+                foundToken = searchBibleSection(results, section, asc) || foundToken;
             } else {
-                stringsToSearch.add(asc.line);
+                foundToken = searchSection(results, section, asc) || foundToken;
             }
 
-            asc.incrementVerseNum();
-
-            // search the scope
-            foundToken = searchScope(resultText, stringsToSearch, asc, foundToken);
-
-            asc.setFoundDarby(foundToken);
-
-            if (asc.author.equals(Author.BIBLE)) {
-                resultText = asc.finishSearchingSingleBibleScope(removeHtml(asc.line), resultText, foundToken);
-                if (asc.getSearchScope() == SearchScope.CLAUSE) {
-                    foundToken = false;
-                }
-            }
+            asc.brl.setFoundDarby(foundToken);
 
             // set the current line as the previous line if it is searchable
             if (isNextSectionSearchable(asc.currentSectionHeader)) {
@@ -233,13 +189,93 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
 
         if (!foundToken) {
-            if (asc.getInfrequentTokens().size() > 1) {
-                searchLog.add(new LogRow(LogLevel.DEBUG, "Did not find token " + asc.getShortReadableReference()));
+            // if exact match only debug level as many references will not have exact matches
+            if (asc.getSearchType() == SearchType.MATCH) {
+                searchLog.add(new LogRow(LogLevel.DEBUG, "Did not find token " + asc.reference.getShortReadableReference()));
             } else {
-                searchLog.add(new LogRow(LogLevel.LOW, "Did not find token " + asc.getShortReadableReference()));
+                searchLog.add(new LogRow(LogLevel.LOW, "Did not find token " + asc.reference.getShortReadableReference()));
             }
         }
     }
+
+    private boolean searchBibleSection(ArrayList<IResult> results, String section, AuthorSearchCache asc) {
+        // return true if jnd OR kjv are valid
+
+        boolean validSection = false;
+
+        String[] lines = section.split(Pattern.quote(" <!-> "));
+
+        String jndSection = lines[0];
+        String kjvSection = lines[1];
+
+        if (searchSection(results, jndSection, asc) || searchSection(results, kjvSection, asc)) {
+            Result result = new Result(asc.author, asc.reference.copy(), section, asc.searchWords);
+            results.add(result);
+            asc.incrementResults();
+            validSection = true;
+        }
+
+        return validSection;
+    }
+
+    private boolean searchSection(ArrayList<IResult> results, String section, AuthorSearchCache asc) {
+
+        ArrayList<String> scopes = getSearchScopes(section, asc.prevLine);
+
+        boolean validSection = false;
+
+        for (String scope : scopes) {
+
+            boolean validScope;
+
+            if (asc.getWildSearch()) {
+                validScope = SearchType.wildSearch(HtmlHelper.tokenizeLine(scope), asc.getSearchTokens());
+            } else {
+                String[] tokenizedLine = HtmlHelper.tokenizeLine(scope);
+                validScope = asc.getSearchType().search(tokenizedLine, asc.getSearchTokens());
+            }
+
+
+            // if the current scope contains all search terms mark them and print it out (or one if it is a wildcard search)
+            if (validScope) {
+
+                validSection = true;
+
+                if (!(asc.author == Author.BIBLE)) {
+
+                    String markedLine = HtmlHelper.markLine(asc.author, new StringBuilder(scope), asc.getSearchWords(), "mse-mark");
+
+                    Result result;
+                    if (asc.author.equals(Author.HYMNS) && asc.notFoundCurrentHymnBook) {
+                        asc.notFoundCurrentHymnBook = false;
+                        result = new Result(asc.author, asc.reference.copy(), markedLine, asc.searchWords,
+                                HtmlHelper.getFormattedHymnbookLink(asc));
+                    } else {
+                        result = new Result(asc.author, asc.reference.copy(), markedLine, asc.searchWords);
+                    }
+                    results.add(result);
+
+                    asc.incrementResults();
+                }
+            }
+        }
+
+        return validSection;
+
+    }
+
+    private ArrayList<String> getSearchScopes(String section, String previousLine) {
+        ArrayList<String> scopes = new ArrayList<>();
+        // get the search lines based on the search scope
+        if ((asc.getSearchType() == SearchType.SENTENCE) || asc.getSearchType() == SearchType.MATCH || asc.getSearchType() == SearchType.PHRASE) {
+            scopes = convertLineIntoSentences(section, getTrailingIncompleteSentence(previousLine));
+        } else {
+            scopes.add(section);
+        }
+        return scopes;
+    }
+
+    // endregion
 
     private boolean isNextSectionSearchable(String sectionHeader) {
 
@@ -254,152 +290,17 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
     }
 
-    private boolean searchScope(ArrayList<String> resultText, ArrayList<String> stringsToSearch, AuthorSearchCache asc, boolean foundToken) {
-
-        for (String scope : stringsToSearch) {
-
-            boolean validScope = false;
-
-            switch (asc.getSearchScope()) {
-                case SENTENCE:
-                    validScope = checkSentenceSearch(scope, asc);
-                    break;
-                case CLAUSE:
-                    validScope = clauseSearch(tokenizeLine(scope, asc), asc.getSearchTokens());
-            }
-
-
-            // if the current scope contains all search terms mark them and print it out (or one if it is a wildcard search)
-            if (validScope) {
-
-                foundToken = true;
-
-                String markedLine = markLine(new StringBuilder(scope), asc.getSearchWords(), "mse-mark");
-
-//                // close any opened blockquote tags
-//                if (markedLine.contains("<blockquote>")) markedLine += "</blockquote>";
-
-                addResultText(resultText, markedLine);
-
-                asc.incrementResults();
-            }
-        }
-
-        return foundToken;
-    }
-
-    private void addResultText(ArrayList<String> resultText, String markedLine) {
-
-        if (asc.author.isMinistry()) {
-
-            resultText.addAll(HtmlHelper.getMinistryResultBlock(
-                    asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum),
-                    getReadableReference(),
-                    markedLine));
-
-        } else if (asc.author.equals(Author.BIBLE)) {
-
-            HtmlHelper.writeBibleResultBlock(resultText, asc, getVolumeName(), getReadableReference(), markedLine);
-
-        } else if (asc.author.equals(Author.HYMNS)) {
-
-            resultText.addAll(HtmlHelper.getHymnsResultBlock(asc.author.getTargetPath(getVolumeName() + "#" + asc.pageNum), getReadableReference(), markedLine));
-
-        }
-
-    }
-
-    private String getReadableReference() {
-        if (asc.author.isMinistry()) {
-            return asc.author.getCode() + " volume " + asc.volNum + " page " + asc.pageNum;
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum - 1].getName() + " chapter " + asc.pageNum + ":" + asc.getVerseNum();
-        } else if (asc.author.equals(Author.HYMNS)) {
-            return Integer.toString(asc.pageNum);
-        }
-
-        return "";
-    }
-
-    private String getVolumeName() {
-        if (asc.author.isMinistry()) {
-            return asc.author.getCode() + asc.volNum + ".htm";
-        } else if (asc.author.equals(Author.BIBLE)) {
-            return BibleBook.values()[asc.volNum - 1].getName() + ".htm";
-        } else if (asc.author.equals(Author.HYMNS)) {
-            return HymnBook.values()[asc.volNum - 1].getOutputFilename();
-        } else {
-            return "";
-        }
-    }
-
-
-    String debugLine;
-
-    // check sentence search
-    private boolean checkSentenceSearch(String scope, AuthorSearchCache asc) {
-        return wordSearch(tokenizeLine(scope, asc), asc.getSearchTokens(), asc.getWildSearch());
-    }
+    // region checkValidScope
 
     boolean foundCurrentSearchToken;
 
-    private boolean wordSearch(String[] currentLineTokens, String[] searchTokens, boolean wildSearch) {
 
-        for (String nextSearchToken : searchTokens) {
-            foundCurrentSearchToken = false;
-            for (String nextLineToken : currentLineTokens) {
-                if (nextSearchToken.equals(nextLineToken)) {
-                    foundCurrentSearchToken = true;
-                    if (wildSearch) return true;
-                }
-            }
-            if (!foundCurrentSearchToken && !asc.getWildSearch()) return false;
-        }
 
-        // if it reaches this point as a wild search then no tokens were found
-        if (wildSearch) return false;
-        return true;
-    }
+    // endregion
 
-    private boolean clauseSearch(String[] currentLineTokens, String[] searchTokens) {
+    private int startOfLastSentencePos;
 
-        boolean toggle = false;
-
-        // read through the clause finding each word in order
-        // return false if reached the end without finding every word
-
-        // true if the next word should be next word in the search tokens
-        boolean currentWordIsSearchToken;
-
-        // position of the next token to find in the search tokens array
-        int j = 0;
-
-        for (int i = 0; i < currentLineTokens.length; i++) {
-
-            if (currentLineTokens[i].equals("")) continue;
-
-            currentWordIsSearchToken = false;
-            if (currentLineTokens[i].equalsIgnoreCase(searchTokens[j])) {
-                j++;
-                currentWordIsSearchToken = true;
-            }
-
-            if (j > 0) {
-
-                // if all words found in order return true
-                if (j == searchTokens.length) return true;
-
-                // if current word wasn't a search token reset j
-                if (!currentWordIsSearchToken) j = 0;
-            }
-
-        }
-
-        return false;
-
-    }
-
-    int startOfLastSentencePos;
+    // region processSection
 
     private String getTrailingIncompleteSentence(String line) {
 
@@ -459,82 +360,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         return sentences;
     }
 
-    StringBuilder lineBuilder = new StringBuilder();
-    int startHtml;
-    int endHtml;
-
-    private String[] tokenizeLine(String line, AuthorSearchCache asc) {
-
-        // if the line contains html - remove the html tag
-        while (line.contains("<")) {
-
-            // set the lineBuilder to the string passed in
-            lineBuilder.setLength(0);
-            lineBuilder.append(line);
-            startHtml = 0;
-            while ((startHtml < lineBuilder.length()) && (lineBuilder.charAt(startHtml) != '<')) {
-                startHtml++;
-            }
-            endHtml = startHtml + 1;
-            while ((endHtml < lineBuilder.length()) && (lineBuilder.charAt(endHtml) != '>')) {
-                endHtml++;
-            }
-            if ((startHtml < lineBuilder.length()) && (endHtml <= lineBuilder.length()))
-                lineBuilder.replace(startHtml, endHtml + 1, "");
-
-            line = lineBuilder.toString();
-        }
-
-        // split the line into tokens (words) by non-word characters
-        return tokenizeArray(line.split("[\\W]"), asc.getAuthorCode(), asc.volNum, asc.pageNum);
-    }
-
-    String[] newTokensArray;
-    ArrayList<String> newTokens = new ArrayList<>();
-
-    private String[] tokenizeArray(String[] tokens, String authorCode, int volNum, int pageNum) {
-
-        newTokens.clear();
-
-        // make each token into a word that can be searched
-        for (String token : tokens) {
-            token = token.toUpperCase();
-            if (!isAlpha(token)) {
-                token = processString(token);
-            }
-            if (!isAlpha(token)) {
-                searchLog.add(new LogRow(LogLevel.HIGH, "Error processing token " + authorCode + " " + volNum + ":" + pageNum + ": " + token));
-                token = "";
-            }
-            newTokens.add(token);
-        } // end for each token
-
-        newTokensArray = new String[newTokens.size()];
-        newTokensArray = newTokens.toArray(newTokensArray);
-
-        return newTokensArray;
-    }
-
-    private boolean isAlpha(String token) {
-        char[] chars = token.toCharArray();
-
-        for (char c : chars) {
-            if (!Character.isLetter(c)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private String processString(String token) {
-        for (char c : token.toCharArray()) {
-            if (!Character.isLetter(c)) {
-                token = token.replace(Character.toString(c), "");
-            }
-        }
-
-        return token;
-    }
+    // endregion
 
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {
         String inString = strIn;
@@ -629,71 +455,11 @@ public class AuthorSearchThread extends SingleSearchThread {
         return outString;
     }
 
-    int charPos = 0;
-    int startOfWord = 0;
-    int endOfWord = 0;
-    String currentCapitalisation;
-
-    private String markLine(StringBuilder line, String[] words, String emphasis) {
-        // highlight all the search words in the line with an html <mark/> tag
-
-        // remove any html already in the line
-        charPos = 0;
-
-        if (!asc.author.equals(Author.HYMNS)) line = removeHtml(line);
-
-        for (String word : words) {
-
-            charPos = 0;
-
-            // while there are still more words matching the current word in the line
-            // and the char position hasn't exceeded the line
-            while (charPos < line.length() && ((startOfWord = line.toString().toLowerCase().indexOf(word.toLowerCase(), charPos)) != -1)) {
-
-                endOfWord = startOfWord + word.length();
-                charPos = endOfWord;
-
-                // if the word has a letter before it or after it then skip it
-                if (startOfWord >= 0 && Character.isLetter(line.charAt(startOfWord - 1))) continue;
-                if (endOfWord < line.length() && Character.isLetter(line.charAt(endOfWord))) continue;
-
-                // otherwise mark the word
-                currentCapitalisation = line.substring(startOfWord, endOfWord);
-                String openDiv = "<span class=\"" + emphasis + "\">";
-                String closeDiv = "</span>";
-                line.replace(startOfWord, endOfWord, openDiv + currentCapitalisation + closeDiv);
-
-                // set the char position to after the word
-                charPos = endOfWord + openDiv.length() + closeDiv.length();
-            }
-        }
-
-        return line.toString();
-    }
-
-    private String removeHtml(String line) {
-        return removeHtml(new StringBuilder(line)).toString();
-    }
-
-    private StringBuilder removeHtml(StringBuilder line) {
-        int charPos = -1;
-
-        while (++charPos < line.length()) {
-            if (line.charAt(charPos) == '<') {
-                int tempCharIndex = charPos + 1;
-                while (tempCharIndex < line.length() - 1 && line.charAt(tempCharIndex) != '>') tempCharIndex++;
-                tempCharIndex++;
-                line.replace(charPos, tempCharIndex, "");
-                charPos = 0;
-            }
-        }
-
-        return line;
-    }
-
     private void log(LogLevel logLevel, String message) {
         searchLog.add(new LogRow(logLevel, message));
     }
+
+    // region singleSearchThreadMethods
 
     @Override
     public ArrayList<LogRow> getLog() {
@@ -701,12 +467,18 @@ public class AuthorSearchThread extends SingleSearchThread {
     }
 
     @Override
-    public ArrayList<String> getResults() {
+    public ArrayList<IResult> getResults() {
         return authorResults;
     }
 
     @Override
-    int getNumberOfResults() {
+    public int getNumberOfResults() {
         return asc.numAuthorResults;
     }
+
+    public AuthorSearchCache getAsc() {
+        return asc;
+    }
+
+    // endregion
 }
