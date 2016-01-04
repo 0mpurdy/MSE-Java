@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class Logger implements ILogger {
 
-    private final String logFilePath = "Log.txt";
+    private final String logFilePath = "log.txt";
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     File loggingFile;

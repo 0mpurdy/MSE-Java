@@ -76,6 +76,9 @@ public class FXMLSearchController implements Initializable {
         // open new logger
         logger = new Logger(LogLevel.INFO);
         logger.openLog();
+        logger.log(LogLevel.INFO, "Started MSE");
+        logger.closeLog();
+        logger.openLog();
 
         // try to recover config options
         cfg = new Config(logger);
