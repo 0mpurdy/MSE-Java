@@ -22,32 +22,27 @@ public class AuthorSearchCache {
     public Reference reference;
     public BibleResultsLogic brl;
 
+    // region search values
+
     public short[] referencesToSearch;
     public int refIndex;
-
     private String searchString;
-
     private boolean wildSearch;
-
     String[] searchWords;
     private String[] searchTokens;
-
     private ArrayList<String> infrequentTokens;
     private String leastFrequentToken;
-
     private String tooFrequentTokens;
-
     private int numInfrequentTokens;
-
     public int numAuthorResults;
-
     public short nextRef;
-
     public String line;
     public String currentSectionHeader;
     public String prevLine;
     private SearchType searchType;
     public boolean notFoundCurrentHymnBook;
+
+    // endregion
 
     public AuthorSearchCache(Config cfg, AuthorIndex authorIndex, Search search) {
         this.cfg = cfg;

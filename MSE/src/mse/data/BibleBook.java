@@ -2,6 +2,8 @@ package mse.data;
 
 public enum BibleBook {
 
+    // region books
+
     GENESIS("Genesis", 50),
     EXODUS("Exodus", 40),
     LEVITICUS("Leviticus", 27),
@@ -69,6 +71,8 @@ public enum BibleBook {
     JUDE("Jude", 1),
     REVELATION("Revelation", 22);
 
+    // endregion
+
     private String name;
     private int numChapters;
 
@@ -91,4 +95,5 @@ public enum BibleBook {
         }
         return -1;
     }
+
 }

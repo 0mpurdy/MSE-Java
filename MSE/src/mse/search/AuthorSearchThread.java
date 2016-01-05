@@ -17,7 +17,7 @@ import mse.helpers.HtmlHelper;
 import mse.helpers.HtmlReader;
 
 /**
- * @author michael
+ * @author Michael Purdy
  */
 public class AuthorSearchThread extends SingleSearchThread {
 
@@ -481,4 +481,5 @@ public class AuthorSearchThread extends SingleSearchThread {
     }
 
     // endregion
+
 }

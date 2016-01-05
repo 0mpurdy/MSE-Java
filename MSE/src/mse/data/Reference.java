@@ -1,7 +1,5 @@
 package mse.data;
 
-import mse.search.AuthorSearchCache;
-
 /**
  * Created by michaelpurdy on 30/12/2015.
  */
@@ -65,4 +63,5 @@ public class Reference {
                 return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum;
         }
     }
+
 }

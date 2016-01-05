@@ -200,4 +200,5 @@ public class Result implements IResult {
     }
 
     // endregion
+
 }

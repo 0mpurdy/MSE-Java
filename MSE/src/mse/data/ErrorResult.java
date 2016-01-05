@@ -15,4 +15,5 @@ public class ErrorResult implements IResult {
     public String getBlock() {
         return error;
     }
+
 }

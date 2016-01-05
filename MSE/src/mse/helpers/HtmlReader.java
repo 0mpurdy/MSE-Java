@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
- * Created by michaelpurdy on 23/12/2015.
+ * Created by Michael Purdy on 23/12/2015.
  */
 public class HtmlReader {
 
