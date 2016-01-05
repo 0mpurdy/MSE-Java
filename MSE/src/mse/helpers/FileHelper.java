@@ -6,7 +6,9 @@ import mse.data.BibleBook;
 import mse.data.HymnBook;
 
 /**
- * Created by mj_pu_000 on 23/12/2015.
+ * Created by Michael Purdy on 23/12/2015.
+ *
+ * This helps get the file names of an html file
  */
 public class FileHelper {
 

@@ -11,4 +11,5 @@ public interface ILogger {
 
     void closeLog();
 
+    void logException(Exception e);
 }

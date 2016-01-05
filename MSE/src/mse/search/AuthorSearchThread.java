@@ -18,6 +18,8 @@ import mse.helpers.HtmlReader;
 
 /**
  * @author Michael Purdy
+ *
+ * This is a thread to perform a search for a single author
  */
 public class AuthorSearchThread extends SingleSearchThread {
 

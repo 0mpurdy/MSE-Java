@@ -33,7 +33,7 @@ public class Logger implements ILogger {
         if (logLevel.value <= this.logLevel.value) {
             Date date = new Date();
             String tag = logLevel.tag;
-            pwLog.printf("%s [%s] - %s\n", tag, dateFormat.format(date), message);
+            pwLog.printf("%s [%s] - %s%s", tag, dateFormat.format(date), message, System.lineSeparator());
         }
     }
 
@@ -65,6 +65,12 @@ public class Logger implements ILogger {
 
     public void closeLog() {
         this.pwLog.close();
+    }
+
+    @Override
+    public void logException(Exception e) {
+        log(LogLevel.HIGH, e.getMessage());
+        e.printStackTrace(pwLog);
     }
 
     public void refresh() {

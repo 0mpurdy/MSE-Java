@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by Michael on 17/11/2015.
+ * Created by Michael Purdy on 17/11/2015.
+ *
+ * This is a thread to perform a search across a range of authors
  */
 public class SearchThread extends Thread {
 
@@ -76,6 +78,10 @@ public class SearchThread extends Thread {
             }
         }
 
+        if (!(resultsFile.setReadable(true, false) && resultsFile.setWritable(true, false))) {
+            logger.log(LogLevel.HIGH, "Could not set permissions on results file.");
+        }
+
         try (PrintWriter pwResults = new PrintWriter(resultsFile)) {
 
             pwResults.println(HtmlHelper.getResultsHeader("../../mseStyle.css"));
@@ -115,17 +121,17 @@ public class SearchThread extends Thread {
             pwResults.println(HtmlHelper.getHtmlFooter("\t</div>"));
 
         } catch (FileNotFoundException fnfe) {
-
-            logger.log(LogLevel.HIGH, "Could not find results file.");
-
+            logger.log(LogLevel.HIGH, "Could not find results file: " + resultsFile.getAbsolutePath());
+            logger.logException(fnfe);
         }
 
         progress.set(1000 * authorsToSearch.size() + 1);
 
         try {
-            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFile()));
+            Desktop.getDesktop().open(resultsFile);
         } catch (IOException | IllegalArgumentException ioe) {
-            logger.log(LogLevel.HIGH, "Could not open results file.");
+            logger.log(LogLevel.HIGH, "Desktop could not open results file: " + resultsFile.getAbsolutePath());
+            logger.logException(ioe);
         }
 
         logger.closeLog();
