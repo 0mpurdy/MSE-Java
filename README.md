@@ -1,15 +1,24 @@
 # Ministry Search Engine
 
-This is a search client to search the bible, hymnbooks and authors of minitry for keywords.
+This is a search client to search the bible, hymnbooks and authors of ministry for keywords.
 
 ## Features
 
- - Search for keywords in a paragraph scope
- - Open contents pages for each book and navigate and read the books from this
+ - View Contents for authors and open books from there
+ - Search for keywords in the types (including wildcard search):
+   * Exact match
+   * Sentence contains words in order
+   * Sentence contains words
+   * Paragraph contains words
+ - Highlight words in search results
+ - Refine searches with words that the results should/should not contain
  - Open and view maps for the biblical area
  
 ## Features planned
 
- - Search with a scentence scope
- - Highlight searched words in search results
- - Perform a wildcard search
+ - Multi-word wildcard searches
+ - Seperate scope (eg sentence) from type (eg contains words in order)
+ - Save a search
+ - Share a search
+ - Report a problem
+ - Bookmark a reference
