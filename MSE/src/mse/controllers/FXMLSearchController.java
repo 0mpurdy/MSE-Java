@@ -113,7 +113,7 @@ public class FXMLSearchController implements Initializable {
 
             // add menu items to open contents pages
             MenuItem nextMenuItem = new MenuItem(nextAuthor.getName());
-            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + nextAuthor.getTargetPath(nextAuthor.getContentsName() + ".htm")));
+            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + nextAuthor.getTargetPath(nextAuthor.getContentsName())));
             booksMenu.getItems().add(nextMenuItem);
             if ((booksMenu.getItems().size() == 2) || (booksMenu.getItems().size() == Author.values().length - 2)) {
                 booksMenu.getItems().add(new SeparatorMenuItem());

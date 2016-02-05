@@ -38,7 +38,7 @@ public enum HymnBook {
     }
 
     public String getOutputFilename() {
-        return filename + ".htm";
+        return filename + ".html";
     }
 
     public static int getIndexFromString(String bookName) {

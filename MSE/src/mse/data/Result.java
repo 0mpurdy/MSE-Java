@@ -71,7 +71,7 @@ public class Result implements IResult {
         text = HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[i]));
         text += " <!-> " + HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[i + 1]));
 
-        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".htm"));
+        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".html"));
         String chapter = link.substring(link.lastIndexOf("#") + 1, link.lastIndexOf(":"));
         String verse = link.substring(link.lastIndexOf(":") + 1);
 

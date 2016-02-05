@@ -45,9 +45,9 @@ public class Reference {
 
     public String getFileName() {
         if (author.isMinistry()) {
-            return author.getCode() + volNum + ".htm";
+            return author.getCode() + volNum + ".html";
         } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + ".htm";
+            return BibleBook.values()[volNum - 1].getName() + ".html";
         } else if (author.equals(Author.HYMNS)) {
             return HymnBook.values()[volNum - 1].getOutputFilename();
         } else {

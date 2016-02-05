@@ -292,14 +292,6 @@ public class AuthorSearchThread extends SingleSearchThread {
         }
     }
 
-    // region checkValidScope
-
-    boolean foundCurrentSearchToken;
-
-
-
-    // endregion
-
     private int startOfLastSentencePos;
 
     // region processSection

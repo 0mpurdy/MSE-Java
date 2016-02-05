@@ -12,7 +12,7 @@ import java.io.*;
 import java.util.HashMap;
 
 /**
- * @author michael
+ * @author Michael Purdy
  */
 public class Config {
 
@@ -23,7 +23,7 @@ public class Config {
 
     private Logger logger;
 
-    private String mseVersion;
+    private static final String mseVersion = "3.0.1";
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -47,7 +47,8 @@ public class Config {
 
         try (BufferedReader br = new BufferedReader(new FileReader(configFile))) {
 
-            mseVersion = getNextOption(br, "mseVersion");
+            // skip mse Version
+            br.readLine();
             resDir = getNextOption(br, "resDir");
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
@@ -91,7 +92,6 @@ public class Config {
 
     private void setDefaults() {
 
-        mseVersion = "3.0.0";
         resDir = "res" + File.separator;
         resultsFileName = "SearchResults.htm";
         searchString = "";
