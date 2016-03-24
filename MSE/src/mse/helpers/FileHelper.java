@@ -17,7 +17,7 @@ public class FileHelper {
 
         switch (author) {
             case BIBLE:
-                filename += author.getTargetPath(BibleBook.values()[volNum - 1].getName() + ".html");
+                filename += author.getTargetPath(BibleBook.values()[volNum - 1].getBookFileName());
                 break;
             case HYMNS:
                 filename += author.getTargetPath(HymnBook.values()[volNum - 1].getOutputFilename());

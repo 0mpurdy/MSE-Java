@@ -24,7 +24,7 @@ public class Reference {
     public String getReadableReference() {
         switch (author) {
             case BIBLE:
-                return BibleBook.values()[volNum - 1].getName() + " chapter " + pageNum + ":" + verseNum;
+                return BibleBook.values()[volNum - 1].getNameWithSpaces() + " chapter " + pageNum + ":" + verseNum;
             case HYMNS:
                 return Integer.toString(pageNum);
             default:
@@ -36,7 +36,7 @@ public class Reference {
         if (author.isMinistry()) {
             return author.getCode() + "vol " + volNum + ":" + pageNum;
         } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
+            return BibleBook.values()[volNum - 1].getNameWithSpaces() + " " + pageNum + ":" + verseNum;
         } else if (author.equals(Author.HYMNS)) {
             return HymnBook.values()[volNum - 1].getName() + " " + pageNum + ":" + verseNum;
         }
@@ -45,9 +45,9 @@ public class Reference {
 
     public String getFileName() {
         if (author.isMinistry()) {
-            return author.getCode() + volNum + ".html";
+            return author.getVolumePath(volNum);
         } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getName() + ".html";
+            return BibleBook.values()[volNum - 1].getBookFileName();
         } else if (author.equals(Author.HYMNS)) {
             return HymnBook.values()[volNum - 1].getOutputFilename();
         } else {
