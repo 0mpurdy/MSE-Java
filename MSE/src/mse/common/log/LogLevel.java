@@ -1,7 +1,7 @@
-package mse.common;
+package mse.common.log;
 
 /**
- * Created by mj_pu_000 on 28/09/2015.
+ * @author Michael Purdy
  */
 public enum LogLevel {
 

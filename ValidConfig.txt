@@ -1,0 +1,19 @@
+mseVersion:3.0.1
+resDir:../MSE-Res-Lite/res/
+resultsFileName:SearchResults.htm
+searchString:
+searchType:Exact Match
+ --- Selected Authors --- 
+JND:false
+CAC:false
+Bible:true
+SMC:false
+Misc:false
+CHM:false
+JT:false
+Hymns:false
+FER:false
+WJH:false
+GRC:false
+JBS:false
+AJG:false

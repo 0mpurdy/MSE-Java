@@ -1,7 +1,7 @@
 package mse.search;
 
-import mse.common.LogRow;
-import mse.data.IResult;
+import mse.common.log.LogRow;
+import mse.data.search.IResult;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package mse.search;
+package mse.data.search;
 
 /**
  * @author Michael Purdy

@@ -2,9 +2,9 @@ package mse.helpers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import mse.common.Config;
-import mse.common.LogLevel;
-import mse.common.Logger;
+import mse.common.config.Config;
+import mse.common.log.LogLevel;
+import mse.common.log.Logger;
 
 import java.awt.*;
 import java.io.File;

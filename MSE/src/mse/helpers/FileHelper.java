@@ -1,29 +1,45 @@
 package mse.helpers;
 
-import mse.common.Config;
-import mse.data.Author;
-import mse.data.BibleBook;
-import mse.data.HymnBook;
+import mse.common.config.Config;
+import mse.data.author.Author;
+import mse.data.author.BibleBook;
+import mse.data.author.HymnBook;
 
 /**
- * Created by Michael Purdy on 23/12/2015.
- *
- * This helps get the file names of an html file
+ * @author Michael Purdy
+ *         Helps to generate links and folder paths
  */
-public class FileHelper {
+public abstract class FileHelper {
 
     public static String getHtmlFileName(Config cfg, Author author, int volNum) {
-        String filename = cfg.getResDir();
+        String filename;
 
         switch (author) {
             case BIBLE:
-                filename += author.getTargetPath(BibleBook.values()[volNum - 1].getBookFileName());
+                filename = author.getTargetPath(BibleBook.values()[volNum - 1].getTargetFilename());
                 break;
             case HYMNS:
-                filename += author.getTargetPath(HymnBook.values()[volNum - 1].getOutputFilename());
+                filename = author.getTargetPath(HymnBook.values()[volNum - 1].getTargetFilename());
                 break;
             default:
-                filename += author.getVolumePath(volNum);
+                filename = author.getTargetVolumePath(volNum);
+
+        }
+        return filename;
+    }
+
+    public static String getTextFileName(Config cfg, Author author, int volNum) {
+        String filename;
+
+        switch (author) {
+            case BIBLE:
+                filename = author.getSourcePath(BibleBook.values()[volNum - 1].getSourceFilename());
+                break;
+            case HYMNS:
+                filename = author.getSourcePath(HymnBook.values()[volNum - 1].getSourceFilename());
+                break;
+            default:
+                filename = author.getSourceVolumePath(volNum);
 
         }
         return filename;

@@ -1,17 +1,15 @@
 package mse.helpers;
 
-import mse.common.LogLevel;
-import mse.common.LogRow;
-import mse.data.*;
+import mse.data.author.Author;
+import mse.data.author.HymnBook;
 import mse.search.AuthorSearchCache;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
- * Created by Michael Purdy on 02/12/2015.
- * <p>
- * Helps with creation of HTML files
+ * @author Michael Purdy
+ *      Helps with creation of HTML files
  */
 public class HtmlHelper {
 
@@ -91,8 +89,12 @@ public class HtmlHelper {
         pw.println("\t\t</div>");
     }
 
+    /**
+     * Highlight all the search words in the line with an html <mark/> tag
+     *
+     * @return The result in HTML format with search words highlighted
+     */
     public static String markLine(Author author, StringBuilder line, String[] words, String emphasis) {
-        // highlight all the search words in the line with an html <mark/> tag
 
         // remove any html already in the line
         int charPos = 0;

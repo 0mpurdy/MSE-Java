@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mse.common;
+package mse.common.config;
 
-import mse.data.Author;
-import mse.search.SearchType;
+import mse.common.log.LogLevel;
+import mse.common.log.Logger;
+import mse.data.author.Author;
+import mse.data.search.SearchType;
 
 import java.io.*;
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public class Config {
 
     private Logger logger;
 
-    private static final String mseVersion = "3.0.1";
+    private static final String mseVersion = "3.0.2";
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -67,7 +69,6 @@ public class Config {
                     selectedAuthors.put(splitLine[0], Boolean.parseBoolean(splitLine[1]));
                 }
             }
-
 
         } catch (IOException | ArrayIndexOutOfBoundsException | NullPointerException ex) {
             logger.log(LogLevel.LOW, "Error reading config - setting defaults");
@@ -159,10 +160,6 @@ public class Config {
         return "target" + File.separator + "results" + File.separator + resultsFileName;
     }
 
-    public String getResultsFolder() {
-        return "target" + File.separator + "results";
-    }
-
     public void setResultsFileName(String resultsFileName) {
         this.resultsFileName = resultsFileName;
     }
@@ -195,7 +192,7 @@ public class Config {
         selectedAuthors.put(authorCode, isSelected);
     }
 
-    public Boolean getSelectedAuthor(String authorCode) {
+    public boolean isAuthorSelected(String authorCode) {
         return selectedAuthors.get(authorCode);
     }
 
@@ -203,7 +200,7 @@ public class Config {
         boolean check = false;
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor != Author.TUNES) {
-                if (getSelectedAuthor(nextAuthor.getCode())) {
+                if (isAuthorSelected(nextAuthor.getCode())) {
                     check = true;
                 }
             }
@@ -211,12 +208,12 @@ public class Config {
         return check;
     }
 
-    public boolean isSetup() {
-        return setup;
+    public void setSetup(boolean setupCheck) {
+        setup = setupCheck;
     }
 
-    public void setSetup(boolean setup) {
-        this.setup = setup;
+    public boolean isSettingUp() {
+        return setup;
     }
 
     public void refresh() {

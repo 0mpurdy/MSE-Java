@@ -1,11 +1,10 @@
 package mse.search;
 
-import mse.common.Config;
-import mse.common.ILogger;
-import mse.data.Author;
-import mse.data.AuthorIndex;
+import mse.common.config.Config;
+import mse.common.log.ILogger;
+import mse.data.author.Author;
+import mse.data.author.AuthorIndex;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

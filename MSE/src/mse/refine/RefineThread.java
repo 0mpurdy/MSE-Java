@@ -1,12 +1,12 @@
 package mse.refine;
 
-import mse.common.Config;
-import mse.common.ILogger;
-import mse.common.LogLevel;
-import mse.common.LogRow;
-import mse.data.Author;
-import mse.data.AuthorResults;
-import mse.data.Result;
+import mse.common.config.Config;
+import mse.common.log.ILogger;
+import mse.common.log.LogLevel;
+import mse.common.log.LogRow;
+import mse.data.author.Author;
+import mse.data.search.AuthorResults;
+import mse.data.search.Result;
 import mse.helpers.HtmlHelper;
 import mse.helpers.HtmlReader;
 
@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**

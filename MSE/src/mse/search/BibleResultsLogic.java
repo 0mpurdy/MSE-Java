@@ -1,7 +1,7 @@
-package mse.data;
+package mse.search;
 
 /**
- * Created by Michael Purdy on 30/12/2015.
+ * @author Michael Purdy
  */
 public class BibleResultsLogic {
 

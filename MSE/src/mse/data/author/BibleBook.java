@@ -1,5 +1,9 @@
-package mse.data;
+package mse.data.author;
 
+/**
+ * @author Michael Purdy
+ *         An enum of all the books of the bible
+ */
 public enum BibleBook {
 
     // region books
@@ -25,7 +29,7 @@ public enum BibleBook {
     PSALMS("Psalms", 150),
     PROVERBS("Proverbs", 31),
     ECCLESIASTES("Ecclesiastes", 12),
-    SONGOFSONGS("SongOfSongs", 8),
+    SONGOFSONGS("Song Of Songs", 8),
     ISAIAH("Isaiah", 66),
     JEREMIAH("Jeremiah", 52),
     LAMENTATIONS("Lamentations", 5),
@@ -81,27 +85,28 @@ public enum BibleBook {
         this.numChapters = numChapters;
     }
 
-    public String getNameWithoutSpaces() {
-        return name.replace(" ","");
+    public String getDashCaseName() {
+        return name.replace(" ", "-").toLowerCase();
     }
 
     public String getNameWithSpaces() {
         return name;
     }
 
+    public String getNameWithoutSpaces() {
+        return name.replace(" ","");
+    }
+
     public int getNumChapters() {
         return numChapters;
     }
 
-    public static int getIndexFromString(String bookName) {
-        for (BibleBook nextBook : values()) {
-            if (nextBook.getNameWithSpaces().equalsIgnoreCase(bookName)) return nextBook.ordinal();
-        }
-        return -1;
+    public String getTargetFilename() {
+        return getDashCaseName() + ".html";
     }
 
-    public String getBookFileName() {
-        return getNameWithoutSpaces() + ".html";
+    public String getSourceFilename() {
+        return getDashCaseName() + ".txt";
     }
 
     public static int getNumOldTestamentBooks() {
@@ -112,4 +117,25 @@ public enum BibleBook {
         return 27;
     }
 
+    public static int getIndexFromString(String bookName) {
+        for (BibleBook nextBook : values()) {
+            if (nextBook.getNameWithSpaces().equalsIgnoreCase(bookName)) return nextBook.ordinal();
+        }
+        return -1;
+    }
+
+    public static BibleBook getBookFromString(String bookName) {
+
+        for (BibleBook nextBook : values()) {
+            if (bookName.equalsIgnoreCase(nextBook.getNameWithSpaces()) ||
+                    bookName.equalsIgnoreCase(nextBook.getDashCaseName()) ||
+                    bookName.equalsIgnoreCase(nextBook.getNameWithoutSpaces())) {
+                return nextBook;
+            }
+        }
+
+        return null;
+    }
+
 }
+

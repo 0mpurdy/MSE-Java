@@ -1,17 +1,12 @@
-package mse.data;
-
-import mse.common.*;
-import mse.search.SearchType;
+package mse.data.search;
 
 import java.util.ArrayList;
 
 /**
- * Created by mj_pu_000 on 09/11/2015.
+ * @author Michael Purdy
  */
 public class Search {
 
-    private Config cfg;
-    private ILogger logger;
     private String searchString;
 
     private boolean wildSearch;
@@ -20,11 +15,9 @@ public class Search {
 
     private int numTotalResults;
 
-    public Search(Config cfg, ILogger logger, String searchString) {
-        this.cfg = cfg;
-        this.logger = logger;
+    public Search(SearchType searchType, String searchString) {
         this.searchString = searchString;
-        this.searchType = cfg.getSearchType();
+        this.searchType = searchType;
         this.numTotalResults = 0;
         setWildSearch();
     }

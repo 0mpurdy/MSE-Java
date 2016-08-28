@@ -1,13 +1,10 @@
-package mse.data;
+package mse.data.author;
 
-import mse.common.ILogger;
-import mse.common.LogLevel;
-import mse.common.Logger;
+import mse.common.log.ILogger;
+import mse.common.log.LogLevel;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by mj_pu_000 on 09/09/2015.

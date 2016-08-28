@@ -1,7 +1,9 @@
-package mse.data;
+package mse.data.search;
 
+import mse.data.author.BibleBook;
+import mse.data.author.HymnBook;
+import mse.data.author.Author;
 import mse.helpers.HtmlHelper;
-import mse.search.SearchType;
 
 import java.util.regex.Pattern;
 
@@ -79,7 +81,7 @@ public class Result implements IResult {
         int pageNum = Integer.parseInt(chapter);
         int verseNum = Integer.parseInt(verse);
 
-        reference = new Reference(author, volNum, pageNum, verseNum);
+        reference = new Reference(author, volNum, pageNum, verseNum, 0);
     }
 
     private void constructHymnFromBlock(String resultBlock) {
@@ -95,7 +97,7 @@ public class Result implements IResult {
         int volNum = HymnBook.getIndexFromString(bookName) + 1;
         int pageNum = Integer.parseInt(hymnNumber);
 
-        reference = new Reference(author, volNum, pageNum, 0);
+        reference = new Reference(author, volNum, pageNum, 0, 0);
     }
 
     private void constructMinistryFromBlock(String resultBlock) {
@@ -110,7 +112,7 @@ public class Result implements IResult {
         int volNum = getMinistryBookNumber(bookName);
         int pageNum = Integer.parseInt(pageNumberString);
 
-        reference = new Reference(author, volNum, pageNum, 0);
+        reference = new Reference(author, volNum, pageNum, 0, 0);
     }
 
     private int getMinistryBookNumber(String bookName) {
@@ -124,7 +126,7 @@ public class Result implements IResult {
 
     // region refine
 
-    public boolean refine (boolean contains, String[] refineWords) {
+    public boolean refine(boolean contains, String[] refineWords) {
 
         String[] lineTokens = HtmlHelper.tokenizeLine(text);
 
@@ -140,15 +142,26 @@ public class Result implements IResult {
 
     // region output
 
+    /**
+     * Print the result on the console (for debugging)
+     */
     public void print() {
         System.out.println(author.getCode() + ": " + reference.getReadableReference());
         System.out.println(text);
     }
 
+    /**
+     * Print just the result block on the console (for debugging)
+     */
     public void printBlock() {
         System.out.println(getBlock());
     }
 
+    /**
+     * Get the result block HTML
+     *
+     * @return The result in HTML format
+     */
     @Override
     public String getBlock() {
         switch (author) {
@@ -161,9 +174,14 @@ public class Result implements IResult {
         }
     }
 
+    /**
+     * Get the result block HTML for a Hymn result
+     *
+     * @return The result in HTML format for a Hymn
+     */
     public String getHymnsBlock() {
         String brokenText = text.replace("\n", "<br>");
-        String block =  "\t\t\t<div class=\"container padded\">\n" +
+        String block = "\t\t\t<div class=\"container padded\">\n" +
                 "\t\t\t\t<a class=\"btn btn-primary\" href=\"" + reference.getPath() + "\" role=\"button\">" +
                 reference.getReadableReference() + "</a>\n" +
                 "\t\t\t\t<div class=\"spaced\">" + getMarkedLine(brokenText) + "</div>\n" +
@@ -172,6 +190,12 @@ public class Result implements IResult {
         return block;
     }
 
+
+    /**
+     * Get the result block HTML for a Ministry result
+     *
+     * @return The result in HTML format for a Ministry result
+     */
     public String getMinistryBlock() {
         String markedLine = HtmlHelper.markLine(author, new StringBuilder(text), searchWords, "mse-mark");
         return "\t\t\t<div class=\"container\">\n" +
@@ -181,6 +205,11 @@ public class Result implements IResult {
                 "\t\t\t</div>";
     }
 
+    /**
+     * Get the result block HTML for a Bible result
+     *
+     * @return The result in HTML format for a Bible result
+     */
     public String getBibleBlock() {
 
         String[] lines = text.split(Pattern.quote(" <!-> "));
@@ -195,6 +224,11 @@ public class Result implements IResult {
                 "\t\t\t</table>";
     }
 
+    /**
+     * Highlight the search words in a line
+     *
+     * @return A line with the search results highlighted
+     */
     private String getMarkedLine(String line) {
         return HtmlHelper.markLine(author, new StringBuilder(line), searchWords, "mse-mark");
     }

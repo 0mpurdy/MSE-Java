@@ -1,10 +1,13 @@
 package mse.search;
 
-import mse.common.Config;
-import mse.common.ILogger;
-import mse.common.LogLevel;
-import mse.common.LogRow;
-import mse.data.*;
+import mse.common.config.Config;
+import mse.common.log.ILogger;
+import mse.common.log.LogLevel;
+import mse.common.log.LogRow;
+import mse.data.author.Author;
+import mse.data.author.AuthorIndex;
+import mse.data.search.IResult;
+import mse.data.search.Search;
 import mse.helpers.HtmlHelper;
 
 import java.awt.*;
@@ -13,9 +16,8 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by Michael Purdy on 17/11/2015.
- *
- * This is a thread to perform a search across a range of authors
+ * @author Michael Purdy
+ *      Thread to search multiple authors
  */
 public class SearchThread extends Thread {
 

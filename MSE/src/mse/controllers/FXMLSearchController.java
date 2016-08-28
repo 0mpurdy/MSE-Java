@@ -11,11 +11,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import mse.data.Search;
+import mse.common.config.Config;
+import mse.common.log.LogLevel;
+import mse.common.log.Logger;
+import mse.data.search.Search;
+import mse.data.search.SearchType;
 import mse.helpers.HtmlHelper;
 import mse.refine.RefineThread;
 import mse.search.*;
-import mse.common.*;
 
 import java.awt.*;
 import java.io.*;
@@ -30,7 +33,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.GridPane;
-import mse.data.Author;
+import mse.data.author.Author;
 import mse.data.Map;
 import mse.helpers.OpenFileHandler;
 
@@ -74,7 +77,7 @@ public class FXMLSearchController implements Initializable {
         progressLabel.setText("From the menu bar you can select a book to browse.");
 
         // open new logger
-        logger = new Logger(LogLevel.INFO);
+        logger = new Logger(LogLevel.INFO, Logger.DEFAULT_LOG);
         logger.openLog();
         logger.log(LogLevel.INFO, "Started MSE");
         logger.closeLog();
@@ -87,6 +90,22 @@ public class FXMLSearchController implements Initializable {
         // set the setup config flag to true
         cfg.setSetup(true);
 
+        setupCheckboxes();
+
+        setupMaps();
+
+        cfg.setSetup(false);
+
+        // initialise the search box
+        searchBox.setText(cfg.getSearchString());
+
+        // initialise the index store
+        indexStore = new IndexStore(cfg);
+
+        logger.closeLog();
+    }
+
+    private void setupCheckboxes() {
         // add checkboxes for searching author
         // TODO check if they're available first
         checkboxes = new ArrayList<>();
@@ -94,17 +113,15 @@ public class FXMLSearchController implements Initializable {
         for (Author nextAuthor : Author.values()) {
             if (nextAuthor.isSearchable()) {
                 CheckBox nextCheckBox = new CheckBox(nextAuthor.getCode());
-                nextCheckBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
-                    public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
-                        if (!cfg.isSetup()) {
-                            cfg.setSelectedAuthor(nextAuthor.getCode(), new_val);
-                            cfg.save();
-                        }
+                nextCheckBox.selectedProperty().addListener((ov, old_val, new_val) -> {
+                    if (!cfg.isSettingUp()) {
+                        cfg.setSelectedAuthor(nextAuthor.getCode(), new_val);
+                        cfg.save();
                     }
                 });
 
                 // select if it is to be searched or not
-                nextCheckBox.setSelected(cfg.getSelectedAuthor(nextAuthor.getCode()));
+                nextCheckBox.setSelected(cfg.isAuthorSelected(nextAuthor.getCode()));
 
                 checkBoxPane.add(nextCheckBox, i % 6, i / 6);
                 checkboxes.add(nextCheckBox);
@@ -120,6 +137,9 @@ public class FXMLSearchController implements Initializable {
             }
 
         }
+    }
+
+    private void setupMaps() {
 
         File mapsFile = new File(cfg.getResDir() + "Maps.txt");
 
@@ -198,16 +218,6 @@ public class FXMLSearchController implements Initializable {
         } catch (IOException ioe) {
             logger.log(LogLevel.HIGH, "Could not find maps file - " + mapsFile.getAbsolutePath());
         }
-
-        cfg.setSetup(false);
-
-        // initialise the search box
-        searchBox.setText(cfg.getSearchString());
-
-        // initialise the index store
-        indexStore = new IndexStore(cfg);
-
-        logger.closeLog();
     }
 
     @FXML
@@ -251,7 +261,7 @@ public class FXMLSearchController implements Initializable {
                     }
                 }
 
-                Search search = new Search(cfg, logger, searchString);
+                Search search = new Search(cfg.getSearchType(), searchString);
 
                 progressBar.setVisible(true);
                 progressBar.setProgress(0);
@@ -443,7 +453,7 @@ public class FXMLSearchController implements Initializable {
         cfg.setSetup(true);
 
         for (CheckBox nextCheckBox : checkboxes) {
-            nextCheckBox.setSelected(cfg.getSelectedAuthor(nextCheckBox.getText()));
+            nextCheckBox.setSelected(cfg.isAuthorSelected(nextCheckBox.getText()));
         }
         searchBox.setText(cfg.getSearchString());
 
@@ -485,7 +495,7 @@ public class FXMLSearchController implements Initializable {
 //    private Config readConfig() {
 //        try {
 //            Gson gson = new Gson();
-//            FileReader fr = new FileReader("config.txt");
+//            IFileReader fr = new IFileReader("config.txt");
 //            Path jsonPath = Paths.get("config.txt");
 //            String json = new String(Files.readAllBytes(jsonPath));
 //            logger.log(LogLevel.INFO, "Config loaded.");

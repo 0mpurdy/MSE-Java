@@ -1,5 +1,6 @@
-package mse.data;
+package mse.data.search;
 
+import mse.data.author.Author;
 import mse.helpers.HtmlHelper;
 
 import java.io.PrintWriter;

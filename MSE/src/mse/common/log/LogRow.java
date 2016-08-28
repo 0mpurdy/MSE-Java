@@ -1,7 +1,7 @@
-package mse.common;
+package mse.common.log;
 
 /**
- * Created by Michael on 17/11/2015.
+ * @author Michael Purdy
  */
 public class LogRow {
 

@@ -1,7 +1,7 @@
-package mse.common;
+package mse.common.log;
 
 /**
- * Created by mj_pu_000 on 09/11/2015.
+ * @author Michael Purdy
  */
 public interface ILogger {
 
@@ -12,4 +12,5 @@ public interface ILogger {
     void closeLog();
 
     void logException(Exception e);
+
 }

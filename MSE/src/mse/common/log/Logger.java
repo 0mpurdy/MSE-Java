@@ -1,4 +1,4 @@
-package mse.common;
+package mse.common.log;
 
 import java.io.*;
 import java.text.DateFormat;
@@ -10,14 +10,15 @@ import java.util.Date;
  */
 public class Logger implements ILogger {
 
-    private final String logFilePath = "log.txt";
+    public static final String DEFAULT_LOG = "log.txt";
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     File loggingFile;
     PrintWriter pwLog;
     LogLevel logLevel;
 
-    public Logger(LogLevel logLevel) {
+    public Logger(LogLevel logLevel, String logFilePath) {
+
         loggingFile = new File(logFilePath);
         try {
             if (!loggingFile.exists()) {
