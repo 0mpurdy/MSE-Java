@@ -48,17 +48,17 @@ public class AuthorIndex {
         return references.get(key);
     }
 
-    public void loadIndex(String resLocation) {
+    public void loadIndex() {
 
         // try to load the index of the current author
         try {
-            InputStream inStream = new FileInputStream(resLocation + author.getIndexFilePath());
+            InputStream inStream = new FileInputStream(author.getIndexFilePath());
             BufferedInputStream bInStream = new BufferedInputStream(inStream);
             ObjectInput input = new ObjectInputStream(bInStream);
             this.tokenCountMap = (HashMap<String, Integer>) input.readObject();
             this.references = (HashMap<String, short[]>) input.readObject();
         } catch (FileNotFoundException fnfe) {
-            logger.log(LogLevel.HIGH, "Could not file find file: " + resLocation + author.getIndexFilePath());
+            logger.log(LogLevel.HIGH, "Could not find index file: " + author.getIndexFilePath());
         } catch (IOException ioe) {
             logger.log(LogLevel.HIGH, "Error loading from: " + author.getIndexFilePath());
         } catch (ClassCastException cce) {

@@ -2,13 +2,15 @@ package mse.search;
 
 import mse.common.config.Config;
 import mse.common.log.ILogger;
+import mse.common.log.LogLevel;
 import mse.data.author.Author;
 import mse.data.author.AuthorIndex;
 
 import java.util.HashMap;
 
 /**
- * Created by mj_pu_000 on 10/11/2015.
+ * @author Michael Purdy
+ *  Store for caching author indexes
  */
 public class IndexStore {
 
@@ -23,12 +25,16 @@ public class IndexStore {
 
     public AuthorIndex getIndex(ILogger logger, Author author) {
 
+        logger.log(LogLevel.TRACE, "\tLoading index for :" + author.getName());
+
         AuthorIndex authorIndex = authorIndexes.get(author.getCode());
 
         if (authorIndex == null) {
             authorIndex = new AuthorIndex(author, logger);
-            authorIndex.loadIndex(cfg.getResDir());
+            authorIndex.loadIndex();
             authorIndexes.put(author.getCode(), authorIndex);
+            logger.log(LogLevel.TRACE, "\tLoading Index: " + authorIndex.getAuthorName() + " from: " + authorIndex.getAuthor().getIndexFilePath());
+            logger.log(LogLevel.TRACE, "\tIndex count: " + authorIndex.getTokenCountMap().keySet().size());
         }
 
         return authorIndex;

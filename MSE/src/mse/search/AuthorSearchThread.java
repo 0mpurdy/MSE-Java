@@ -73,6 +73,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         asc.setup(searchLog);
         log(LogLevel.TRACE, "\tSearch strings: " + asc.printableSearchWords());
         log(LogLevel.TRACE, "\tSearch tokens: " + asc.printableSearchTokens());
+        log(LogLevel.TRACE, "\tLeast Frequent Token: " + asc.getLeastFrequentToken());
 
         if ((asc.getLeastFrequentToken() != null) && !asc.getTokenNotFound()) {
             // at least one searchable token and all tokens in author index
