@@ -51,6 +51,10 @@ public enum Author {
         return code;
     }
 
+    public String getFolder() {
+        return folder;
+    }
+
     public String getName() {
         return name;
     }

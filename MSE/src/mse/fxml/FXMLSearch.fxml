@@ -5,8 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<VBox xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mse.controllers.FXMLSearchController">
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mse.controllers.FXMLSearchController">
    <children>
       <MenuBar>
         <menus>
@@ -41,7 +40,7 @@
             </Menu>
         </menus>
       </MenuBar>
-      <HBox VBox.vgrow="ALWAYS">
+      <HBox VBox.vgrow="NEVER">
          <VBox.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
          </VBox.margin>
@@ -70,21 +69,21 @@
             </Button>
          </children>
       </HBox>
-      <VBox>
+      <VBox VBox.vgrow="NEVER">
          <children>
-            <ProgressBar fx:id="progressBar" prefWidth="480.0" progress="0.0" VBox.vgrow="NEVER">
-               <VBox.margin>
-                  <Insets left="20.0" right="20.0" top="10.0" />
-               </VBox.margin>
-            </ProgressBar>
-            <Label fx:id="progressLabel" text="Progress">
+            <Label fx:id="progressLabel" alignment="TOP_LEFT" text="Progress" VBox.vgrow="NEVER">
                <VBox.margin>
                   <Insets bottom="10.0" left="20.0" right="10.0" top="5.0" />
                </VBox.margin>
             </Label>
+            <ProgressBar fx:id="progressBar" prefWidth="480.0" progress="0.0" VBox.vgrow="ALWAYS">
+               <VBox.margin>
+                  <Insets left="20.0" right="20.0" top="10.0" />
+               </VBox.margin>
+            </ProgressBar>
          </children>
       </VBox>
-      <GridPane fx:id="checkBoxPane" maxWidth="480.0">
+      <GridPane fx:id="checkBoxPane" alignment="CENTER" VBox.vgrow="ALWAYS">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />

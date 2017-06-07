@@ -3,9 +3,11 @@ package mse.data.search;
 import mse.data.author.BibleBook;
 import mse.data.author.HymnBook;
 import mse.data.author.Author;
+import mse.helpers.LinkHelper;
 
 /**
  * A reference to a search result
+ *
  * @author michaelpurdy
  */
 public class Reference {
@@ -27,6 +29,11 @@ public class Reference {
         return new Reference(author, volNum, pageNum, sectionNum, sentenceNum);
     }
 
+    /**
+     * Get a readable representation of the reference
+     *
+     * @return readable representation of the reference
+     */
     public String getReadableReference() {
         switch (author) {
             case BIBLE:
@@ -38,6 +45,14 @@ public class Reference {
         }
     }
 
+    /**
+     * Get a short readable representation of the reference
+     * eg "FER vol 4:170"
+     * eg "2 Timothy 2:2"
+     * eg "1973 Hymn book 480:1"
+     *
+     * @return short readable representation of the reference
+     */
     public String getShortReadableReference() {
         if (author.isMinistry()) {
             return author.getCode() + "vol " + volNum + ":" + pageNum;
@@ -49,28 +64,18 @@ public class Reference {
         return "Can't get short readable reference";
     }
 
-    public String getFileName() {
-        if (author.isMinistry()) {
-            return author.getTargetVolumeName(volNum);
-        } else if (author.equals(Author.BIBLE)) {
-            return BibleBook.values()[volNum - 1].getTargetFilename();
-        } else if (author.equals(Author.HYMNS)) {
-            return HymnBook.values()[volNum - 1].getTargetFilename();
-        } else {
-            return "";
-        }
-    }
-
+    /**
+     * Get a path to the reference (relative to the Search Results page)
+     * eg ../../target/fer/fer4.html
+     *
+     * @return path to reference
+     */
     public String getPath() {
         switch (author) {
             case BIBLE:
-                return author.getRelativeHtmlTargetPath(getFileName() + "#" + pageNum + ":" + sectionNum);
+                return LinkHelper.getHtmlLink(author, volNum, pageNum, sectionNum);
             default:
-                if ((sentenceNum - 1) > 0) {
-                    return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum + ":" + (sentenceNum - 1);
-                } else {
-                    return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum;
-                }
+                return LinkHelper.getHtmlLink(author, volNum, pageNum, sentenceNum - 1);
         }
     }
 
