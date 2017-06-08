@@ -45,7 +45,7 @@ public class RefineThread extends Thread {
         }
 
         try {
-            Desktop.getDesktop().open(new File(cfg.getResDir() + cfg.getResultsFile()));
+            Desktop.getDesktop().open(new File(cfg.getResDir() + File.separator + cfg.getResultsFile()));
         } catch (IOException | IllegalArgumentException ioe) {
             logger.log(LogLevel.HIGH, "Could not open results file.");
         }
@@ -58,7 +58,7 @@ public class RefineThread extends Thread {
 
         ArrayList<LogRow> logRows = new ArrayList<>();
 
-        HtmlReader htmlReader = new HtmlReader(cfg.getResDir() + cfg.getResultsFile(), logRows);
+        HtmlReader htmlReader = new HtmlReader(cfg.getResDir() + File.separator + cfg.getResultsFile(), logRows);
 
         ArrayList<AuthorResults> authorResultses = new ArrayList<>();
         int totalResults = 0;
@@ -91,7 +91,7 @@ public class RefineThread extends Thread {
         PrintWriter pwResults = null;
         try {
 
-            pwResults = new PrintWriter(cfg.getResDir() + cfg.getResultsFile());
+            pwResults = new PrintWriter(cfg.getResDir() + File.separator + cfg.getResultsFile());
             pwResults.println(HtmlHelper.getResultsHeader("../../mseStyle.css"));
 
             for (AuthorResults results : authorResultses) {

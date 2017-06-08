@@ -25,7 +25,7 @@ public class Config {
 
     private Logger logger;
 
-    private static final String mseVersion = "3.0.3";
+    private static final String mseVersion = "3.0.4";
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -52,6 +52,12 @@ public class Config {
             // skip mse Version
             br.readLine();
             resDir = getNextOption(br, "resDir");
+
+            // remove unnecessary trailing /
+            if (resDir.endsWith("/") || resDir.endsWith("\\")) {
+                resDir = resDir.substring(0, resDir.length() - 1);
+            }
+
             resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
             searchType = SearchType.fromString(getNextOption(br, "searchType"));
@@ -93,7 +99,7 @@ public class Config {
 
     private void setDefaults() {
 
-        resDir = "res" + File.separator;
+        resDir = "res";
         resultsFileName = "SearchResults.htm";
         searchString = "";
         searchType = SearchType.MATCH;

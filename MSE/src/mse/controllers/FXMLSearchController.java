@@ -131,7 +131,7 @@ public class FXMLSearchController implements Initializable {
 
             // add menu items to open contents pages
             MenuItem nextMenuItem = new MenuItem(nextAuthor.getName());
-            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + FileHelper.getContentsFilePath(nextAuthor, File.separator)));
+            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + File.separator + FileHelper.getContentsFilePath(nextAuthor, File.separator)));
             booksMenu.getItems().add(nextMenuItem);
             if ((booksMenu.getItems().size() == 2) || (booksMenu.getItems().size() == Author.values().length - 2)) {
                 booksMenu.getItems().add(new SeparatorMenuItem());
@@ -142,7 +142,7 @@ public class FXMLSearchController implements Initializable {
 
     private void setupMaps() {
 
-        File mapsFile = new File(cfg.getResDir() + "Maps.txt");
+        File mapsFile = new File(cfg.getResDir() + File.separator + "Maps.txt");
 
         // add menu items for maps
         try (BufferedReader br = new BufferedReader(new FileReader(mapsFile))) {
@@ -209,7 +209,7 @@ public class FXMLSearchController implements Initializable {
             // add maps to maps menu
             for (Map map : maps) {
                 MenuItem nextMenuItem = new MenuItem(map.getArea() + " - " + map.getMapName());
-                nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + "maps" + File.separator + map.getMapLocation()));
+                nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + File.separator + "maps" + File.separator + map.getMapLocation()));
                 mapsMenu.getItems().add(nextMenuItem);
                 if (mapsMenu.getItems().size() == 3) {
                     mapsMenu.getItems().add(new SeparatorMenuItem());
@@ -245,7 +245,7 @@ public class FXMLSearchController implements Initializable {
             // check if any authors are selected
             if (cfg.isAnyAuthorSelected()) {
 
-                logger.log(LogLevel.INFO, "Searched: " + searchString);
+                logger.log(LogLevel.INFO, "Searched: " + searchString + " with type: " + cfg.getSearchType().getMenuName());
                 try {
                     addPreviousSearch(searchString);
                 } catch (IOException e1) {
@@ -476,11 +476,11 @@ public class FXMLSearchController implements Initializable {
 
             previousSearchWriter.close();
 
-            File resultsFile = new File(cfg.getResDir() + cfg.getResultsFile());
+            File resultsFile = new File(cfg.getResDir() + File.separator + cfg.getResultsFile());
             PrintWriter resultsWriter;
             resultsFile.getParentFile().mkdirs();
             resultsFile.createNewFile();
-            resultsWriter = new PrintWriter(cfg.getResDir() + cfg.getResultsFile());
+            resultsWriter = new PrintWriter(cfg.getResDir() + File.separator + cfg.getResultsFile());
             HtmlHelper.writeHtmlHeader(resultsWriter, "Results", "../../mseStyle.css");
             resultsWriter.println("\n<body>\n</body>\n</html>");
 
