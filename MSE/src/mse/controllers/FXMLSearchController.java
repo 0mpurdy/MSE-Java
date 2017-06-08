@@ -16,6 +16,7 @@ import mse.common.log.LogLevel;
 import mse.common.log.Logger;
 import mse.data.search.Search;
 import mse.data.search.SearchType;
+import mse.helpers.FileHelper;
 import mse.helpers.HtmlHelper;
 import mse.refine.RefineThread;
 import mse.search.*;
@@ -130,7 +131,7 @@ public class FXMLSearchController implements Initializable {
 
             // add menu items to open contents pages
             MenuItem nextMenuItem = new MenuItem(nextAuthor.getName());
-            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + nextAuthor.getTargetPath(nextAuthor.getContentsName())));
+            nextMenuItem.setOnAction(new OpenFileHandler(cfg, logger, cfg.getResDir() + FileHelper.getContentsFilePath(nextAuthor, File.separator)));
             booksMenu.getItems().add(nextMenuItem);
             if ((booksMenu.getItems().size() == 2) || (booksMenu.getItems().size() == Author.values().length - 2)) {
                 booksMenu.getItems().add(new SeparatorMenuItem());
@@ -290,7 +291,7 @@ public class FXMLSearchController implements Initializable {
 
 
         String refineText = searchBox.getText();
-        logger.log(LogLevel.INFO,"Refined by: " + refineText);
+        logger.log(LogLevel.INFO, "Refined by: " + refineText);
 
         boolean contains = !(refineText.charAt(0) == '!');
 

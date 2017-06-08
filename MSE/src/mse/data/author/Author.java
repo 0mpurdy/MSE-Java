@@ -1,8 +1,8 @@
 package mse.data.author;
 
-import mse.data.PreparePlatform;
-
-import java.io.File;
+//import mse.data.PreparePlatform;
+//
+//import java.io.File;
 
 public enum Author {
 
@@ -25,7 +25,7 @@ public enum Author {
 
     // endregion
 
-    private static final PreparePlatform platform = PreparePlatform.PC;
+//    private static final PreparePlatform platform = PreparePlatform.PC;
 
     private final int index;
     private final String code;
@@ -59,41 +59,41 @@ public enum Author {
         return name;
     }
 
-    public String getTargetPath(String filename) {
-        return platform.getTargetPath() + File.separator + folder + File.separator + filename;
-    }
+//    public String getTargetPath(String filename) {
+//        return platform.getTargetPath() + File.separator + folder + File.separator + filename;
+//    }
+//
+//    public String getSourcePath(String filename) {
+//        return platform.getSourcePath() + File.separator + folder + File.separator + filename;
+//    }
 
-    public String getSourcePath(String filename) {
-        return platform.getSourcePath() + File.separator + folder + File.separator + filename;
-    }
+//    public String getRelativeHtmlTargetPath(String filename) {
+//        return "../../target/" + folder + "/" + filename;
+//    }
 
-    public String getRelativeHtmlTargetPath(String filename) {
-        return "../../target/" + folder + "/" + filename;
-    }
-
-    public String getTargetVolumePath(int volumeNumber) {
-        return getTargetPath(getTargetVolumeName(volumeNumber));
-    }
+//    public String getTargetVolumePath(int volumeNumber) {
+//        return getTargetPath(getTargetVolumeName(volumeNumber));
+//    }
 
     public String getTargetVolumeName(int volumeNumber) {
         return folder + volumeNumber + ".html";
     }
 
-    public String getSourceVolumePath(int volumeNumber) {
-        return getSourcePath(getSourceVolumeName(volumeNumber));
-    }
+//    public String getSourceVolumePath(int volumeNumber) {
+//        return getSourcePath(getSourceVolumeName(volumeNumber));
+//    }
 
     public String getSourceVolumeName(int volumeNumber) {
         return folder + volumeNumber + ".txt";
     }
 
-    public String getContentsName() {
-        return code + "-contents.html";
-    }
+//    public String getContentsName() {
+//        return code + "-contents.html";
+//    }
 
-    public String getIndexFilePath() {
-        return getTargetPath("index-" + code.toLowerCase() + ".idx");
-    }
+//    public String getIndexFilePath() {
+//        return getTargetPath("index-" + code.toLowerCase() + ".idx");
+//    }
 
     public boolean isMinistry() {
         return isMinistry;

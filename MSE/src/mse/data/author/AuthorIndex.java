@@ -2,6 +2,7 @@ package mse.data.author;
 
 import mse.common.log.ILogger;
 import mse.common.log.LogLevel;
+import mse.helpers.FileHelper;
 
 import java.io.*;
 import java.util.HashMap;
@@ -48,19 +49,21 @@ public class AuthorIndex {
         return references.get(key);
     }
 
-    public void loadIndex() {
+    public void loadIndex(String resDir) {
+
+        String indexFilePath = resDir + File.separator + FileHelper.getIndexFilePath(author, File.separator);
 
         // try to load the index of the current author
         try {
-            InputStream inStream = new FileInputStream(author.getIndexFilePath());
+            InputStream inStream = new FileInputStream(indexFilePath);
             BufferedInputStream bInStream = new BufferedInputStream(inStream);
             ObjectInput input = new ObjectInputStream(bInStream);
             this.tokenCountMap = (HashMap<String, Integer>) input.readObject();
             this.references = (HashMap<String, short[]>) input.readObject();
         } catch (FileNotFoundException fnfe) {
-            logger.log(LogLevel.HIGH, "Could not find index file: " + author.getIndexFilePath());
+            logger.log(LogLevel.HIGH, "Could not find index file: " + indexFilePath);
         } catch (IOException ioe) {
-            logger.log(LogLevel.HIGH, "Error loading from: " + author.getIndexFilePath());
+            logger.log(LogLevel.HIGH, "Error loading from: " + indexFilePath);
         } catch (ClassCastException cce) {
             logger.log(LogLevel.HIGH, "Error casting class when loading new index");
         } catch (ClassNotFoundException cnfe) {

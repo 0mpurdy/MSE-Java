@@ -5,7 +5,9 @@ import mse.common.log.ILogger;
 import mse.common.log.LogLevel;
 import mse.data.author.Author;
 import mse.data.author.AuthorIndex;
+import mse.helpers.FileHelper;
 
+import java.io.File;
 import java.util.HashMap;
 
 /**
@@ -31,9 +33,9 @@ public class IndexStore {
 
         if (authorIndex == null) {
             authorIndex = new AuthorIndex(author, logger);
-            authorIndex.loadIndex();
+            authorIndex.loadIndex(cfg.getResDir());
             authorIndexes.put(author.getCode(), authorIndex);
-            logger.log(LogLevel.TRACE, "\tLoading Index: " + authorIndex.getAuthorName() + " from: " + authorIndex.getAuthor().getIndexFilePath());
+            logger.log(LogLevel.TRACE, "\tLoading Index: " + authorIndex.getAuthorName() + " from: " + cfg.getResDir() + FileHelper.getIndexFilePath(authorIndex.getAuthor(), File.separator));
             logger.log(LogLevel.TRACE, "\tIndex count: " + authorIndex.getTokenCountMap().keySet().size());
         }
 
