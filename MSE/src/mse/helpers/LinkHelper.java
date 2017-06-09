@@ -37,7 +37,7 @@ public class LinkHelper {
 //            return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum + ":" + (sentenceNum - 1);
 //        }
 
-        return "../../" + FileHelper.getHtmlFilePath(author, volume, "/") + "#" + page;
+        return "../../" + FileHelper.getHtmlFile(author, volume, "/") + "#" + page;
     }
 
 }

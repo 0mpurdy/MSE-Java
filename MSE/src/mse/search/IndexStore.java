@@ -35,7 +35,7 @@ public class IndexStore {
             authorIndex = new AuthorIndex(author, logger);
             authorIndex.loadIndex(cfg.getResDir());
             authorIndexes.put(author.getCode(), authorIndex);
-            logger.log(LogLevel.TRACE, "\tLoading Index: " + authorIndex.getAuthorName() + " from: " + cfg.getResDir() + FileHelper.getIndexFilePath(authorIndex.getAuthor(), File.separator));
+            logger.log(LogLevel.TRACE, "\tLoading Index: " + authorIndex.getAuthorName() + " from: " + cfg.getResDir() + FileHelper.getIndexFile(authorIndex.getAuthor(), File.separator));
             logger.log(LogLevel.TRACE, "\tIndex count: " + authorIndex.getTokenCountMap().keySet().size());
         }
 

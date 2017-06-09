@@ -12,15 +12,23 @@ import mse.data.author.HymnBook;
 public abstract class FileHelper {
 
     /**
-     * Get the path to an html file, relative to the res directory
-     * eg target/fer/fer4.html
+     * Get the path to the source folder of an author, relative to the res directory
+     * eg target/fer
      *
-     * @param author author of the file
-     * @param volNum volume number of the file
-     * @return the name of the file
+     * @param author
+     * @return
      */
-    public static String getHtmlFilePath(Author author, int volNum, String fileSeparator) {
-        return getTargetFolder(author, fileSeparator) + fileSeparator + getHtmlFileName(author, volNum);
+    public static String getSourceFolder(Author author, String fileSeparator) {
+        return getSourceFolder() + fileSeparator + author.getFolder();
+    }
+
+    /**
+     * Get the source folder name
+     *
+     * @return name of the source folder
+     */
+    public static String getSourceFolder() {
+        return "source";
     }
 
     /**
@@ -31,32 +39,16 @@ public abstract class FileHelper {
      * @return
      */
     public static String getTargetFolder(Author author, String fileSeparator) {
-        return "target" + fileSeparator + author.getFolder();
+        return getTargetFolder() + fileSeparator + author.getFolder();
     }
 
     /**
-     * Get the name of an html file
-     * eg fer4.html
+     * Get the target folder name
      *
-     * @param author author of the file
-     * @param volNum volume number of the file
-     * @return the name of the file
+     * @return name of the target folder
      */
-    public static String getHtmlFileName(Author author, int volNum) {
-        String filename;
-
-        switch (author) {
-            case BIBLE:
-                filename = BibleBook.values()[volNum - 1].getTargetFilename();
-                break;
-            case HYMNS:
-                filename = HymnBook.values()[volNum - 1].getTargetFilename();
-                break;
-            default:
-                filename = author.getTargetVolumeName(volNum);
-
-        }
-        return filename;
+    public static String getTargetFolder() {
+        return "target";
     }
 
     /**
@@ -67,19 +59,8 @@ public abstract class FileHelper {
      * @param volNum the volume number of the file
      * @return the path to the text file
      */
-    public static String getTextFilePath(Author author, int volNum, String fileSeparator) {
-        return getSourceFolder(author, fileSeparator) + fileSeparator + getTextFileName(author, volNum);
-    }
-
-    /**
-     * Get the path to the source folder of an author, relative to the res directory
-     * eg target/fer
-     *
-     * @param author
-     * @return
-     */
-    public static String getSourceFolder(Author author, String fileSeparator) {
-        return "source" + fileSeparator + author.getFolder();
+    public static String getTextFile(Author author, int volNum, String fileSeparator) {
+        return getSourceFolder(author, fileSeparator) + fileSeparator + getTextFile(author, volNum);
     }
 
     /**
@@ -90,7 +71,7 @@ public abstract class FileHelper {
      * @param volNum the volume number of the file
      * @return the name of the text file
      */
-    public static String getTextFileName(Author author, int volNum) {
+    public static String getTextFile(Author author, int volNum) {
         String filename;
 
         switch (author) {
@@ -108,13 +89,50 @@ public abstract class FileHelper {
     }
 
     /**
+     * Get the path to an html file, relative to the res directory
+     * eg target/fer/fer4.html
+     *
+     * @param author author of the file
+     * @param volNum volume number of the file
+     * @return the name of the file
+     */
+    public static String getHtmlFile(Author author, int volNum, String fileSeparator) {
+        return getTargetFolder(author, fileSeparator) + fileSeparator + getHtmlFile(author, volNum);
+    }
+
+    /**
+     * Get the name of an html file
+     * eg fer4.html
+     *
+     * @param author author of the file
+     * @param volNum volume number of the file
+     * @return the name of the file
+     */
+    public static String getHtmlFile(Author author, int volNum) {
+        String filename;
+
+        switch (author) {
+            case BIBLE:
+                filename = BibleBook.values()[volNum - 1].getTargetFilename();
+                break;
+            case HYMNS:
+                filename = HymnBook.values()[volNum - 1].getTargetFilename();
+                break;
+            default:
+                filename = author.getTargetVolumeName(volNum);
+
+        }
+        return filename;
+    }
+
+    /**
      * Get the path to the index folder, relative to the res directory
      *
      * @param author
      * @return
      */
-    public static String getIndexFilePath(Author author, String fileSeparator) {
-        return getTargetFolder(author, fileSeparator) + fileSeparator + "index-" + author.getCode().toLowerCase() + ".idx";
+    public static String getIndexFile(Author author, String fileSeparator) {
+        return getTargetFolder(author, fileSeparator) + fileSeparator + getIndexFile(author);
     }
 
     /**
@@ -123,18 +141,8 @@ public abstract class FileHelper {
      * @param author
      * @return
      */
-    public static String getIndexFileName(Author author) {
+    public static String getIndexFile(Author author) {
         return "index-" + author.getCode().toLowerCase() + ".idx";
-    }
-
-    /**
-     * Get the name of an author's contents page
-     *
-     * @param author
-     * @return
-     */
-    public static String getContentsFileName(Author author) {
-        return author.getCode().toLowerCase() + "-contents.html";
     }
 
     /**
@@ -143,8 +151,18 @@ public abstract class FileHelper {
      * @param author
      * @return
      */
-    public static String getContentsFilePath(Author author, String fileSeparator) {
-        return getTargetFolder(author, fileSeparator) + fileSeparator + author.getCode().toLowerCase() + "-contents.html";
+    public static String getContentsFile(Author author, String fileSeparator) {
+        return getTargetFolder(author, fileSeparator) + fileSeparator + getContentsFile(author);
+    }
+
+    /**
+     * Get the name of an author's contents page
+     *
+     * @param author
+     * @return
+     */
+    public static String getContentsFile(Author author) {
+        return author.getCode().toLowerCase() + "-contents.html";
     }
 
 }

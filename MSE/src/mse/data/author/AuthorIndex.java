@@ -51,7 +51,7 @@ public class AuthorIndex {
 
     public void loadIndex(String resDir) {
 
-        String indexFilePath = resDir + File.separator + FileHelper.getIndexFilePath(author, File.separator);
+        String indexFilePath = resDir + File.separator + FileHelper.getIndexFile(author, File.separator);
 
         // try to load the index of the current author
         try {

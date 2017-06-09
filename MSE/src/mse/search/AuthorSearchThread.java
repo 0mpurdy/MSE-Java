@@ -135,7 +135,7 @@ public class AuthorSearchThread extends SingleSearchThread {
         searchLog.add(new LogRow(LogLevel.TRACE, "\tVol: " + currentVolumeNumber));
 
         // open the file
-        String filename = cfg.getResDir() + File.separator + FileHelper.getHtmlFilePath(asc.author, currentVolumeNumber, File.separator);
+        String filename = cfg.getResDir() + File.separator + FileHelper.getHtmlFile(asc.author, currentVolumeNumber, File.separator);
         IFileReader fReader = new HtmlReader(filename, searchLog);
 
         // read first line
