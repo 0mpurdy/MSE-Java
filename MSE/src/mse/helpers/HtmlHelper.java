@@ -62,20 +62,26 @@ public class HtmlHelper {
         return header;
     }
 
+    /**
+     * Print the title of the author and the words that were searched within that author
+     * @param author Name of the author
+     * @param searchWords Words that were searched
+     * @return String HTML header for the author results section
+     */
     public static String getAuthorResultsHeader(Author author, String searchWords) {
         // print the title of the author search results and search words
-
-        String temp;
-        if (author.isMinistry() || author == Author.BIBLE) {
-            temp = " left-aligned";
-        } else {
-            temp = " centered";
-        }
-        final String extraClass = temp;
-
         return "\t\t<hr>\n\t\t<h1>Results of search through " + author.getName() + "</h1>\n" +
-                "\t\t<p>Searched: " + searchWords + "</p>\n" +
-                "\t\t<div class=\"container" + extraClass + "\">";
+                "\t\t<p>Searched: " + searchWords + "</p>\n";
+    }
+
+    /**
+     * Get the opening of the container that contains the author's results
+     * @param author Author that the results pertain to
+     * @return String HTML opening tag for the author results container
+     */
+    public static String getAuthorResultsContainerOpen(Author author) {
+        final String extraClass = (author.isMinistry() || author == Author.BIBLE) ? " left-aligned" : " centered";
+        return "\t\t<div class=\"container" + extraClass + "\">";
     }
 
     public static String getFormattedHymnbookLink(AuthorSearchCache asc) {
@@ -133,7 +139,7 @@ public class HtmlHelper {
     }
 
     public static String getSingleAuthorResults(String name, int numResults) {
-        return "\t\t<div class=\"spaced\">Number of results for " + name + ": " + numResults + "</div>";
+        return "\t\t<div class=\"spaced\">Number of results: " + numResults + "</div>";
     }
 
     // endregion

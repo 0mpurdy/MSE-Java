@@ -91,7 +91,7 @@ public class Result implements IResult {
         text = lines[2].replace("<br>", "\n");
         text = HtmlHelper.removeTabs(HtmlHelper.removeHtml(text));
 
-        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".htm"));
+        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".html"));
         String hymnNumber = link.substring(link.lastIndexOf("#") + 1);
 
         int volNum = HymnBook.getIndexFromString(bookName) + 1;
@@ -106,7 +106,7 @@ public class Result implements IResult {
         String link = HtmlHelper.extractFirstLink(lines[1]);
         text = HtmlHelper.removeTabs(HtmlHelper.removeHtml(lines[2]));
 
-        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".htm"));
+        String bookName = link.substring(link.lastIndexOf("/") + 1, link.indexOf(".html"));
         String pageNumberString = link.substring(link.lastIndexOf("#") + 1);
 
         int volNum = getMinistryBookNumber(bookName);

@@ -25,7 +25,7 @@ public class Config {
 
     private Logger logger;
 
-    private static final String mseVersion = "3.0.4";
+    private static final String mseVersion = "3.0.5";
     private String resDir;
     private String resultsFileName;
     private String searchString;
@@ -100,7 +100,7 @@ public class Config {
     private void setDefaults() {
 
         resDir = "res";
-        resultsFileName = "SearchResults.htm";
+        resultsFileName = "search-results.html";
         searchString = "";
         searchType = SearchType.MATCH;
 

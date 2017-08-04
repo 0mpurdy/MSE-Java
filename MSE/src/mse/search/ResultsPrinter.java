@@ -61,15 +61,17 @@ public class ResultsPrinter {
                     // write the author header
                     pwResults.println(HtmlHelper.getAuthorResultsHeader(asc.author, asc.printableSearchWords()));
 
+                    // write the number of results for the author
+                    pwResults.println(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
+
+                    pwResults.println(HtmlHelper.getAuthorResultsContainerOpen(asc.author));
+
                     // write all the results / errors
                     for (IResult result : nextThread.getResults()) {
                         pwResults.println(result.getBlock());
                     }
 
                     HtmlHelper.closeAuthorContainer(pwResults);
-
-                    // write the number of results for the author
-                    pwResults.println(HtmlHelper.getSingleAuthorResults(asc.getAuthorName(), asc.numAuthorResults));
 
                     // write the log
                     nextThread.getLog().forEach(logger::log);
