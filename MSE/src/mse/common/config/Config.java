@@ -25,13 +25,14 @@ public class Config {
 
     private Logger logger;
 
-    private static final String mseVersion = "3.0.4";
-    private String resDir;
-    private String resultsFileName;
+    private static final String mseVersion = "3.0.5";
     private String searchString;
     private SearchType searchType;
     private HashMap<String, Boolean> selectedAuthors;
     private boolean setup;
+
+    // todo fix laziness
+    public FileConfig fileConfig;
 
     public Config(Logger logger) {
 
@@ -51,14 +52,12 @@ public class Config {
 
             // skip mse Version
             br.readLine();
-            resDir = getNextOption(br, "resDir");
 
-            // remove unnecessary trailing /
-            if (resDir.endsWith("/") || resDir.endsWith("\\")) {
-                resDir = resDir.substring(0, resDir.length() - 1);
-            }
+            // set up FileConfig
+            fileConfig = new FileConfig();
+            fileConfig.setResDir(getNextOption(br, "resDir"));
+            fileConfig.setResultsFileName(getNextOption(br, "resultsFileName"));
 
-            resultsFileName = getNextOption(br, "resultsFileName");
             searchString = getNextOption(br, "searchString");
             searchType = SearchType.fromString(getNextOption(br, "searchType"));
             if (searchType == null) searchType = SearchType.MATCH;
@@ -99,8 +98,7 @@ public class Config {
 
     private void setDefaults() {
 
-        resDir = "res";
-        resultsFileName = "SearchResults.htm";
+        fileConfig = new FileConfig();
         searchString = "";
         searchType = SearchType.MATCH;
 
@@ -124,8 +122,8 @@ public class Config {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(configFile))) {
 
                 writeOption(bw, "mseVersion", mseVersion);
-                writeOption(bw, "resDir", resDir);
-                writeOption(bw, "resultsFileName", resultsFileName);
+                writeOption(bw, "resDir", fileConfig.getResDir());
+                writeOption(bw, "resultsFileName", fileConfig.getResultsFileName());
                 writeOption(bw, "searchString", searchString);
                 writeOption(bw, "searchType", searchType.getMenuName());
 
@@ -159,15 +157,15 @@ public class Config {
     }
 
     public String getResDir() {
-        return resDir;
+        return fileConfig.getResDir();
     }
 
     public String getResultsFile() {
-        return "target" + File.separator + "results" + File.separator + resultsFileName;
+        return "target" + File.separator + "results" + File.separator + fileConfig.getResultsFileName();
     }
 
     public void setResultsFileName(String resultsFileName) {
-        this.resultsFileName = resultsFileName;
+        this.fileConfig.setResultsFileName(resultsFileName);
     }
 
     public String getSearchString() {
