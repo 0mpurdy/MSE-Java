@@ -203,6 +203,11 @@ public class HtmlHelper {
 
     // region tokenHelp
 
+    /**
+     * Remove the HTML and split the line into tokens by non-word characters
+     * @param line The line to tokenize
+     * @return String[] tokens
+     */
     public static String[] tokenizeLine(String line) {
         line = removeHtml(line);
 
