@@ -17,10 +17,7 @@ import mse.common.config.Config;
 import mse.common.log.LogLevel;
 import mse.common.log.LogRow;
 import mse.data.author.Author;
-import mse.data.search.ErrorResult;
-import mse.data.search.IResult;
-import mse.data.search.Result;
-import mse.data.search.SearchType;
+import mse.data.search.*;
 import mse.helpers.IFileReader;
 import mse.helpers.FileHelper;
 import mse.helpers.HtmlHelper;
@@ -37,6 +34,8 @@ public class AuthorSearchThread extends SingleSearchThread {
     private AuthorSearchCache asc;
     private ArrayList<IResult> authorResults;
     private AtomicInteger progress;
+    private ArrayList<String> sentences = new ArrayList<>();
+
 
     public AuthorSearchThread(Config cfg, AuthorSearchCache asc, AtomicInteger progress) {
         this.cfg = cfg;
@@ -271,7 +270,6 @@ public class AuthorSearchThread extends SingleSearchThread {
                 validScope = asc.getSearchType().search(tokenizedLine, asc.getSearchTokens());
             }
 
-
             // if the current scope contains all search terms mark them and print it out (or one if it is a wildcard search)
             if (validScope) {
 
@@ -350,8 +348,6 @@ public class AuthorSearchThread extends SingleSearchThread {
         return "";
     }
 
-    private ArrayList<String> sentences = new ArrayList<>();
-
     private ArrayList<String> convertLineIntoSentences(String line, String trailingIncompleteSentence) {
 
         sentences.clear();
@@ -383,9 +379,16 @@ public class AuthorSearchThread extends SingleSearchThread {
 
         }
 
-        if (sentences.size() > 0) sentences.set(0, trailingIncompleteSentence + " " + sentences.get(0));
+        prependTrailingIncompleteSentence(sentences, trailingIncompleteSentence);
 
         return sentences;
+    }
+
+    private ArrayList<String> prependTrailingIncompleteSentence(ArrayList<String> scopes, String trailingIncompleteSentence) {
+        if (scopes.size() > 0) {
+            scopes.set(0, trailingIncompleteSentence + scopes.get(0));
+        }
+        return scopes;
     }
 
     private String getBasicWords(String strIn, boolean dropPunctuation, boolean dropTableTags) {
