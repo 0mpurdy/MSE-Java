@@ -25,6 +25,9 @@ public class LinkHelper {
      * Get the Html link from a ministry search result to the location it references
      * eg ../../target/fer/fer1.html#170
      *
+     * If it's not the first section, also add the section number
+     * eg ../../target/jnd/jnd30.html#8:18
+     *
      * @param author author of the result
      * @param volume volume the result is in
      * @param page page the result is on
@@ -32,10 +35,9 @@ public class LinkHelper {
      * @return link to the referenced result
      */
     public static String getMinistryHtmlLink(Author author, int volume, int page, int section) {
-        // todo add section
-//        if ((sentenceNum - 1) > 0) {
-//            return author.getRelativeHtmlTargetPath(getFileName()) + "#" + pageNum + ":" + (sentenceNum - 1);
-//        }
+        if ((section) > 0) {
+            return "../../" + FileHelper.getHtmlFile(author, volume, "/") + "#" + page +  ":" + section;
+        }
 
         return "../../" + FileHelper.getHtmlFile(author, volume, "/") + "#" + page;
     }
