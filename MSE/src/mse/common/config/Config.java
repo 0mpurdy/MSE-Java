@@ -25,7 +25,7 @@ public class Config {
 
     private Logger logger;
 
-    private static final String mseVersion = "3.0.5";
+    private static final String mseVersion = "3.0.6";
     private String resDir;
     private String resultsFileName;
     private String searchString;
