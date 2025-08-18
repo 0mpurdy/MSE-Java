@@ -1,16 +1,16 @@
-package mse.refine;
+package com.zerompurdy.mse.refine;
 
-import mse.common.config.Config;
-import mse.common.log.ILogger;
-import mse.common.log.LogLevel;
-import mse.common.log.LogRow;
-import mse.data.author.Author;
-import mse.data.search.AuthorResults;
-import mse.data.search.Result;
-import mse.helpers.HtmlHelper;
-import mse.helpers.HtmlReader;
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.ILogger;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.search.AuthorResults;
+import com.zerompurdy.mse.data.search.Result;
+import com.zerompurdy.mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.helpers.HtmlReader;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

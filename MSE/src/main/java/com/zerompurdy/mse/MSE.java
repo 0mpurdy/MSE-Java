@@ -1,41 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package mse;
+package com.zerompurdy.mse;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
-import java.io.File;
+import java.io.IOException;
 
-/**
- *
- * @author mj_pu_000
- */
 public class MSE extends Application {
-
     @Override
-    public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("fxml/FXMLSearch.fxml"));
-
-        Scene scene = new Scene(root);
-
-        stage.getIcons().add(new Image(MSE.class.getResourceAsStream("/favicon.png")));
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(MSE.class.getResource("FXMLSearch.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        stage.setTitle("MSE");
         stage.setScene(scene);
         stage.show();
     }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-    
 }

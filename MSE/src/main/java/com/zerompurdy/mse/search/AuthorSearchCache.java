@@ -1,15 +1,15 @@
-package mse.search;
+package com.zerompurdy.mse.search;
+
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.author.AuthorIndex;
+import com.zerompurdy.mse.data.search.Reference;
+import com.zerompurdy.mse.data.search.Search;
+import com.zerompurdy.mse.data.search.SearchType;
+import com.zerompurdy.mse.helpers.HtmlHelper;
 
 import java.util.ArrayList;
-
-import mse.common.config.Config;
-import mse.common.log.LogRow;
-import mse.data.author.Author;
-import mse.data.author.AuthorIndex;
-import mse.data.search.Reference;
-import mse.data.search.Search;
-import mse.data.search.SearchType;
-import mse.helpers.HtmlHelper;
 
 /**
  * Cache for storing search parameters

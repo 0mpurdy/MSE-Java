@@ -1,7 +1,7 @@
-package mse.data.search;
+package com.zerompurdy.mse.data.search;
 
-import mse.data.author.Author;
-import mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.helpers.HtmlHelper;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;

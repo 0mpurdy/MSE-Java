@@ -1,8 +1,8 @@
-package mse.data.author;
+package com.zerompurdy.mse.data.author;
 
-import mse.common.log.ILogger;
-import mse.common.log.LogLevel;
-import mse.helpers.FileHelper;
+import com.zerompurdy.mse.common.log.ILogger;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.helpers.FileHelper;
 
 import java.io.*;
 import java.util.HashMap;

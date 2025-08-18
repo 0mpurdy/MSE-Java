@@ -3,25 +3,27 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mse.search;
+package com.zerompurdy.mse.search;
 
 //java
+
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.search.ErrorResult;
+import com.zerompurdy.mse.data.search.IResult;
+import com.zerompurdy.mse.data.search.Result;
+import com.zerompurdy.mse.data.search.SearchType;
+import com.zerompurdy.mse.helpers.FileHelper;
+import com.zerompurdy.mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.helpers.HtmlReader;
+import com.zerompurdy.mse.helpers.IFileReader;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-
-// mse
-import mse.common.config.Config;
-import mse.common.log.LogLevel;
-import mse.common.log.LogRow;
-import mse.data.author.Author;
-import mse.data.search.*;
-import mse.helpers.IFileReader;
-import mse.helpers.FileHelper;
-import mse.helpers.HtmlHelper;
-import mse.helpers.HtmlReader;
 
 /**
  * @author Michael Purdy

@@ -1,6 +1,6 @@
-package mse.helpers;
+package com.zerompurdy.mse.helpers;
 
-import mse.data.author.Author;
+import com.zerompurdy.mse.data.author.Author;
 
 /**
  * Created by mj_pu_000 on 07/06/2017.

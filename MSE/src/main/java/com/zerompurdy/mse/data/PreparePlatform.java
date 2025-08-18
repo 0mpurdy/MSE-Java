@@ -1,4 +1,4 @@
-//package mse.data;
+package com.zerompurdy.mse.data;//package mse.data;
 //
 //import mse.helpers.FileHelper;
 //import java.io.File;

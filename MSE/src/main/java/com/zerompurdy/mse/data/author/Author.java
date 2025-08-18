@@ -1,6 +1,6 @@
-package mse.data.author;
+package com.zerompurdy.mse.data.author;
 
-//import mse.data.PreparePlatform;
+//import com.zerompurdy.mse.data.PreparePlatform;
 //
 //import java.io.File;
 

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package mse.common.config;
+package com.zerompurdy.mse.common.config;
 
-import mse.common.log.LogLevel;
-import mse.common.log.Logger;
-import mse.data.author.Author;
-import mse.data.search.SearchType;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.Logger;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.search.SearchType;
 
 import java.io.*;
 import java.util.HashMap;

@@ -1,17 +1,16 @@
-package mse.search;
+package com.zerompurdy.mse.search;
 
-import mse.common.config.Config;
-import mse.common.log.ILogger;
-import mse.common.log.LogLevel;
-import mse.common.log.LogRow;
-import mse.data.author.Author;
-import mse.data.author.AuthorIndex;
-import mse.data.search.IResult;
-import mse.data.search.Search;
-import mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.ILogger;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.author.AuthorIndex;
+import com.zerompurdy.mse.data.search.Search;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 

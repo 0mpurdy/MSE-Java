@@ -1,9 +1,9 @@
-package mse.data.search;
+package com.zerompurdy.mse.data.search;
 
-import mse.data.author.BibleBook;
-import mse.data.author.HymnBook;
-import mse.data.author.Author;
-import mse.helpers.LinkHelper;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.author.BibleBook;
+import com.zerompurdy.mse.data.author.HymnBook;
+import com.zerompurdy.mse.helpers.LinkHelper;
 
 /**
  * A reference to a search result

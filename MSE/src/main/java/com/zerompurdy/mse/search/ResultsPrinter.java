@@ -1,11 +1,11 @@
-package mse.search;
+package com.zerompurdy.mse.search;
 
-import mse.common.config.Config;
-import mse.common.log.ILogger;
-import mse.common.log.LogLevel;
-import mse.data.search.IResult;
-import mse.data.search.Search;
-import mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.ILogger;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.data.search.IResult;
+import com.zerompurdy.mse.data.search.Search;
+import com.zerompurdy.mse.helpers.HtmlHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;

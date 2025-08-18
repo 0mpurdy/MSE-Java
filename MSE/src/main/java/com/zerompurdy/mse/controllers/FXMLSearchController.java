@@ -1,42 +1,38 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package mse.controllers;
+package com.zerompurdy.mse.controllers;
 
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
-import mse.common.config.Config;
-import mse.common.log.LogLevel;
-import mse.common.log.Logger;
-import mse.data.search.Search;
-import mse.data.search.SearchType;
-import mse.helpers.FileHelper;
-import mse.helpers.HtmlHelper;
-import mse.refine.RefineThread;
-import mse.search.*;
+import javafx.scene.layout.GridPane;
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.Logger;
+import com.zerompurdy.mse.data.Map;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.search.Search;
+import com.zerompurdy.mse.data.search.SearchType;
+import com.zerompurdy.mse.helpers.FileHelper;
+import com.zerompurdy.mse.helpers.HtmlHelper;
+import com.zerompurdy.mse.helpers.OpenFileHandler;
+import com.zerompurdy.mse.refine.RefineThread;
+import com.zerompurdy.mse.search.IndexStore;
+import com.zerompurdy.mse.search.SearchProgressThread;
+import com.zerompurdy.mse.search.SearchThread;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.layout.GridPane;
-import mse.data.author.Author;
-import mse.data.Map;
-import mse.helpers.OpenFileHandler;
 
 /**
  * @author michael

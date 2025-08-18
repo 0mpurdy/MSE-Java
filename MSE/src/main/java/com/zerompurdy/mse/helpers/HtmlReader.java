@@ -1,9 +1,9 @@
-package mse.helpers;
+package com.zerompurdy.mse.helpers;
 
-import mse.common.log.LogLevel;
-import mse.common.log.LogRow;
-import mse.data.author.Author;
-import mse.search.AuthorSearchCache;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.search.AuthorSearchCache;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

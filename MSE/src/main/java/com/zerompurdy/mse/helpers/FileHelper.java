@@ -1,8 +1,8 @@
-package mse.helpers;
+package com.zerompurdy.mse.helpers;
 
-import mse.data.author.Author;
-import mse.data.author.BibleBook;
-import mse.data.author.HymnBook;
+import com.zerompurdy.mse.data.author.Author;
+import com.zerompurdy.mse.data.author.BibleBook;
+import com.zerompurdy.mse.data.author.HymnBook;
 
 /**
  * @author Michael Purdy

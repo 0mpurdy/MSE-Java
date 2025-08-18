@@ -1,7 +1,7 @@
-package mse.search;
+package com.zerompurdy.mse.search;
 
-import mse.common.log.LogRow;
-import mse.data.search.IResult;
+import com.zerompurdy.mse.common.log.LogRow;
+import com.zerompurdy.mse.data.search.IResult;
 
 import java.util.ArrayList;
 

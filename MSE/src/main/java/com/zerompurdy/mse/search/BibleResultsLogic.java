@@ -1,4 +1,4 @@
-package mse.search;
+package com.zerompurdy.mse.search;
 
 /**
  * @author Michael Purdy

@@ -1,12 +1,12 @@
-package mse.helpers;
+package com.zerompurdy.mse.helpers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import mse.common.config.Config;
-import mse.common.log.LogLevel;
-import mse.common.log.Logger;
+import com.zerompurdy.mse.common.config.Config;
+import com.zerompurdy.mse.common.log.LogLevel;
+import com.zerompurdy.mse.common.log.Logger;
 
-import java.awt.*;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 

@@ -1,4 +1,4 @@
-package mse.data;
+package com.zerompurdy.mse.data;
 
 
 /**

@@ -1,4 +1,4 @@
-package mse.data.search;
+package com.zerompurdy.mse.data.search;
 
 import java.util.ArrayList;
 

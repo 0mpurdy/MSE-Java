@@ -1,4 +1,4 @@
-package mse.search;
+package com.zerompurdy.mse.search;
 
 import javafx.application.Platform;
 import javafx.scene.control.Label;

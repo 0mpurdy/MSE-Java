@@ -1,4 +1,4 @@
-package mse.data;
+package com.zerompurdy.mse.data;
 
 /**
  * Created by mj_pu_000 on 23/10/2015.

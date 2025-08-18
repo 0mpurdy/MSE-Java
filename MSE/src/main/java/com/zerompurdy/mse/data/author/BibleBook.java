@@ -1,4 +1,4 @@
-package mse.data.author;
+package com.zerompurdy.mse.data.author;
 
 /**
  * @author Michael Purdy
