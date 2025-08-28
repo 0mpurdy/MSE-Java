@@ -48,6 +48,22 @@ jlink {
     imageZip.set(layout.buildDirectory.file("/distributions/app-${javafx.platform.classifier}.zip"))
     options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
     launcher {
-        name = "app"
+        name = "MSE"
+    }
+
+    jpackage {
+        imageName = "MSE"
+        installerName = "MSE-Installer"
+        appVersion = "3.1.0"
+        vendor = "Michael Purdy"
+        description = "Ministry Search Engine"
+
+        installerOptions.addAll(listOf(
+            "--win-dir-chooser",
+            "--win-menu",
+            "--win-shortcut"
+        ))
+
+        icon = "src/main/resources/icon.ico"
     }
 }
