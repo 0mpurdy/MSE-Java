@@ -1,6 +1,9 @@
 package com.zerompurdy.mse.common.log;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,7 +13,8 @@ import java.util.Date;
  */
 public class Logger implements ILogger {
 
-    public static final String DEFAULT_LOG = "log.txt";
+    public static final String DATA_DIRECTORY = System.getenv("APPDATA") + File.separator + "MSE";
+    public static final String DEFAULT_LOG = DATA_DIRECTORY + File.separator + "log.txt";
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     File loggingFile;
@@ -18,9 +22,13 @@ public class Logger implements ILogger {
     LogLevel logLevel;
 
     public Logger(LogLevel logLevel, String logFilePath) {
+        System.out.println("Setting up log file " + logFilePath);
+
 
         loggingFile = new File(logFilePath);
         try {
+            Path path = Paths.get(DATA_DIRECTORY);
+            Files.createDirectories(path);
             if (!loggingFile.exists()) {
                 loggingFile.createNewFile();
             }

@@ -18,6 +18,8 @@ import java.util.HashMap;
  */
 public class Config {
 
+    public static final String DATA_DIRECTORY = System.getenv("APPDATA") + File.separator + "MSE";
+
     // the number of times a word has to appear before it is too frequent
     public final int TOO_FREQUENT = 10000;
 
@@ -37,7 +39,7 @@ public class Config {
 
         this.logger = logger;
 
-        this.configFilePath = "config.txt";
+        this.configFilePath = DATA_DIRECTORY + File.separator + "config.txt";
 
         File configFile = new File(configFilePath);
         if (!configFile.exists()) {
@@ -86,7 +88,7 @@ public class Config {
     private String getNextOption(BufferedReader br, String optionName) throws IOException {
         String option = "";
         try {
-            option = br.readLine().split(":")[1];
+            option = br.readLine().split(":", 2)[1];
         } catch (ArrayIndexOutOfBoundsException ex) {
             logger.log(LogLevel.DEBUG, "No value found for config option " + optionName);
         }
@@ -99,7 +101,7 @@ public class Config {
 
     private void setDefaults() {
 
-        resDir = "res";
+        resDir = DATA_DIRECTORY + File.separator +  "res";
         resultsFileName = "search-results.html";
         searchString = "";
         searchType = SearchType.MATCH;
