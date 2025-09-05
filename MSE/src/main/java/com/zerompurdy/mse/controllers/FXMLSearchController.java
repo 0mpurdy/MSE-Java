@@ -1,5 +1,6 @@
 package com.zerompurdy.mse.controllers;
 
+import com.zerompurdy.mse.data.CopyResourcesThread;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,11 +25,12 @@ import com.zerompurdy.mse.refine.RefineThread;
 import com.zerompurdy.mse.search.IndexStore;
 import com.zerompurdy.mse.search.SearchProgressThread;
 import com.zerompurdy.mse.search.SearchThread;
+import javafx.stage.DirectoryChooser;
 
 import java.awt.Desktop;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -221,6 +223,50 @@ public class FXMLSearchController implements Initializable {
     public void handlesSearch(ActionEvent e) {
 
         logger.openLog();
+
+        if (!Files.exists(Paths.get(cfg.getResDir()))) {
+            logger.log(LogLevel.INFO, "Setting up resources directory");
+
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Open Resource File");
+            File selectedFile = directoryChooser.showDialog(progressBar.getScene().getWindow());
+
+            if (selectedFile == null) {
+                logger.log(LogLevel.HIGH, "Missing resources directory");
+                progressLabel.setText("You must select the resources after first load.");
+            } else {
+                logger.log(LogLevel.INFO, "Selected " + selectedFile.getAbsolutePath());
+
+                progressBar.setVisible(true);
+                progressBar.setProgress(0);
+
+                AtomicInteger progress = new AtomicInteger();
+
+                try {
+                    // probably inefficient to walk all twice but I like the idea of the progress bar
+                    long fileCount = Files.walk(Paths.get(selectedFile.getAbsolutePath()))
+                            .filter(Files::isRegularFile)
+                            .count();
+
+                    SearchProgressThread searchProgressThread = new SearchProgressThread(progressBar, progressLabel, progress, (int) fileCount);
+                    searchProgressThread.start();
+
+                    // start the thread to search
+                    CopyResourcesThread copyThread = new CopyResourcesThread(cfg, logger, progress, selectedFile.getAbsolutePath(), cfg.getResDir());
+                    copyThread.start();
+
+                } catch(IOException ioe){
+                    ioe.printStackTrace();
+
+                }
+
+                progressLabel.setText("After loading the resources for the first time, search again.");
+            }
+
+
+            return;
+        };
+
         progressBar.setVisible(false);
 
         // save new config
